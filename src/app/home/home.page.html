@@ -1,17 +1,64 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+<ion-header>
+  <ion-toolbar #headerToolbar>
+    @if ((this.headerConfig?.secondaryImage?.trim() === '' ||
+    this.headerConfig?.secondaryImage === null) &&
+    (headerConfig?.mainImagePosition === 'center')) {
+    <ion-title style="text-align: center; display: contents">
+      <img [src]="this.headerConfig?.mainImage" alt="Logo" class="main-image"
+    /></ion-title>
+    } @else { @if (this.headerConfig?.mainImage?.trim() !== '' &&
+    this.headerConfig?.mainImage) {}
+    <img
+      [src]="this.headerConfig?.mainImage"
+      alt="Logo"
+      class="main-image"
+      [slot]="headerConfig?.mainImagePosition === 'left'
+        ? 'start'
+        : headerConfig?.mainImagePosition === 'right'
+        ? 'end'
+        : 'primary'"
+    />
+    @if (this.headerConfig?.secondaryImage?.trim() !== '' &&
+    this.headerConfig?.secondaryImage) {<img
+      [src]="this.headerConfig?.secondaryImage"
+      alt="Logo"
+      class="secondary-image"
+      slot="secondary"
+    />} }
+
+    <ion-buttons slot="end">
+      <ion-button>
+        <ion-icon name="settings-outline" color="dark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <div class="element-container">
+    <app-page-element
+      [type]="'tracking'"
+      [title]="'TRACKING'"
+      [subtitle]="'Follow your Favorites'"
+      [backgroundColor]="'#2a7b9b'"
+      [backgroundImage]="'https://cdn.outsideonline.com/wp-content/uploads/2021/11/boston-marathon-elite-men-start-line_h.jpg'"
+      [textColor]="'#ece4e4'"
+      [icon]="'https://unpkg.com/ionicons@7.1.0/dist/svg/analytics-outline.svg'"
+    ></app-page-element>
+    @if (newsElementModel) {
+    <app-page-element
+      [type]="'news'"
+      [title]="newsElementModel.title"
+      [subtitle]="newsElementModel.subtitle"
+      [backgroundColor]="newsElementModel.backgroundColor"
+      [backgroundImage]="newsElementModel.backgroundImage"
+      [textColor]="newsElementModel.textColor"
+      [icon]="newsElementModel.icon"
+    ></app-page-element>
+    }
+    <app-page-element
+      [type]="'info'"
+      [infoChildElementModelArray]="infoChildElementModelArray"
+    ></app-page-element>
+  </div>
 </ion-content>

@@ -1,0 +1,8 @@
+<div class="info-row" role="list">
+  @for (infoChildElementModel of infoChildElementModelArray; track $index) {
+  <app-info-child
+    [infoChildElementModel]="infoChildElementModel"
+    role="listitem"
+  ></app-info-child>
+  }
+</div>

@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar #headerToolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()"></ion-back-button
+    ></ion-buttons>
+    <ion-title>{{ info?.title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  @if (info?.image && info?.image?.trim() !== '') {
+  <div class="image-container">
+    <img [src]="info?.image" alt="Info Image" />
+  </div>
+  } @if (info?.link && info?.link?.trim()!=='') {
+  <div class="link-container">
+    <ion-button expand="full" (click)="navigateToLink(info?.link)" #infoButton
+      >Περισσότερες Πληροφορίες</ion-button
+    >
+  </div>
+  }
+  <div class="info-description" [innerHTML]="info?.content"></div>
+</ion-content>

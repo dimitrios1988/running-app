@@ -1,0 +1,20 @@
+:host {
+  --main-image-width: 0px;
+  --secondary-image-width: 0px;
+}
+.element-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0.7rem;
+  gap: 0.8rem;
+}
+
+.main-image {
+  width: var(--main-image-width);
+  height: auto;
+}
+
+.secondary-image {
+  width: var(--secondary-image-width);
+  height: auto;
+}

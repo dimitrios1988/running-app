@@ -12,6 +12,13 @@ export const routes: Routes = [
           import('../home/home.page').then((m) => m.HomePage),
       },
       {
+        path: 'home/info/viewer/:id',
+        loadComponent: () =>
+          import('../home/info/info.viewer/info.viewer.component').then(
+            (m) => m.InfoViewerComponent
+          ),
+      },
+      {
         path: 'tab2',
         loadComponent: () =>
           import('../tab2/tab2.page').then((m) => m.Tab2Page),

@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  app_url: 'https://liveprint.zefksisconsulting.gr/',
+  app_name: 'mobile_app_manager',
+  user: 'mobile_app',
+  password: 'mobile_app',
 };
 
 /*

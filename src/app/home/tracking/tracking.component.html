@@ -1,0 +1,28 @@
+<button
+  type="button"
+  #trackingElement
+  class="tracking-element"
+  (click)="navigateToTracking()"
+>
+  <img
+    [src]="backgroundImage"
+    alt="Tracking Header Image"
+    class="background-image"
+  />
+  <div class="title-row">
+    <div class="icon-column">
+      <img #trackingIcon [src]="icon" width="32" alt="" />
+    </div>
+    <div class="title-column">
+      <span class="title">{{ title }}</span>
+      <span class="subtitle">{{ subtitle }}</span>
+    </div>
+    <div class="arrow-column">
+      <ion-icon
+        name="chevron-forward-outline"
+        aria-hidden="true"
+        class="right-arrow"
+      ></ion-icon>
+    </div>
+  </div>
+</button>

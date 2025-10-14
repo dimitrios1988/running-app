@@ -1,0 +1,24 @@
+@switch (type) { @case ('tracking') {
+<app-tracking
+  [title]="title"
+  [backgroundColor]="backgroundColor"
+  [backgroundImage]="backgroundImage"
+  [icon]="icon"
+  [subtitle]="subtitle"
+  [textColor]="textColor"
+  [title]="title"
+></app-tracking>
+} @case ('news') {
+<app-news
+  [title]="title"
+  [subtitle]="subtitle"
+  [backgroundColor]="backgroundColor"
+  [backgroundImage]="backgroundImage"
+  [textColor]="textColor"
+  [icon]="icon"
+></app-news>
+} @case ('info') {
+<app-info [infoChildElementModelArray]="infoChildElementModelArray"></app-info>
+} @default {
+<p>Not supported type of element</p>
+} }
