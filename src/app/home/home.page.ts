@@ -2,13 +2,13 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  inject,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonContent,
   IonIcon,
   IonButton,
@@ -21,6 +21,7 @@ import { InfoChildElementModel } from './info/info-child/info-child-element.inte
 import { HomeService } from './home.service';
 import { HeaderElementModel } from './entities/header-element.interface';
 import { NewsElementModel } from './news/news-element.interface';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'home-tab',
@@ -32,7 +33,6 @@ import { NewsElementModel } from './news/news-element.interface';
     IonIcon,
     IonHeader,
     IonToolbar,
-    IonTitle,
     IonContent,
     PageElementComponent,
   ],
@@ -72,6 +72,9 @@ export class HomePage implements OnInit, AfterViewInit {
 
   headerElementModel?: HeaderElementModel;
   newsElementModel?: NewsElementModel;
+  infoChildElementModel?: InfoChildElementModel[];
+
+  private router = inject(Router);
 
   constructor(private homeService: HomeService) {
     addIcons({ settingsOutline });
@@ -80,6 +83,7 @@ export class HomePage implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.headerElementModel = this.homeService.getHeaderElement('en');
     this.newsElementModel = this.homeService.getNewsElement('en');
+    this.infoChildElementModel = this.homeService.getInfoChildElements('en');
   }
 
   ngAfterViewInit(): void {
@@ -101,6 +105,9 @@ export class HomePage implements OnInit, AfterViewInit {
       '--secondary-image-width',
       this.headerElementModel?.secondaryImageWidth ?? '0px'
     );
-    el.style.setProperty('padding', '10px');
+  }
+
+  navigateToSettings() {
+    this.router.navigate(['/tabs/home/settings']);
   }
 }

@@ -1,33 +1,37 @@
 <ion-header>
   <ion-toolbar #headerToolbar>
-    @if ((this.headerConfig?.secondaryImage?.trim() === '' ||
-    this.headerConfig?.secondaryImage === null) &&
-    (headerConfig?.mainImagePosition === 'center')) {
-    <ion-title style="text-align: center; display: contents">
-      <img [src]="this.headerConfig?.mainImage" alt="Logo" class="main-image"
-    /></ion-title>
-    } @else { @if (this.headerConfig?.mainImage?.trim() !== '' &&
-    this.headerConfig?.mainImage) {}
+    @if ((this.headerElementModel?.secondaryImage?.trim() === '' ||
+    this.headerElementModel?.secondaryImage === null) &&
+    (headerElementModel?.mainImagePosition === 'center')) {
+    <div style="text-align: center">
+      <img
+        [src]="this.headerElementModel?.mainImage"
+        alt="Logo"
+        class="main-image"
+      />
+    </div>
+    } @else { @if (this.headerElementModel?.mainImage?.trim() !== '' &&
+    this.headerElementModel?.mainImage) {}
     <img
-      [src]="this.headerConfig?.mainImage"
+      [src]="this.headerElementModel?.mainImage"
       alt="Logo"
       class="main-image"
-      [slot]="headerConfig?.mainImagePosition === 'left'
+      [slot]="headerElementModel?.mainImagePosition === 'left'
         ? 'start'
-        : headerConfig?.mainImagePosition === 'right'
+        : headerElementModel?.mainImagePosition === 'right'
         ? 'end'
         : 'primary'"
     />
-    @if (this.headerConfig?.secondaryImage?.trim() !== '' &&
-    this.headerConfig?.secondaryImage) {<img
-      [src]="this.headerConfig?.secondaryImage"
+    @if (this.headerElementModel?.secondaryImage?.trim() !== '' &&
+    this.headerElementModel?.secondaryImage) {<img
+      [src]="this.headerElementModel?.secondaryImage"
       alt="Logo"
       class="secondary-image"
       slot="secondary"
     />} }
 
     <ion-buttons slot="end">
-      <ion-button>
+      <ion-button (click)="navigateToSettings()">
         <ion-icon name="settings-outline" color="dark"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -40,7 +44,7 @@
       [type]="'tracking'"
       [title]="'TRACKING'"
       [subtitle]="'Follow your Favorites'"
-      [backgroundColor]="'#2a7b9b'"
+      [backgroundColor]="'#4a90e2'"
       [backgroundImage]="'https://cdn.outsideonline.com/wp-content/uploads/2021/11/boston-marathon-elite-men-start-line_h.jpg'"
       [textColor]="'#ece4e4'"
       [icon]="'https://unpkg.com/ionicons@7.1.0/dist/svg/analytics-outline.svg'"

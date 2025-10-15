@@ -19,6 +19,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'home/settings',
+        loadComponent: () =>
+          import('../settings/settings.component').then(
+            (m) => m.SettingsComponent
+          ),
+      },
+      {
         path: 'tab2',
         loadComponent: () =>
           import('../tab2/tab2.page').then((m) => m.Tab2Page),

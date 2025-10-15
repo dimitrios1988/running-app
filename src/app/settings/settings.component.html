@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()"></ion-back-button
+    ></ion-buttons>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <div style="margin-top: 1rem">
+    <ion-list>
+      <ion-item>
+        <ion-select
+          label="Language"
+          placeholder="Select Language"
+          interface="popover"
+        >
+          <ion-select-option value="en">English</ion-select-option>
+          <ion-select-option value="gr">Greek</ion-select-option>
+        </ion-select>
+      </ion-item></ion-list
+    >
+  </div>
+</ion-content>
