@@ -3,7 +3,7 @@
     @if ((this.headerElementModel?.secondaryImage?.trim() === '' ||
     this.headerElementModel?.secondaryImage === null) &&
     (headerElementModel?.mainImagePosition === 'center')) {
-    <div style="text-align: center">
+    <div class="center-header-image">
       <img
         [src]="this.headerElementModel?.mainImage"
         alt="Logo"
@@ -40,29 +40,21 @@
 
 <ion-content [fullscreen]="true">
   <div class="element-container">
+    @if (trackingElementModel) {
     <app-page-element
       [type]="'tracking'"
-      [title]="'TRACKING'"
-      [subtitle]="'Follow your Favorites'"
-      [backgroundColor]="'#4a90e2'"
-      [backgroundImage]="'https://cdn.outsideonline.com/wp-content/uploads/2021/11/boston-marathon-elite-men-start-line_h.jpg'"
-      [textColor]="'#ece4e4'"
-      [icon]="'https://unpkg.com/ionicons@7.1.0/dist/svg/analytics-outline.svg'"
+      [trackingElementModel]="trackingElementModel"
     ></app-page-element>
-    @if (newsElementModel) {
+    } @if (newsElementModel) {
     <app-page-element
       [type]="'news'"
-      [title]="newsElementModel.title"
-      [subtitle]="newsElementModel.subtitle"
-      [backgroundColor]="newsElementModel.backgroundColor"
-      [backgroundImage]="newsElementModel.backgroundImage"
-      [textColor]="newsElementModel.textColor"
-      [icon]="newsElementModel.icon"
+      [newsElementModel]="newsElementModel"
     ></app-page-element>
-    }
+    } @if(infoChildElementModelArray && infoChildElementModelArray.length > 0) {
     <app-page-element
       [type]="'info'"
       [infoChildElementModelArray]="infoChildElementModelArray"
-    ></app-page-element>
+    ></app-page-element
+    >}
   </div>
 </ion-content>

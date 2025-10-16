@@ -3,6 +3,7 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { cssFilterFromHex, hexToRgb } from '../../shared/color.utils';
+import { NewsElementModel } from './news-element.interface';
 
 @Component({
   selector: 'app-news',
@@ -12,25 +13,20 @@ import { cssFilterFromHex, hexToRgb } from '../../shared/color.utils';
 })
 export class NewsComponent implements OnInit {
   @ViewChild('newsElement', { static: true }) newsElement!: ElementRef;
-  @Input() title: string = '';
-  @Input() subtitle: string = '';
-  @Input() backgroundColor: string = '#2a7b9b';
-  @Input() textColor: string = '#ece4e4';
-  @Input() backgroundImage: string = '';
-  @Input() icon: string = '';
+  @Input() newsElementModel!: NewsElementModel;
 
   constructor() {
     addIcons({ chevronForwardOutline });
   }
 
   ngOnInit() {
-    const backgroundRgb = hexToRgb(this.backgroundColor);
+    const backgroundRgb = hexToRgb(this.newsElementModel.backgroundColor);
     this.newsElement.nativeElement.style.setProperty(
       '--bg-color',
       `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
     );
 
-    const filterColor = cssFilterFromHex(this.textColor);
+    const filterColor = cssFilterFromHex(this.newsElementModel.textColor);
     this.newsElement.nativeElement.style.setProperty(
       '--filter-color',
       filterColor

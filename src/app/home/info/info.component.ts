@@ -11,7 +11,7 @@ import { InfoChildComponent } from './info-child/info-child.component';
   imports: [InfoChildComponent],
 })
 export class InfoComponent implements OnInit {
-  @Input() infoChildElementModelArray: InfoChildElementModel[] | undefined;
+  @Input() infoChildElementModelArray!: InfoChildElementModel[];
 
   constructor() {
     addIcons({ chevronForwardOutline });

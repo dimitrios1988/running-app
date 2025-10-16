@@ -22,6 +22,7 @@ import { HomeService } from './home.service';
 import { HeaderElementModel } from './entities/header-element.interface';
 import { NewsElementModel } from './news/news-element.interface';
 import { Router } from '@angular/router';
+import { TrackingElementModel } from './tracking/tracking-element.interface';
 
 @Component({
   selector: 'home-tab',
@@ -40,39 +41,11 @@ import { Router } from '@angular/router';
 export class HomePage implements OnInit, AfterViewInit {
   @ViewChild('headerToolbar', { static: true, read: ElementRef })
   headerToolbar!: ElementRef<HTMLElement>;
-  infoChildElementModelArray: InfoChildElementModel[] = [
-    {
-      id: 1,
-      link: 'https://google.com',
-      title: '42KM',
-      subtitle: 'Event Info',
-      backgroundColor: '#2a7b9b',
-      textColor: '#ece4e4',
-      opens_in_external_url: true,
-    },
-    {
-      id: 2,
-      link: 'https://google.com',
-      title: '21KM',
-      subtitle: 'Event Info',
-      backgroundColor: '#2a7b9b',
-      textColor: '#ece4e4',
-      opens_in_external_url: false,
-    },
-    {
-      id: 3,
-      link: 'https://google.com',
-      title: 'COVID-19 Info',
-      subtitle: 'Latest updates and guidelines',
-      backgroundColor: '#2a7b9b',
-      textColor: '#ece4e4',
-      opens_in_external_url: false,
-    },
-  ];
 
+  infoChildElementModelArray!: InfoChildElementModel[];
   headerElementModel?: HeaderElementModel;
   newsElementModel?: NewsElementModel;
-  infoChildElementModel?: InfoChildElementModel[];
+  trackingElementModel?: TrackingElementModel;
 
   private router = inject(Router);
 
@@ -83,7 +56,9 @@ export class HomePage implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.headerElementModel = this.homeService.getHeaderElement('en');
     this.newsElementModel = this.homeService.getNewsElement('en');
-    this.infoChildElementModel = this.homeService.getInfoChildElements('en');
+    this.infoChildElementModelArray =
+      this.homeService.getInfoChildElements('en');
+    this.trackingElementModel = this.homeService.getTrackingElement('en');
   }
 
   ngAfterViewInit(): void {

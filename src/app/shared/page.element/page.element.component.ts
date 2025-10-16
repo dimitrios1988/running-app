@@ -3,6 +3,8 @@ import { TrackingComponent } from '../../home/tracking/tracking.component';
 import { NewsComponent } from '../../home/news/news.component';
 import { InfoComponent } from '../../home/info/info.component';
 import { InfoChildElementModel } from '../../home/info/info-child/info-child-element.interface';
+import { TrackingElementModel } from '../../home/tracking/tracking-element.interface';
+import { NewsElementModel } from '../../home/news/news-element.interface';
 
 @Component({
   selector: 'app-page-element',
@@ -11,14 +13,10 @@ import { InfoChildElementModel } from '../../home/info/info-child/info-child-ele
   imports: [TrackingComponent, NewsComponent, InfoComponent],
 })
 export class PageElementComponent implements OnInit {
-  @Input() title: string = '';
-  @Input() subtitle: string = '';
-  @Input() backgroundColor: string = '#eee7e7ff';
-  @Input() textColor: string = '#000000';
-  @Input() backgroundImage: string = '';
   @Input() type: 'tracking' | 'info' | 'news' = 'info';
-  @Input() icon: string = '';
-  @Input() infoChildElementModelArray: InfoChildElementModel[] = [];
+  @Input() infoChildElementModelArray?: InfoChildElementModel[];
+  @Input() trackingElementModel?: TrackingElementModel;
+  @Input() newsElementModel?: NewsElementModel;
 
   constructor() {}
 

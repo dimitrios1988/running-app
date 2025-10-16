@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HeaderElementModel } from './entities/header-element.interface';
 import { NewsElementModel } from './news/news-element.interface';
+import { TrackingElementModel } from './tracking/tracking-element.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -62,5 +63,17 @@ export class HomeService {
         opens_in_external_url: false,
       },
     ];
+  }
+
+  getTrackingElement(language: string): TrackingElementModel {
+    return {
+      title: 'TRACKING',
+      subtitle: 'Follow your Favorites',
+      backgroundColor: '#4a90e2',
+      textColor: '#ece4e4',
+      backgroundImage:
+        'https://cdn.outsideonline.com/wp-content/uploads/2021/11/boston-marathon-elite-men-start-line_h.jpg',
+      icon: 'https://unpkg.com/ionicons@7.1.0/dist/svg/analytics-outline.svg',
+    };
   }
 }

@@ -5,17 +5,17 @@
   (click)="navigateToNews()"
 >
   <img
-    [src]="backgroundImage"
+    [src]="newsElementModel.backgroundImage"
     alt="News Header Image"
     class="background-image"
   />
   <div class="title-row">
     <div class="icon-column">
-      <img #newsIcon [src]="icon" width="32" alt="" />
+      <img #newsIcon [src]="newsElementModel.icon" width="32" alt="" />
     </div>
     <div class="title-column">
-      <span class="title">{{ title }}</span>
-      <span class="subtitle">{{ subtitle }}</span>
+      <span class="title">{{ newsElementModel.title }}</span>
+      <span class="subtitle">{{ newsElementModel.subtitle }}</span>
     </div>
     <div class="arrow-column">
       <ion-icon
