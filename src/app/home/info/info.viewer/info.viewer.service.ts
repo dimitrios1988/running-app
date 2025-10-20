@@ -9,7 +9,7 @@ export class InfoViewerService {
 
   getInfo(id: number): IInfoViewer {
     return {
-      title: `Info Viewer ${id}s`,
+      title: `Info Viewer ${id}`,
       backgroundColor: '#2a7b9b',
       content: `<p>Hello</p>`,
       image:

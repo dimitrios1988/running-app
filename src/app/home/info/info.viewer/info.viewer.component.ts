@@ -20,6 +20,7 @@ import { IInfoViewer } from './info.viewer.interface';
 import { InfoViewerService } from './info.viewer.service';
 import { Location } from '@angular/common';
 import { InAppBrowser, DefaultWebViewOptions } from '@capacitor/inappbrowser';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-info.viewer',
@@ -33,6 +34,7 @@ import { InAppBrowser, DefaultWebViewOptions } from '@capacitor/inappbrowser';
     IonToolbar,
     IonContent,
     IonButton,
+    TranslatePipe,
   ],
 })
 export class InfoViewerComponent implements AfterViewInit {
@@ -40,15 +42,17 @@ export class InfoViewerComponent implements AfterViewInit {
   headerToolbar!: ElementRef<HTMLElement>;
   @ViewChild('infoButton', { static: false, read: ElementRef })
   infoButton?: ElementRef<HTMLElement>;
-  info?: IInfoViewer;
+  info!: IInfoViewer;
 
   private activatedRoute = inject(ActivatedRoute);
   private location = inject(Location);
   private infoId: number;
+
   constructor(infoViewerService: InfoViewerService) {
     this.infoId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
     this.info = infoViewerService.getInfo(this.infoId);
   }
+
   ngAfterViewInit(): void {
     this.initializeHeaderToolbarStyles();
     this.initializeInfoButtonStyles();
@@ -72,13 +76,13 @@ export class InfoViewerComponent implements AfterViewInit {
     const headerToolbarElement = this.headerToolbar?.nativeElement;
     if (!headerToolbarElement) return;
     if (
-      this.info?.backgroundColor !== null &&
-      this.info?.backgroundColor !== undefined &&
-      this.info?.backgroundColor.trim() !== ''
+      this.info.backgroundColor !== null &&
+      this.info.backgroundColor !== undefined &&
+      this.info.backgroundColor.trim() !== ''
     ) {
       headerToolbarElement.style.setProperty(
         '--background',
-        this.info?.backgroundColor ?? ''
+        this.info.backgroundColor
       );
     }
   }
@@ -87,9 +91,9 @@ export class InfoViewerComponent implements AfterViewInit {
     const infoButtonElement = this.infoButton?.nativeElement;
     if (!infoButtonElement) return;
     if (
-      this.info?.backgroundColor !== null &&
-      this.info?.backgroundColor !== undefined &&
-      this.info?.backgroundColor.trim() !== ''
+      this.info.backgroundColor !== null &&
+      this.info.backgroundColor !== undefined &&
+      this.info.backgroundColor.trim() !== ''
     ) {
       infoButtonElement.style.setProperty(
         '--background',
