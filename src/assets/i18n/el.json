@@ -1,5 +1,12 @@
 {
   "TABS": {
     "HOME": "Αρχική"
-  }
+  },
+  "SETTINGS": {
+    "TITLE": "Ρυθμίσεις",
+    "LANGUAGE": "Γλώσσα",
+    "SELECT_LANGUAGE": "Επιλέξτε Γλώσσα",
+    "UNITS": "Μονάδες Μέτρησης"
+  },
+  "INFO_VIEWER": { "MORE_INFO": "Περισσότερες Πληροφορίες" }
 }

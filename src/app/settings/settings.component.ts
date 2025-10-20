@@ -11,8 +11,9 @@ import {
   IonBackButton,
   IonContent,
 } from '@ionic/angular/standalone';
-import { Location } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
+import { Location, AsyncPipe } from '@angular/common';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { SettingsService } from './settings.service';
 
 @Component({
   selector: 'app-settings',
@@ -30,14 +31,18 @@ import { TranslateService } from '@ngx-translate/core';
     IonItem,
     IonSelect,
     IonSelectOption,
+    AsyncPipe,
+    TranslatePipe,
   ],
 })
 export class SettingsComponent implements OnInit {
   private location = inject(Location);
-  currentLang: string;
+  private settingsService = inject(SettingsService);
+  currentLang: Promise<string | null>;
 
   constructor(private translate: TranslateService) {
-    this.currentLang = translate.getCurrentLang() || 'en';
+    this.currentLang =
+      this.settingsService.getSelectedLanguage() || Promise.resolve('en');
   }
 
   goBack() {
@@ -46,9 +51,16 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit() {}
 
+  selectedLanguageChanged(lang: string) {
+    this.settingsService.setSelectedLanguage(lang).then(() => {
+      // Language preference saved
+      this.switchLanguage(lang);
+    });
+  }
+
   switchLanguage(lang: string) {
     this.translate.use(lang).subscribe(() => {
-      this.currentLang = lang;
+      //this.currentLang = lang;
       // Optionally persist to storage and update Ionic RTL if needed
     });
   }

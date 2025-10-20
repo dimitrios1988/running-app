@@ -1,5 +1,12 @@
 {
   "TABS": {
     "HOME": "Home"
-  }
+  },
+  "SETTINGS": {
+    "TITLE": "Settings",
+    "SELECT_LANGUAGE": "Select Language",
+    "LANGUAGE": "Language",
+    "UNITS": "Units"
+  },
+  "INFO_VIEWER": { "MORE_INFO": "More Info" }
 }

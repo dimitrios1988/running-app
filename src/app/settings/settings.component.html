@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button (click)="goBack()"></ion-back-button
     ></ion-buttons>
-    <ion-title>Settings</ion-title>
+    <ion-title>{{ "SETTINGS.TITLE" | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
@@ -11,11 +11,11 @@
     <ion-list>
       <ion-item>
         <ion-select
-          label="Language"
-          placeholder="Select Language"
+          label="{{ 'SETTINGS.LANGUAGE' | translate }}"
+          placeholder="{{ 'SETTINGS.SELECT_LANGUAGE' | translate }}"
           interface="popover"
-          (ionChange)="switchLanguage($event.detail.value)"
-          [value]="currentLang"
+          (ionChange)="selectedLanguageChanged($event.detail.value)"
+          [value]="currentLang | async"
         >
           <ion-select-option value="en">English</ion-select-option>
           <ion-select-option value="el">Greek</ion-select-option>

@@ -17,10 +17,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
-  private translateService = inject(TranslateService);
 
   constructor() {
     addIcons({ home, ellipse, square });
-    this.translateService.use('en').subscribe();
   }
 }
