@@ -12,6 +12,7 @@ import {
   IonContent,
 } from '@ionic/angular/standalone';
 import { Location } from '@angular/common';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-settings',
@@ -33,12 +34,22 @@ import { Location } from '@angular/common';
 })
 export class SettingsComponent implements OnInit {
   private location = inject(Location);
+  currentLang: string;
 
-  constructor() {}
+  constructor(private translate: TranslateService) {
+    this.currentLang = translate.getCurrentLang() || 'en';
+  }
 
   goBack() {
     this.location.back();
   }
 
   ngOnInit() {}
+
+  switchLanguage(lang: string) {
+    this.translate.use(lang).subscribe(() => {
+      this.currentLang = lang;
+      // Optionally persist to storage and update Ionic RTL if needed
+    });
+  }
 }

@@ -14,9 +14,11 @@
           label="Language"
           placeholder="Select Language"
           interface="popover"
+          (ionChange)="switchLanguage($event.detail.value)"
+          [value]="currentLang"
         >
           <ion-select-option value="en">English</ion-select-option>
-          <ion-select-option value="gr">Greek</ion-select-option>
+          <ion-select-option value="el">Greek</ion-select-option>
         </ion-select>
       </ion-item></ion-list
     >
