@@ -1,6 +1,7 @@
 {
   "TABS": {
-    "HOME": "Home"
+    "HOME": "Home",
+    "NOTIFICATIONS": "Notifications"
   },
   "SETTINGS": {
     "TITLE": "Settings",
@@ -8,5 +9,15 @@
     "LANGUAGE": "Language",
     "UNITS": "Units"
   },
-  "INFO_VIEWER": { "MORE_INFO": "More Info" }
+  "INFO_VIEWER": { "MORE_INFO": "More Info" },
+  "NEWS_LIST": {
+    "TITLE": "News",
+    "PULLING_TEXT": "Pull down to refresh news",
+    "REFRESHING_TEXT": "Updating news..."
+  },
+  "NOTIFICATIONS": {
+    "NEW_NOTIFICATION": "New Notification",
+    "NO_NOTIFICATIONS": "No notifications",
+    "NOTIFICATIONS": "Notifications"
+  }
 }

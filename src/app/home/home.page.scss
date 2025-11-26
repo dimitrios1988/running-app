@@ -20,5 +20,8 @@
 }
 
 .center-header-image {
-  text-align: center;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

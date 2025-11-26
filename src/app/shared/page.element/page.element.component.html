@@ -1,10 +1,9 @@
-@switch (type) { @case ('tracking') { @if(trackingElementModel){
-<app-tracking [trackingElementModel]="trackingElementModel"></app-tracking>
-} } @case ('news') { @if(newsElementModel) {
-<app-news [newsElementModel]="newsElementModel"></app-news>
-} } @case ('info') { @if(infoChildElementModelArray &&
-infoChildElementModelArray.length > 0) {
-<app-info [infoChildElementModelArray]="infoChildElementModelArray"></app-info>
-} } @default {
-<p>Not supported type of element</p>
+@switch (element.type) { @case('tracking') {
+<app-tracking [trackingElementModel]="element"></app-tracking> } @case('news') {
+<app-news [newsElementModel]="element"></app-news> } @case('info') {
+<app-info [infoChildElementModelArray]="element.infoChildElements"></app-info> }
+@case ('countdowntimer') {
+<app-countdowntimer [CountdownTimerElementModel]="element"></app-countdowntimer>
+} @default {
+<p>Unsupported element type</p>
 } }

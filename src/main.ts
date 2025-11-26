@@ -16,6 +16,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SettingsService } from './app/settings/settings.service';
+import { AppConfigurationService } from './app/app.configuration.service';
 
 /**
  * Preloads a translation file before bootstrapping Angular.
@@ -32,14 +33,6 @@ async function preloadTranslations(
 }
 
 (async () => {
-  // 1️⃣ Choose default language (you could make this dynamic later)
-  const lang = 'en';
-  const fallbackLang = 'en';
-
-  // 2️⃣ Preload translations before Angular starts
-  const translations = await preloadTranslations(lang);
-
-  // 3️⃣ Bootstrap Angular + Ionic application
   const appRef = await bootstrapApplication(AppComponent, {
     providers: [
       { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -51,21 +44,47 @@ async function preloadTranslations(
           prefix: '/assets/i18n/',
           suffix: '.json',
         }),
-        lang,
-        fallbackLang,
+        //lang,
+        //fallbackLang,
       }),
     ],
   });
 
-  // 4️⃣ Inject TranslateService and set preloaded translations
+  const appConfigurationService = appRef.injector.get(AppConfigurationService);
+  const defaultLanguage =
+    appConfigurationService.appConfiguration.defaultLanguage;
+  const suppportedLanguages =
+    appConfigurationService.appConfiguration.supportedLanguages;
   const translateService = appRef.injector.get(TranslateService);
-  translateService.setTranslation(lang, translations, true);
+  translateService.setFallbackLang(defaultLanguage.code);
+
+  suppportedLanguages
+    .filter((lang) => lang.code != defaultLanguage.code)
+    .forEach(async (lang) => {
+      let translations = await preloadTranslations(lang.code);
+      translateService.setTranslation(lang.code, translations, false);
+    });
   const settingsService = appRef.injector.get(SettingsService);
-  settingsService.getSelectedLanguage().then((lang) => {
-    if (lang) {
-      translateService.use(lang).subscribe();
+  settingsService.getSelectedLanguage().then((selectedLang) => {
+    if (
+      selectedLang &&
+      suppportedLanguages.some((lang) => lang.code === selectedLang)
+    ) {
+      translateService.use(selectedLang).subscribe();
+      if (
+        suppportedLanguages.some(
+          (lang) => lang.code === translateService.getBrowserLang()
+        )
+      ) {
+        translateService.use(translateService.getBrowserLang()!).subscribe();
+        settingsService.setSelectedLanguage(translateService.getBrowserLang()!);
+      } else {
+        settingsService.setSelectedLanguage(defaultLanguage.code);
+        translateService.use(defaultLanguage.code).subscribe();
+      }
     } else {
-      translateService.use(fallbackLang).subscribe(); // default language
+      settingsService.setSelectedLanguage(defaultLanguage.code);
+      translateService.use(defaultLanguage.code).subscribe();
     }
   });
 })();

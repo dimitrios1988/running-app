@@ -19,6 +19,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'home/news',
+        loadComponent: () =>
+          import('../home/news/news-list/news.list.component').then(
+            (m) => m.NewsListComponent
+          ),
+      },
+      {
+        path: 'home/news/viewer/:id',
+        loadComponent: () =>
+          import('../home/news/news-viewer/news.viewer.component').then(
+            (m) => m.NewsViewerComponent
+          ),
+      },
+      {
         path: 'home/settings',
         loadComponent: () =>
           import('../settings/settings.component').then(
@@ -31,9 +45,11 @@ export const routes: Routes = [
           import('../tab2/tab2.page').then((m) => m.Tab2Page),
       },
       {
-        path: 'tab3',
+        path: 'notifications',
         loadComponent: () =>
-          import('../tab3/tab3.page').then((m) => m.Tab3Page),
+          import('../notifications/notifications.page').then(
+            (m) => m.NotificationsPage
+          ),
       },
       {
         path: '',

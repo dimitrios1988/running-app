@@ -1,12 +1,11 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { AsyncPipe } from '@angular/common';
+import { map, switchMap, shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { Browser } from '@capacitor/browser';
+
 import {
   IonToolbar,
   IonButton,
@@ -16,16 +15,16 @@ import {
   IonBackButton,
   IonButtons,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
+
 import { IInfoViewer } from './info.viewer.interface';
 import { InfoViewerService } from './info.viewer.service';
-import { Location } from '@angular/common';
-import { InAppBrowser, DefaultWebViewOptions } from '@capacitor/inappbrowser';
-import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-info.viewer',
   templateUrl: './info.viewer.component.html',
   styleUrls: ['./info.viewer.component.scss'],
+  standalone: true,
   imports: [
     IonButtons,
     IonBackButton,
@@ -35,70 +34,36 @@ import { TranslatePipe } from '@ngx-translate/core';
     IonContent,
     IonButton,
     TranslatePipe,
+    AsyncPipe,
   ],
 })
-export class InfoViewerComponent implements AfterViewInit {
-  @ViewChild('headerToolbar', { static: true, read: ElementRef })
-  headerToolbar!: ElementRef<HTMLElement>;
-  @ViewChild('infoButton', { static: false, read: ElementRef })
-  infoButton?: ElementRef<HTMLElement>;
-  info!: IInfoViewer;
+export class InfoViewerComponent {
+  private route = inject(ActivatedRoute);
+  private svc = inject(InfoViewerService);
+  private sanitizer = inject(DomSanitizer);
 
-  private activatedRoute = inject(ActivatedRoute);
-  private location = inject(Location);
-  private infoId: number;
+  /**
+   * info$ emits the viewer model enriched with `safeContent` (SafeHtml).
+   * It reacts to route param changes and is shared/replayed for template consumption.
+   */
+  readonly info$: Observable<IInfoViewer & { safeContent: SafeHtml }> =
+    this.route.paramMap.pipe(
+      map((pm) => Number(pm.get('id'))),
+      switchMap((id) => this.svc.getInfo(id)),
+      map((info) => ({
+        ...info,
+        safeContent: this.sanitizer.bypassSecurityTrustHtml(info.content ?? ''),
+      })),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
 
-  constructor(infoViewerService: InfoViewerService) {
-    this.infoId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
-    this.info = infoViewerService.getInfo(this.infoId);
-  }
-
-  ngAfterViewInit(): void {
-    this.initializeHeaderToolbarStyles();
-    this.initializeInfoButtonStyles();
-  }
-
-  navigateToLink(link: string | null | undefined) {
-    if (link) {
+  // open links with Capacitor Browser (fallbacks to window.open if needed)
+  async navigateToLink(link: string | null | undefined) {
+    if (!link) return;
+    try {
+      await Browser.open({ url: link });
+    } catch {
       window.open(link, '_blank', 'noopener,noreferrer');
-      InAppBrowser.openInWebView({
-        url: 'https://www.google.com',
-        options: DefaultWebViewOptions,
-      });
-    }
-  }
-
-  goBack() {
-    this.location.back();
-  }
-
-  initializeHeaderToolbarStyles() {
-    const headerToolbarElement = this.headerToolbar?.nativeElement;
-    if (!headerToolbarElement) return;
-    if (
-      this.info.backgroundColor !== null &&
-      this.info.backgroundColor !== undefined &&
-      this.info.backgroundColor.trim() !== ''
-    ) {
-      headerToolbarElement.style.setProperty(
-        '--background',
-        this.info.backgroundColor
-      );
-    }
-  }
-
-  initializeInfoButtonStyles() {
-    const infoButtonElement = this.infoButton?.nativeElement;
-    if (!infoButtonElement) return;
-    if (
-      this.info.backgroundColor !== null &&
-      this.info.backgroundColor !== undefined &&
-      this.info.backgroundColor.trim() !== ''
-    ) {
-      infoButtonElement.style.setProperty(
-        '--background',
-        this.info?.backgroundColor ?? ''
-      );
     }
   }
 }

@@ -3,7 +3,8 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { cssFilterFromHex, hexToRgb } from '../../shared/color.utils';
-import { NewsElementModel } from './news-element.interface';
+import { Router } from '@angular/router';
+import { NewsElementModel } from '../../shared/page.element/page.element.model';
 
 @Component({
   selector: 'app-news',
@@ -15,7 +16,7 @@ export class NewsComponent implements OnInit {
   @ViewChild('newsElement', { static: true }) newsElement!: ElementRef;
   @Input() newsElementModel!: NewsElementModel;
 
-  constructor() {
+  constructor(private router: Router) {
     addIcons({ chevronForwardOutline });
   }
 
@@ -34,6 +35,6 @@ export class NewsComponent implements OnInit {
   }
 
   navigateToNews() {
-    throw new Error('Method not implemented.');
+    this.router.navigate(['/tabs/home/news/']);
   }
 }

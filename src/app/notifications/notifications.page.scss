@@ -1,0 +1,46 @@
+/* ion-content wrapper (we turn off native scrolling) */
+ion-content.virtual-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 112px); /* adjust if your toolbar height differs */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* CDK viewport must fill the available space */
+.scroll-viewport {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+   display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0;
+  gap: 12px;
+}
+
+
+
+.notifications-item {
+  width: 100%;
+  margin: 0;
+  box-shadow: var(--ion-box-shadow);
+  cursor: pointer;
+  display: flex ;
+  flex-direction: column;
+  border-bottom: 2px;
+}
+
+ion-label strong {
+  display: block;
+  max-width: calc(100% - 60px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ion-label ion-note {
+  font-size: 0.9rem;
+}
+

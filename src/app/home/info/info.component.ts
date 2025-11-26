@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
-import { InfoChildElementModel } from './info-child/info-child-element.interface';
 import { InfoChildComponent } from './info-child/info-child.component';
+import { InfoChildElementModel } from '../../shared/page.element/page.element.model';
 
 @Component({
   selector: 'app-info',

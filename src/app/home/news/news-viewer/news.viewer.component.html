@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start"> <ion-back-button></ion-back-button></ion-buttons>
+    <ion-title>{{ (news$ | async)?.title }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  @if(news$ | async; as data) { @if(data.featuredImageUrl) {
+  <div class="news-featured-image-container">
+    <img
+      class="news-featured-image"
+      [src]="data.featuredImageUrl"
+      alt="Featured Image"
+    />
+  </div>
+  }
+  <div class="news-viewer-content" [innerHTML]="data.content"></div>
+  }
+</ion-content>

@@ -17,8 +17,11 @@
           (ionChange)="selectedLanguageChanged($event.detail.value)"
           [value]="currentLang | async"
         >
-          <ion-select-option value="en">English</ion-select-option>
-          <ion-select-option value="el">Greek</ion-select-option>
+          @for (language of appConfiguration.supportedLanguages; track $index) {
+          <ion-select-option [value]="language.code">{{
+            language.name
+          }}</ion-select-option>
+          }
         </ion-select>
       </ion-item></ion-list
     >

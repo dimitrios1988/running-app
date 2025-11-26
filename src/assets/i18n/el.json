@@ -1,6 +1,7 @@
 {
   "TABS": {
-    "HOME": "Αρχική"
+    "HOME": "Αρχική",
+    "NOTIFICATIONS": "Ειδοποιήσεις"
   },
   "SETTINGS": {
     "TITLE": "Ρυθμίσεις",
@@ -8,5 +9,15 @@
     "SELECT_LANGUAGE": "Επιλέξτε Γλώσσα",
     "UNITS": "Μονάδες Μέτρησης"
   },
-  "INFO_VIEWER": { "MORE_INFO": "Περισσότερες Πληροφορίες" }
+  "INFO_VIEWER": { "MORE_INFO": "Περισσότερες Πληροφορίες" },
+  "NEWS_LIST": {
+    "TITLE": "Ειδήσεις",
+    "PULLING_TEXT": "Τραβήξτε προς τα κάτω για ανανέωση ειδήσεων",
+    "REFRESHING_TEXT": "Ενημέρωση ειδήσεων..."
+  },
+  "NOTIFICATIONS": {
+    "NEW_NOTIFICATION": "Νέα Ειδοποίηση",
+    "NO_NOTIFICATIONS": "Δεν υπάρχουν ειδοποιήσεις",
+    "NOTIFICATIONS": "Ειδοποιήσεις"
+  }
 }

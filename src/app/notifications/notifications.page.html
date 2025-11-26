@@ -1,0 +1,39 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title> {{'NOTIFICATIONS.NOTIFICATIONS' | translate}} </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="false" class="virtual-wrapper">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="{{ 'NEWS_LIST.REFRESHING_TEXT' | translate }}"
+    ></ion-refresher-content>
+  </ion-refresher>
+  <cdk-virtual-scroll-viewport
+    class="scroll-viewport"
+    itemSize="64"
+    orientation="vertical"
+    (scrolledIndexChange)="onScroll()"
+  >
+    <ion-list lines="full"
+      ><ion-item
+        *cdkVirtualFor="let notification of notifications; let i = index"
+        [button]="true"
+        class="notifications-item"
+      >
+        <ion-label>
+          <strong>{{ notification.title }}</strong>
+          <ion-text color="medium">{{ notification.message }}</ion-text>
+        </ion-label>
+        <ion-icon
+          slot="end"
+          name="chevron-forward-outline"
+          class="right-arrow"
+        ></ion-icon> </ion-item
+    ></ion-list>
+  </cdk-virtual-scroll-viewport>
+</ion-content>

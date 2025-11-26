@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { AppConfigurationService } from '../app.configuration.service';
 
 @Injectable({
   providedIn: 'root',

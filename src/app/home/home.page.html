@@ -1,38 +1,46 @@
 <ion-header>
-  <ion-toolbar #headerToolbar>
-    @if ((this.headerElementModel?.secondaryImage?.trim() === '' ||
-    this.headerElementModel?.secondaryImage === null) &&
-    (headerElementModel?.mainImagePosition === 'center')) {
+  <ion-toolbar
+    style="--main-image-width: {{ mainImageWidth() }}; --secondary-image-width: {{ secondaryImageWidth() }};"
+  >
+    <!-- Centered main image if no secondary image -->
+    @if ( (headerElementModel()?.secondaryImage?.trim() === '' ||
+    headerElementModel()?.secondaryImage === null) &&
+    headerElementModel()?.mainImagePosition === 'center' ) {
     <div class="center-header-image">
       <img
-        [src]="this.headerElementModel?.mainImage"
+        [src]="headerElementModel()?.mainImage"
         alt="Logo"
         class="main-image"
+        loading="lazy"
       />
     </div>
-    } @else { @if (this.headerElementModel?.mainImage?.trim() !== '' &&
-    this.headerElementModel?.mainImage) {}
+    } @else { @if (headerElementModel()?.mainImage?.trim()) {
     <img
-      [src]="this.headerElementModel?.mainImage"
+      [src]="headerElementModel()?.mainImage"
       alt="Logo"
       class="main-image"
-      [slot]="headerElementModel?.mainImagePosition === 'left'
-        ? 'start'
-        : headerElementModel?.mainImagePosition === 'right'
-        ? 'end'
-        : 'primary'"
+      [slot]="
+            headerElementModel()?.mainImagePosition === 'left'
+              ? 'start'
+              : headerElementModel()?.mainImagePosition === 'right'
+              ? 'end'
+              : 'primary'
+          "
+      loading="lazy"
     />
-    @if (this.headerElementModel?.secondaryImage?.trim() !== '' &&
-    this.headerElementModel?.secondaryImage) {<img
-      [src]="this.headerElementModel?.secondaryImage"
-      alt="Logo"
+    } @if (headerElementModel()?.secondaryImage?.trim()) {
+    <img
+      [src]="headerElementModel()?.secondaryImage"
+      alt="Secondary Logo"
       class="secondary-image"
       slot="secondary"
-    />} }
+      loading="lazy"
+    />
+    } }
 
     <ion-buttons slot="end">
       <ion-button (click)="navigateToSettings()">
-        <ion-icon name="settings-outline" color="dark"></ion-icon>
+        <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -40,21 +48,8 @@
 
 <ion-content [fullscreen]="true">
   <div class="element-container">
-    @if (trackingElementModel) {
-    <app-page-element
-      [type]="'tracking'"
-      [trackingElementModel]="trackingElementModel"
-    ></app-page-element>
-    } @if (newsElementModel) {
-    <app-page-element
-      [type]="'news'"
-      [newsElementModel]="newsElementModel"
-    ></app-page-element>
-    } @if(infoChildElementModelArray && infoChildElementModelArray.length > 0) {
-    <app-page-element
-      [type]="'info'"
-      [infoChildElementModelArray]="infoChildElementModelArray"
-    ></app-page-element
-    >}
+    @for (el of pageElementModel(); track $index) {
+    <app-page-element [element]="el"></app-page-element>
+    }
   </div>
 </ion-content>

@@ -5,20 +5,39 @@ import {
   IonTabButton,
   IonIcon,
   IonLabel,
+  IonBadge,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { ellipse, square, home } from 'ionicons/icons';
+import { ellipse, home, notifications } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, TranslatePipe],
+  imports: [
+    IonBadge,
+    IonTabs,
+    IonTabBar,
+    IonTabButton,
+    IonIcon,
+    IonLabel,
+    TranslatePipe,
+  ],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
+  private router = inject(Router);
 
   constructor() {
-    addIcons({ home, ellipse, square });
+    addIcons({ home, ellipse, notifications });
+  }
+
+  navigateToHome() {
+    void this.router.navigate(['/tabs/home/settings']);
+  }
+
+  navigateToNotifications() {
+    void this.router.navigate(['/tabs/notifications']);
   }
 }

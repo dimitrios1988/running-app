@@ -14,6 +14,7 @@ import {
 import { Location, AsyncPipe } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SettingsService } from './settings.service';
+import { AppConfigurationService } from '../app.configuration.service';
 
 @Component({
   selector: 'app-settings',
@@ -38,6 +39,7 @@ import { SettingsService } from './settings.service';
 export class SettingsComponent implements OnInit {
   private location = inject(Location);
   private settingsService = inject(SettingsService);
+  public appConfiguration = inject(AppConfigurationService).appConfiguration;
   currentLang: Promise<string | null>;
 
   constructor(private translate: TranslateService) {

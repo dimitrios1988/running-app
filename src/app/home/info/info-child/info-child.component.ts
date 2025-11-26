@@ -6,12 +6,13 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { InfoChildElementModel } from './info-child-element.interface';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { hexToRgb } from '../../../shared/color.utils';
 import { Router } from '@angular/router';
+import { Browser } from '@capacitor/browser';
+import { InfoChildElementModel } from '../../../shared/page.element/page.element.model';
 @Component({
   imports: [IonIcon],
   selector: 'app-info-child',
@@ -34,11 +35,22 @@ export class InfoChildComponent implements OnInit {
   }
 
   navigateToInfo() {
-    if (!this.infoChildElementModel?.opens_in_external_url === false) {
+    if (this.infoChildElementModel?.opens_in_external_url === false) {
       this.router.navigate([
         '/tabs/home/info/viewer',
         this.infoChildElementModel?.id,
       ]);
+    } else {
+      this.navigateToLink(this.infoChildElementModel?.link);
+    }
+  }
+
+  private async navigateToLink(link: string | null | undefined) {
+    if (!link) return;
+    try {
+      await Browser.open({ url: link });
+    } catch {
+      window.open(link, '_blank', 'noopener,noreferrer');
     }
   }
 
