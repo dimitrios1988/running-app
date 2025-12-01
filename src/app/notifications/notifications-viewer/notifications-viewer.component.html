@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    @if(loading()) {
+    <ion-title>Loading...</ion-title>
+    } @else if(error()) {
+    <ion-title>Error</ion-title>
+    } @else {
+    <ion-title>{{ "NOTIFICATIONS_VIEWER.NOTIFICATION" | translate }}</ion-title>
+    }
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  @if(loading()) {
+  <div class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+  } @else if(error()) {
+  <div class="error-container">
+    <p>{{ "NOTIFICATIONS_VIEWER.ERROR_LOADING" | translate }}</p>
+  </div>
+  } @else if(notification()) {
+  <div class="notification-container">
+    <h2>{{ notification()?.title }}</h2>
+    <p class="notification-date">
+      {{ notification()?.publishedAt | date : "medium" }}
+    </p>
+    <div
+      class="notification-content"
+      [innerHTML]="notification()?.message"
+    ></div>
+  </div>
+  } @else {
+  <div class="error-container">
+    <p>{{ "NOTIFICATIONS_VIEWER.NOT_FOUND" | translate }}</p>
+  </div>
+  }
+</ion-content>

@@ -27,6 +27,7 @@ import {
   chevronForwardOutline,
 } from 'ionicons/icons';
 import { Observable, Subscription, tap } from 'rxjs';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-notifications',
   templateUrl: 'notifications.page.html',
@@ -57,7 +58,7 @@ export class NotificationsPage implements OnInit, OnDestroy {
   private notificationsService: NotificationsService =
     inject(NotificationsService);
   private notificationSub$?: Subscription;
-
+  private router: Router = inject(Router);
   constructor() {
     addIcons({ chevronDownCircleOutline, chevronForwardOutline });
   }
@@ -100,5 +101,9 @@ export class NotificationsPage implements OnInit, OnDestroy {
 
   isAtTop() {
     return this.atTop;
+  }
+
+  openNotification(notification: INotification) {
+    this.router.navigate(['/tabs/notifications/viewer/', notification.id]);
   }
 }

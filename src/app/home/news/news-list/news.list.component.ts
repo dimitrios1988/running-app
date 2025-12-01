@@ -104,6 +104,6 @@ export class NewsListComponent implements OnInit, OnDestroy {
   }
 
   openNewsItem(item: INewsListItem) {
-    //this.router.navigate(['/tabs/home/news/viewer', item.id]);
+    this.router.navigate(['/tabs/home/news/viewer', item.id]);
   }
 }

@@ -19,5 +19,10 @@
     "NEW_NOTIFICATION": "Νέα Ειδοποίηση",
     "NO_NOTIFICATIONS": "Δεν υπάρχουν ειδοποιήσεις",
     "NOTIFICATIONS": "Ειδοποιήσεις"
+  },
+  "NOTIFICATIONS_VIEWER": {
+    "NOTIFICATION": "Ειδοποίηση",
+    "ERROR_LOADING": "Η ειδοποίηση δεν βρέθηκε.",
+    "NOT_FOUND": "Η ειδοποίηση που προσπαθείτε να δείτε δεν υπάρχει."
   }
 }

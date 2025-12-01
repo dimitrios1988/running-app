@@ -52,6 +52,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'notifications/viewer/:id',
+        loadComponent: () =>
+          import(
+            '../notifications/notifications-viewer/notifications-viewer.component'
+          ).then((m) => m.NotificationsViewerComponent),
+      },
+      {
         path: '',
         redirectTo: '/tabs/home',
         pathMatch: 'full',

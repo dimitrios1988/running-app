@@ -19,5 +19,10 @@
     "NEW_NOTIFICATION": "New Notification",
     "NO_NOTIFICATIONS": "No notifications",
     "NOTIFICATIONS": "Notifications"
+  },
+  "NOTIFICATIONS_VIEWER": {
+    "NOTIFICATION": "Notification",
+    "ERROR_LOADING": "Notification not found.",
+    "NOT_FOUND": "The notification you are trying to view does not exist."
   }
 }

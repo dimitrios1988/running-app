@@ -24,6 +24,7 @@
         *cdkVirtualFor="let notification of notifications; let i = index"
         [button]="true"
         class="notifications-item"
+        (click)="openNotification(notification)"
       >
         <ion-label>
           <strong>{{ notification.title }}</strong>

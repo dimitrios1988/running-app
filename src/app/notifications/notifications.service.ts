@@ -39,4 +39,11 @@ export class NotificationsService {
       })
     );
   }
+
+  getNotificationById(id: number): Observable<INotification | undefined> {
+    const notification = this._notifications()
+      .slice()
+      .find((n) => n.id === id);
+    return of(notification);
+  }
 }
