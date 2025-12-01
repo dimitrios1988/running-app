@@ -1,93 +1,89 @@
 import {
-  AfterViewInit,
   Component,
-  ElementRef,
   Input,
+  OnDestroy,
   OnInit,
-  ViewChild,
+  ChangeDetectionStrategy,
+  HostBinding,
 } from '@angular/core';
 import { CountdownTimerElementModel } from '../../shared/page.element/page.element.model';
-import { cssFilterFromHex } from 'src/app/shared/color.utils';
+import { cssFilterFromHex } from '../../../app/shared/color.utils';
+import { interval, Observable, of, Subject } from 'rxjs';
+import { map, startWith, takeUntil, shareReplay } from 'rxjs/operators';
+import { DatePipe, AsyncPipe } from '@angular/common';
+
+interface TimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
 
 @Component({
   selector: 'app-countdowntimer',
+  standalone: true,
   templateUrl: './countdowntimer.component.html',
   styleUrls: ['./countdowntimer.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DatePipe, AsyncPipe],
 })
-export class CountdowntimerComponent implements OnInit, AfterViewInit {
-  @ViewChild('countdownTimerElement', { static: true })
-  countdownTimerElement!: ElementRef;
+export class CountdowntimerComponent implements OnInit, OnDestroy {
   @Input() CountdownTimerElementModel!: CountdownTimerElementModel;
 
-  @ViewChild('days', { static: true }) days!: ElementRef;
-  @ViewChild('hours', { static: true }) hours!: ElementRef;
-  @ViewChild('minutes', { static: true }) minutes!: ElementRef;
-  @ViewChild('seconds', { static: true }) seconds!: ElementRef;
+  // Expose the computed time as an observable for async pipe binding
+  time$!: Observable<TimeLeft>;
 
-  months: Array<string> = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  // expose targetDate for template
+  targetDate!: Date;
 
-  currentTime!: string;
-  private targetTime!: number;
-  private targetDate!: Date;
-  private difference!: number;
-  private date!: Date;
-  private now!: number;
-  constructor() {}
+  // bind computed CSS filter to host style variable
+  @HostBinding('style.--filter-color') filterColor?: string;
 
-  ngOnInit() {
-    this.targetDate = new Date(
-      this.CountdownTimerElementModel.targetDateTime.getFullYear(),
-      this.CountdownTimerElementModel.targetDateTime.getMonth(),
-      this.CountdownTimerElementModel.targetDateTime.getDate()
-    );
-    this.currentTime = `${
-      this.months[this.targetDate.getMonth()]
-    } ${this.targetDate.getDate()}, ${this.targetDate.getFullYear()}`;
+  private destroy$ = new Subject<void>();
 
-    this.targetTime = this.targetDate.getTime();
-
-    if (this.CountdownTimerElementModel.textColor) {
-      const filterColor = cssFilterFromHex(
-        this.CountdownTimerElementModel.textColor
-      );
-      this.countdownTimerElement.nativeElement.style.setProperty(
-        '--filter-color',
-        filterColor
-      );
+  ngOnInit(): void {
+    // guard: ensure model exists
+    const model = this.CountdownTimerElementModel;
+    if (!model || !model.targetDateTime) {
+      this.time$ = of({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      this.targetDate = new Date();
+      return;
     }
+
+    this.targetDate = new Date(model.targetDateTime);
+
+    if (model.textColor) {
+      this.filterColor = cssFilterFromHex(model.textColor);
+    }
+
+    // emit every second, start immediately
+    this.time$ = interval(1000).pipe(
+      startWith(0),
+      map(() => this.calculateTimeLeft(new Date(), this.targetDate)),
+      takeUntil(this.destroy$),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
   }
 
-  ngAfterViewInit() {
-    setInterval(() => {
-      //this.tickTock();
-      this.difference = this.targetTime - this.now;
-      this.difference = this.difference / (1000 * 60 * 60 * 24);
-      this.days.nativeElement.innerText = Math.floor(this.difference);
-      /* !isNaN(this.days.nativeElement.innerText)
-        ? (this.days.nativeElement.innerText = Math.floor(this.difference))
-        : (this.days.nativeElement.innerHTML = `<img src="https://i.gifer.com/VAyR.gif" />`); */
-    }, 1000);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  tickTock() {
-    this.date = new Date();
-    this.now = this.date.getTime();
-    this.days.nativeElement.innerText = Math.floor(this.difference);
-    this.hours.nativeElement.innerText = 23 - this.date.getHours();
-    this.minutes.nativeElement.innerText = 60 - this.date.getMinutes();
-    this.seconds.nativeElement.innerText = 60 - this.date.getSeconds();
+  private calculateTimeLeft(start: Date, end: Date): TimeLeft {
+    const diffMs = Math.max(0, end.getTime() - start.getTime()); // don't go negative
+    const totalSeconds = Math.floor(diffMs / 1000);
+
+    const days = Math.floor(totalSeconds / (60 * 60 * 24));
+    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+    const seconds = totalSeconds % 60;
+
+    return { days, hours, minutes, seconds };
+  }
+
+  // small helper used in template for zero-padding
+  formatTwo(n: number): string {
+    return n < 10 ? `0${n}` : `${n}`;
   }
 }

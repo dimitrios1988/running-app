@@ -1,17 +1,21 @@
-<div class="countdown-timer-element" #countdownTimerElement>
-  <p>Countdown to {{ currentTime }}</p>
+<div class="countdown-timer-element">
+  <p>Countdown to {{ targetDate | date : "mediumDate" }}</p>
+
   <div class="wrapper">
-    <div class="description">
+    <div class="description" aria-hidden="true">
       <p>Days</p>
       <p>Hours</p>
       <p>Minutes</p>
       <p>Seconds</p>
     </div>
-    <div class="times">
-      <p #days>0</p>
-      <p #hours></p>
-      <p #minutes></p>
-      <p #seconds></p>
+
+    @if(time$ | async; as t){
+    <div class="times" role="timer" aria-live="polite">
+      <p>{{ formatTwo(t.days) }}</p>
+      <p>{{ formatTwo(t.hours) }}</p>
+      <p>{{ formatTwo(t.minutes) }}</p>
+      <p>{{ formatTwo(t.seconds) }}</p>
     </div>
+    }
   </div>
 </div>

@@ -92,19 +92,10 @@ export class HomeService {
   getCountdowntimerElements(): Observable<CountdownTimerElementModel[]> {
     return of([
       {
-        order: 5,
-        type: 'countdowntimer',
-        id: 10,
-        targetDateTime: new Date(),
-        backgroundColor: '#4a90e2',
-        textColor: '#ece4e4',
-        title: 'Timer 1',
-      },
-      {
         order: 6,
         type: 'countdowntimer',
         id: 11,
-        targetDateTime: new Date(),
+        targetDateTime: new Date(2025, 11, 3, 18, 30, 0, 0),
         backgroundColor: '#4a90e2',
         textColor: '#ece4e4',
         title: 'Timer 2',
