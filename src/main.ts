@@ -71,7 +71,9 @@ async function preloadTranslations(
       suppportedLanguages.some((lang) => lang.code === selectedLang)
     ) {
       translateService.use(selectedLang).subscribe();
-      if (
+      if (suppportedLanguages.some((lang) => lang.code === selectedLang)) {
+        translateService.use(selectedLang).subscribe();
+      } else if (
         suppportedLanguages.some(
           (lang) => lang.code === translateService.getBrowserLang()
         )
