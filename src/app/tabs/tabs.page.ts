@@ -32,12 +32,4 @@ export class TabsPage {
   constructor() {
     addIcons({ home, ellipse, notifications });
   }
-
-  navigateToHome() {
-    void this.router.navigate(['/tabs/home/settings']);
-  }
-
-  navigateToNotifications() {
-    void this.router.navigate(['/tabs/notifications']);
-  }
 }

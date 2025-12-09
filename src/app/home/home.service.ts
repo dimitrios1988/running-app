@@ -1,28 +1,71 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HeaderElementModel } from './entities/header-element.interface';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import {
   NewsElementModel,
   InfoParentElementModel,
   TrackingElementModel,
   CountdownTimerElementModel,
+  ContentImageElementModel,
 } from '../shared/page.element/page.element.model';
+import { HttpClient } from '@angular/common/http';
+import { AUTH_CREDENTIALS } from '../secrets';
+import { AuthService } from '../auth/auth.service';
+import { HeaderElementResponse } from './models/header.element.resp';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HomeService {
+  private readonly http: HttpClient = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+
+  private readonly pageElementsUrl = new URL(
+    `/api/mobile_app_manager/page_elements/v1`,
+    AUTH_CREDENTIALS.app_url
+  ).toString();
+
   constructor() {}
 
-  getHeaderElement(language: string): Observable<HeaderElementModel> {
-    return of({
-      mainImage:
-        'https://www.athensauthenticmarathon.gr/img/authenticmarathon_layout/logo.svg',
-      mainImageWidth: '80px',
-      mainImagePosition: 'center',
-      secondaryImage: '',
-      secondaryImageWidth: '50px',
-    });
+  getHeaderElement(language: string): Observable<HeaderElementModel | null> {
+    return this.http
+      .get<HeaderElementResponse[]>(this.pageElementsUrl, {
+        params: { language, element: 'header' },
+      })
+      .pipe(
+        map((response: HeaderElementResponse[]) => {
+          if (response.length === 0) return null;
+          return {
+            mainImage: response[0]['0(page_element)'].primary_image
+              ? new URL(
+                  `/data/download/${
+                    response[0]['0(page_element)'].primary_image[0].name
+                  }?attribute_id=cc6d340b-2728-4bdb-95c3-90feb97dbcb2&file_id=${
+                    response[0]['0(page_element)'].primary_image[0].id
+                  }&version=0&token=${this.authService.getToken()}`,
+                  AUTH_CREDENTIALS.app_url
+                ).toString()
+              : '',
+            mainImagePosition: 'center',
+            mainImageWidth: `${
+              response[0]['0(page_element)'].primary_image_width ?? '0'
+            }%`,
+            secondaryImage: response[0]['0(page_element)'].secondary_image
+              ? new URL(
+                  `/data/download/${
+                    response[0]['0(page_element)'].secondary_image[0].name
+                  }?attribute_id=45d68dae-2bf7-475a-9b92-35f7a9899912&file_id=${
+                    response[0]['0(page_element)'].secondary_image[0].id
+                  }&version=0&token=${this.authService.getToken()}`,
+                  AUTH_CREDENTIALS.app_url
+                ).toString()
+              : '',
+            secondaryImageWidth: `${
+              response[0]['0(page_element)'].secondary_image_width ?? '0'
+            }%`,
+          };
+        })
+      );
   }
 
   getNewsElement(language: string): Observable<NewsElementModel> {
@@ -89,7 +132,9 @@ export class HomeService {
     });
   }
 
-  getCountdowntimerElements(): Observable<CountdownTimerElementModel[]> {
+  getCountdowntimerElements(
+    language: string
+  ): Observable<CountdownTimerElementModel[]> {
     return of([
       {
         order: 6,
@@ -99,6 +144,21 @@ export class HomeService {
         backgroundColor: '#4a90e2',
         textColor: '#ece4e4',
         title: 'Timer 2',
+      },
+    ]);
+  }
+
+  getContentImageElements(
+    language: string
+  ): Observable<ContentImageElementModel[]> {
+    return of([
+      {
+        order: 7,
+        type: 'contentimage',
+        id: 21,
+        imageUrl: `https://picsum.photos/1280/320?random=1`,
+        altText: 'Athens Marathon Logo',
+        linkUrl: 'https://athensauthenticmarathon.gr',
       },
     ]);
   }

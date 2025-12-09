@@ -1,36 +1,36 @@
 <ion-header>
   <ion-toolbar
-    style="--main-image-width: {{ mainImageWidth() }}; --secondary-image-width: {{ secondaryImageWidth() }};"
+    style="--main-image-width: {{ headerElementModel?.mainImageWidth?? '0px'}}; --secondary-image-width: {{ headerElementModel?.secondaryImageWidth ?? '0px' }};"
   >
     <!-- Centered main image if no secondary image -->
-    @if ( (headerElementModel()?.secondaryImage?.trim() === '' ||
-    headerElementModel()?.secondaryImage === null) &&
-    headerElementModel()?.mainImagePosition === 'center' ) {
+    @if ( (headerElementModel?.secondaryImage?.trim() === '' ||
+    headerElementModel?.secondaryImage === null) &&
+    headerElementModel?.mainImagePosition === 'center' ) {
     <div class="center-header-image">
       <img
-        [src]="headerElementModel()?.mainImage"
+        [src]="headerElementModel?.mainImage"
         alt="Logo"
         class="main-image"
         loading="lazy"
       />
     </div>
-    } @else { @if (headerElementModel()?.mainImage?.trim()) {
+    } @else { @if (headerElementModel?.mainImage?.trim()) {
     <img
-      [src]="headerElementModel()?.mainImage"
+      [src]="headerElementModel?.mainImage"
       alt="Logo"
       class="main-image"
       [slot]="
-            headerElementModel()?.mainImagePosition === 'left'
+            headerElementModel?.mainImagePosition === 'left'
               ? 'start'
-              : headerElementModel()?.mainImagePosition === 'right'
+              : headerElementModel?.mainImagePosition === 'right'
               ? 'end'
               : 'primary'
           "
       loading="lazy"
     />
-    } @if (headerElementModel()?.secondaryImage?.trim()) {
+    } @if (headerElementModel?.secondaryImage?.trim()) {
     <img
-      [src]="headerElementModel()?.secondaryImage"
+      [src]="headerElementModel?.secondaryImage"
       alt="Secondary Logo"
       class="secondary-image"
       slot="secondary"
@@ -48,7 +48,7 @@
 
 <ion-content [fullscreen]="true">
   <div class="element-container">
-    @for (el of pageElementModel(); track $index) {
+    @for (el of (pageElementModels ? pageElementModels : []); track $index) {
     <app-page-element [element]="el"></app-page-element>
     }
   </div>

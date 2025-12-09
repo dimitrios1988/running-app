@@ -16,6 +16,8 @@
     "REFRESHING_TEXT": "Ενημέρωση ειδήσεων..."
   },
   "NOTIFICATIONS": {
+    "PULLING_TEXT": "Τραβήξτε προς τα κάτω για ανανέωση ειδοποιήσεων",
+    "REFRESHING_TEXT": "Ενημέρωση ειδοποιήσεων...",
     "NEW_NOTIFICATION": "Νέα Ειδοποίηση",
     "NO_NOTIFICATIONS": "Δεν υπάρχουν ειδοποιήσεις",
     "NOTIFICATIONS": "Ειδοποιήσεις"
