@@ -1,0 +1,13 @@
+@if (contentImageElementModel !== null || contentImageElementModel !==
+undefined) {
+<div
+  class="content-image-element-container"
+  (click)="navigateToLink(contentImageElementModel.linkUrl)"
+>
+  <img
+    src="{{ contentImageElementModel.imageUrl }}"
+    alt="{{ contentImageElementModel.altText }}"
+    title="{{ contentImageElementModel.altText }}"
+  />
+</div>
+}
