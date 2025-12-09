@@ -13,7 +13,12 @@
 
   <div class="title-row">
     <div class="icon-column" aria-hidden="true">
-      <img [src]="trackingElementModel?.icon" width="32" height="32" alt="" />
+      <img
+        [src]="trackingElementModel?.icon"
+        width="32"
+        height="32"
+        [alt]="trackingElementModel?.title"
+      />
     </div>
 
     <div class="title-column">
