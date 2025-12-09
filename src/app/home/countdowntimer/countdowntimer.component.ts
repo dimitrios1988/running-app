@@ -28,22 +28,25 @@ interface TimeLeft {
   imports: [DatePipe, AsyncPipe],
 })
 export class CountdowntimerComponent implements OnInit, OnDestroy {
-  @Input() CountdownTimerElementModel!: CountdownTimerElementModel;
+  @Input() countdownTimerElementModel!: CountdownTimerElementModel;
 
   // Expose the computed time as an observable for async pipe binding
   time$!: Observable<TimeLeft>;
+  title!: string;
 
   // expose targetDate for template
   targetDate!: Date;
 
   // bind computed CSS filter to host style variable
   @HostBinding('style.--filter-color') filterColor?: string;
+  @HostBinding('style.--bg-color') bgColor?: string;
 
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     // guard: ensure model exists
-    const model = this.CountdownTimerElementModel;
+    const model = this.countdownTimerElementModel;
+    this.title = model.title;
     if (!model || !model.targetDateTime) {
       this.time$ = of({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       this.targetDate = new Date();
@@ -54,6 +57,9 @@ export class CountdowntimerComponent implements OnInit, OnDestroy {
 
     if (model.textColor) {
       this.filterColor = cssFilterFromHex(model.textColor);
+    }
+    if (model.backgroundColor) {
+      this.bgColor = model.backgroundColor;
     }
 
     // emit every second, start immediately
