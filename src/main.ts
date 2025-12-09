@@ -12,11 +12,16 @@ import {
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
-import { provideHttpClient } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SettingsService } from './app/settings/settings.service';
 import { AppConfigurationService } from './app/app.configuration.service';
+import { AuthInterceptor } from './app/auth/auth.interceptor';
 
 /**
  * Preloads a translation file before bootstrapping Angular.
@@ -38,15 +43,18 @@ async function preloadTranslations(
       { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
       provideIonicAngular(),
       provideRouter(routes, withPreloading(PreloadAllModules)),
-      provideHttpClient(),
+      provideHttpClient(withInterceptorsFromDi()),
       provideTranslateService({
         loader: provideTranslateHttpLoader({
           prefix: '/assets/i18n/',
           suffix: '.json',
         }),
-        //lang,
-        //fallbackLang,
       }),
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: AuthInterceptor,
+        multi: true,
+      },
     ],
   });
 
@@ -57,7 +65,6 @@ async function preloadTranslations(
     appConfigurationService.appConfiguration.supportedLanguages;
   const translateService = appRef.injector.get(TranslateService);
   translateService.setFallbackLang(defaultLanguage.code);
-
   suppportedLanguages
     .filter((lang) => lang.code != defaultLanguage.code)
     .forEach(async (lang) => {
