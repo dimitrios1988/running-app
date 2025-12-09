@@ -1,24 +1,36 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
-import { AppConfigurationService } from '../app.configuration.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsService {
-  constructor() {}
+  private selectedLanguage = signal<string | null>(null);
 
-  async getSelectedLanguage() {
-    const selectedLanguage = await Preferences.get({
-      key: 'selectedLanguage',
-    });
-    return selectedLanguage.value;
+  // Expose the signal as a computed property
+  selectedLanguage$ = computed(() => this.selectedLanguage());
+
+  constructor() {
+    this.initLanguage();
   }
 
-  setSelectedLanguage(lang: string): Promise<void> {
-    return Preferences.set({
+  private async initLanguage() {
+    const lang = await Preferences.get({ key: 'selectedLanguage' });
+    if (lang.value) {
+      this.selectedLanguage.set(lang.value);
+    }
+  }
+
+  async setSelectedLanguage(lang: string): Promise<void> {
+    this.selectedLanguage.set(lang);
+    await Preferences.set({
       key: 'selectedLanguage',
       value: lang,
     });
+  }
+
+  async getSelectedLanguage(): Promise<string | null> {
+    const lang = await Preferences.get({ key: 'selectedLanguage' });
+    return lang.value;
   }
 }

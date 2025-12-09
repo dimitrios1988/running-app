@@ -15,7 +15,7 @@
           placeholder="{{ 'SETTINGS.SELECT_LANGUAGE' | translate }}"
           interface="popover"
           (ionChange)="selectedLanguageChanged($event.detail.value)"
-          [value]="currentLang | async"
+          [value]="currentLang"
         >
           @for (language of appConfiguration.supportedLanguages; track $index) {
           <ion-select-option [value]="language.code">{{

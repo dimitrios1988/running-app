@@ -32,7 +32,6 @@ import { AppConfigurationService } from '../app.configuration.service';
     IonItem,
     IonSelect,
     IonSelectOption,
-    AsyncPipe,
     TranslatePipe,
   ],
 })
@@ -40,11 +39,10 @@ export class SettingsComponent implements OnInit {
   private location = inject(Location);
   private settingsService = inject(SettingsService);
   public appConfiguration = inject(AppConfigurationService).appConfiguration;
-  currentLang: Promise<string | null>;
+  currentLang: string | null;
 
   constructor(private translate: TranslateService) {
-    this.currentLang =
-      this.settingsService.getSelectedLanguage() || Promise.resolve('en');
+    this.currentLang = this.settingsService.selectedLanguage$();
   }
 
   goBack() {
