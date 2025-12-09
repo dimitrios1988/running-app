@@ -8,9 +8,9 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content
       pullingIcon="chevron-down-circle-outline"
-      pullingText="Pull to refresh"
+      pullingText="{{ 'NOTIFICATIONS.PULLING_TEXT' | translate }}"
       refreshingSpinner="circles"
-      refreshingText="{{ 'NEWS_LIST.REFRESHING_TEXT' | translate }}"
+      refreshingText="{{ 'NOTIFICATIONS.REFRESHING_TEXT' | translate }}"
     ></ion-refresher-content>
   </ion-refresher>
   <cdk-virtual-scroll-viewport
@@ -30,11 +30,16 @@
           <strong>{{ notification.title }}</strong>
           <ion-text color="medium">{{ notification.message }}</ion-text>
         </ion-label>
-        <ion-icon
-          slot="end"
-          name="chevron-forward-outline"
-          class="right-arrow"
-        ></ion-icon> </ion-item
+        <div class="metadata-end-wrapper" slot="end">
+          <ion-note color="medium"
+            >{{notification.publishedAt | date : "short"}}</ion-note
+          >
+          <ion-icon
+            slot="end"
+            name="chevron-forward-outline"
+            class="right-arrow"
+          ></ion-icon>
+        </div> </ion-item
     ></ion-list>
   </cdk-virtual-scroll-viewport>
 </ion-content>

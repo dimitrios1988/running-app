@@ -12,6 +12,7 @@ import {
   IonIcon,
   RefresherEventDetail,
   IonList,
+  IonNote,
 } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
@@ -28,11 +29,14 @@ import {
 } from 'ionicons/icons';
 import { Observable, Subscription, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-notifications',
   templateUrl: 'notifications.page.html',
   styleUrls: ['notifications.page.scss'],
   imports: [
+    IonNote,
     IonList,
     IonIcon,
     IonText,
@@ -47,6 +51,7 @@ import { Router } from '@angular/router';
     CdkVirtualScrollViewport,
     ScrollingModule,
     TranslatePipe,
+    CommonModule,
   ],
 })
 export class NotificationsPage implements OnInit, OnDestroy {

@@ -14,7 +14,7 @@ import { signal, effect } from '@angular/core';
 import { INotification } from '../notification.interface';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-notifications-viewer',

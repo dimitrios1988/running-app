@@ -21,8 +21,6 @@ ion-content.virtual-wrapper {
   gap: 12px;
 }
 
-
-
 .notifications-item {
   width: 100%;
   margin: 0;
@@ -42,5 +40,12 @@ ion-label strong {
 
 ion-label ion-note {
   font-size: 0.9rem;
+}
+
+.metadata-end-wrapper{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 5px;
 }
 
