@@ -4,6 +4,7 @@ import { NewsComponent } from '../../home/news/news.component';
 import { InfoComponent } from '../../home/info/info.component';
 import { PageElementModel } from './page.element.model';
 import { CountdowntimerComponent } from '../../home/countdowntimer/countdowntimer.component';
+import { ContentImageComponent } from '../../home/content-image/content-image.component';
 
 @Component({
   selector: 'app-page-element',
@@ -14,6 +15,7 @@ import { CountdowntimerComponent } from '../../home/countdowntimer/countdowntime
     NewsComponent,
     InfoComponent,
     CountdowntimerComponent,
+    ContentImageComponent,
   ],
 })
 export class PageElementComponent {

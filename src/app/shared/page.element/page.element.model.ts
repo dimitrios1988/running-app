@@ -5,7 +5,8 @@ export type PageElementModel =
   | TrackingElementModel
   | NewsElementModel
   | InfoParentElementModel
-  | CountdownTimerElementModel;
+  | CountdownTimerElementModel
+  | ContentImageElementModel;
 
 export interface BasePageElement {
   order: number;
@@ -53,4 +54,12 @@ export interface CountdownTimerElementModel extends BasePageElement {
   backgroundColor: string | null;
   textColor: string | null;
   title: string;
+}
+
+export interface ContentImageElementModel extends BasePageElement {
+  id: number;
+  type: 'contentimage';
+  imageUrl: string;
+  altText: string;
+  linkUrl: string | null;
 }

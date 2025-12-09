@@ -3,7 +3,9 @@
 <app-news [newsElementModel]="element"></app-news> } @case('info') {
 <app-info [infoChildElementModelArray]="element.infoChildElements"></app-info> }
 @case ('countdowntimer') {
-<app-countdowntimer [CountdownTimerElementModel]="element"></app-countdowntimer>
+<app-countdowntimer [countdownTimerElementModel]="element"></app-countdowntimer>
+}@case ('contentimage') {
+<app-content-image [contentImageElementModel]="element"></app-content-image>
 } @default {
 <p>Unsupported element type</p>
 } }
