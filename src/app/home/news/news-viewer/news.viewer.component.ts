@@ -3,6 +3,7 @@ import {
   inject,
   ChangeDetectionStrategy,
   effect,
+  OnDestroy,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -15,7 +16,7 @@ import {
 } from '@ionic/angular/standalone';
 import { NewsService } from '../news.service';
 import { INews } from './news.item';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { map, switchMap, shareReplay } from 'rxjs/operators';
 
@@ -35,9 +36,10 @@ import { map, switchMap, shareReplay } from 'rxjs/operators';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NewsViewerComponent {
+export class NewsViewerComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private newsService = inject(NewsService);
+  private newsSubscription: Subscription;
 
   // reactive pipeline: responds to route param changes, shared for template consumption
   readonly news$: Observable<INews> = this.route.paramMap.pipe(
@@ -47,10 +49,13 @@ export class NewsViewerComponent {
   );
 
   constructor() {
-    this.news$.subscribe();
+    this.newsSubscription = this.news$.subscribe();
     effect(() => {
       this.newsService.news$();
-      this.news$.subscribe((news) => console.log('Loaded news item:', news));
+      this.newsSubscription = this.news$.subscribe();
     });
+  }
+  ngOnDestroy(): void {
+    this.newsSubscription.unsubscribe();
   }
 }

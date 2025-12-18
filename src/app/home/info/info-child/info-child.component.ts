@@ -31,7 +31,21 @@ export class InfoChildComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setBackgroudColor();
+    if (this.infoChildElementModel?.backgroundColor) {
+      const backgroundRgb = hexToRgb(
+        this.infoChildElementModel?.backgroundColor
+      );
+      this.infoChildElement.nativeElement.style.setProperty(
+        '--bg-color',
+        `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
+      );
+    }
+    if (this.infoChildElementModel?.textColor) {
+      this.infoChildElement.nativeElement.style.setProperty(
+        '--text-color',
+        this.infoChildElementModel?.textColor
+      );
+    }
   }
 
   navigateToInfo() {
@@ -52,15 +66,5 @@ export class InfoChildComponent implements OnInit {
     } catch {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
-  }
-
-  private setBackgroudColor() {
-    const backgroundRgb = hexToRgb(
-      this.infoChildElementModel?.backgroundColor || '#2a7b9b'
-    );
-    this.infoChildElement.nativeElement.style.setProperty(
-      '--bg-color',
-      `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
-    );
   }
 }

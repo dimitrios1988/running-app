@@ -49,13 +49,11 @@ export class TrackingComponent implements OnChanges {
         ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)`
         : undefined;
     } else {
-      this.hostBgColor = undefined;
+      this.hostBgColor = 'transparent';
     }
 
     if (m?.textColor) {
       this.hostFilterColor = cssFilterFromHex(m.textColor);
-    } else {
-      this.hostFilterColor = undefined;
     }
   }
 }

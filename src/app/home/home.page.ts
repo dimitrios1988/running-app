@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   inject,
   effect,
+  OnDestroy,
 } from '@angular/core';
 import {
   IonButtons,
@@ -16,11 +17,13 @@ import { addIcons } from 'ionicons';
 import { settingsOutline } from 'ionicons/icons';
 import { PageElementComponent } from '../shared/page.element/page.element.component';
 import { HomeService } from './home.service';
-import { HeaderElementModel } from './entities/header-element.interface';
 import { Router } from '@angular/router';
-import { PageElementModel } from '../shared/page.element/page.element.model';
+import {
+  HeaderElementModel,
+  PageElementModel,
+} from '../shared/page.element/page.element.model';
 import { SettingsService } from '../settings/settings.service';
-import { forkJoin, mergeMap, tap } from 'rxjs';
+import { forkJoin, mergeMap, Subscription, tap } from 'rxjs';
 
 @Component({
   selector: 'home-tab',
@@ -36,12 +39,12 @@ import { forkJoin, mergeMap, tap } from 'rxjs';
   ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HomePage {
+export class HomePage implements OnDestroy {
   private homeService = inject(HomeService);
   private router = inject(Router);
   private settingsService = inject(SettingsService);
+  private sub: Subscription = Subscription.EMPTY;
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;
 
@@ -50,38 +53,33 @@ export class HomePage {
     effect(() => {
       const currentLang = this.settingsService.selectedLanguage$();
       if (!currentLang) return;
-      const headerElementModel$ =
-        this.homeService.getHeaderElement(currentLang);
-      const newsElementModel$ = this.homeService.getNewsElement(currentLang);
-      const trackingElementModel$ =
-        this.homeService.getTrackingElement(currentLang);
-      const infoParentElementModel$ =
-        this.homeService.getInfoParentElement(currentLang);
-      const countdowntimerElementModels$ =
-        this.homeService.getCountdowntimerElements(currentLang);
-      const contentImageElementModels$ =
-        this.homeService.getContentImageElements(currentLang);
+      const homeElementModel$ = this.homeService.getHomeElements(currentLang);
 
-      headerElementModel$
+      this.sub = homeElementModel$
         .pipe(
           tap((model) => {
-            this.headerElementModel = model!;
+            if (!model) return;
+            this.headerElementModel = model.headerElementModel
+              ? model.headerElementModel
+              : undefined;
+            this.pageElementModels = [
+              ...(model.newsElementModel ? [model.newsElementModel] : []),
+              ...(model.countdownTimerElementModels ?? []),
+              ...(model.contentImageElementModels ?? []),
+              ...(model.trackingElementModel
+                ? [model.trackingElementModel]
+                : []),
+              ...(model.infoParentElementModel
+                ? [model.infoParentElementModel]
+                : []),
+            ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
           })
         )
         .subscribe();
-      const pageElementModels$ = [
-        newsElementModel$,
-        trackingElementModel$,
-        infoParentElementModel$,
-        countdowntimerElementModels$.pipe(mergeMap((arr) => arr || [])),
-        contentImageElementModels$.pipe(mergeMap((arr) => arr || [])),
-      ];
-      forkJoin(pageElementModels$).subscribe((value) => {
-        this.pageElementModels = value.sort(
-          (a, b) => (a.order ?? 0) - (b.order ?? 0)
-        );
-      });
     });
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
   navigateToSettings() {

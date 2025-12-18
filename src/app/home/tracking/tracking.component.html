@@ -4,12 +4,14 @@
   (click)="onClick()"
   [attr.aria-label]="trackingElementModel?.title"
 >
+  @if(trackingElementModel?.backgroundImage){
   <img
     [src]="trackingElementModel?.backgroundImage"
     alt="Tracking background"
     class="background-image"
     role="presentation"
   />
+  }
 
   <div class="title-row">
     <div class="icon-column" aria-hidden="true">

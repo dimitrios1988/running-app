@@ -28,6 +28,7 @@ import { addIcons } from 'ionicons';
 import { chevronDownCircleOutline } from 'ionicons/icons';
 import { DatePipe } from '@angular/common';
 import { Observable, Subscription, tap } from 'rxjs';
+import { SettingsService } from '../../../settings/settings.service';
 
 @Component({
   selector: 'app-news.list',
@@ -61,12 +62,14 @@ export class NewsListComponent implements OnInit, OnDestroy {
   private newsService = inject(NewsService);
   private atTop = true;
   private newsListItemsSub?: Subscription;
+  private settingsService = inject(SettingsService);
+
   constructor() {
     addIcons({ chevronDownCircleOutline });
   }
 
-  private loadNews(): Observable<INewsListItem[]> {
-    return this.newsService.getNewsItems().pipe(
+  private loadNews(language: string): Observable<INewsListItem[]> {
+    return this.newsService.getNewsItems(language).pipe(
       tap((data: INewsListItem[]) => {
         this.newsListItems = data;
         this.checkViewportSize();
@@ -79,7 +82,9 @@ export class NewsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.newsListItemsSub = this.loadNews().subscribe();
+    const currentLang = this.settingsService.selectedLanguage$();
+    if (!currentLang) return;
+    this.newsListItemsSub = this.loadNews(currentLang).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -98,7 +103,9 @@ export class NewsListComponent implements OnInit, OnDestroy {
 
   async doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
     this.newsListItemsSub?.unsubscribe();
-    this.newsListItemsSub = this.loadNews()
+    const currentLang = this.settingsService.selectedLanguage$();
+    if (!currentLang) return;
+    this.newsListItemsSub = this.loadNews(currentLang)
       .pipe(tap(() => (event.target as HTMLIonRefresherElement)?.complete()))
       .subscribe();
   }

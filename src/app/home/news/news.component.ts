@@ -21,17 +21,25 @@ export class NewsComponent implements OnInit {
   }
 
   ngOnInit() {
-    const backgroundRgb = hexToRgb(this.newsElementModel.backgroundColor);
-    this.newsElement.nativeElement.style.setProperty(
-      '--bg-color',
-      `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
-    );
-
-    const filterColor = cssFilterFromHex(this.newsElementModel.textColor);
-    this.newsElement.nativeElement.style.setProperty(
-      '--filter-color',
-      filterColor
-    );
+    if (this.newsElementModel.backgroundColor) {
+      const backgroundRgb = hexToRgb(this.newsElementModel.backgroundColor);
+      this.newsElement.nativeElement.style.setProperty(
+        '--bg-color',
+        `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
+      );
+    } else {
+      this.newsElement.nativeElement.style.setProperty(
+        '--bg-color',
+        'transparent'
+      );
+    }
+    if (this.newsElementModel.textColor) {
+      const filterColor = cssFilterFromHex(this.newsElementModel.textColor);
+      this.newsElement.nativeElement.style.setProperty(
+        '--filter-color',
+        filterColor
+      );
+    }
   }
 
   navigateToNews() {

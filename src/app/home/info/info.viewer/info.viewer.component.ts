@@ -50,10 +50,15 @@ export class InfoViewerComponent {
     this.route.paramMap.pipe(
       map((pm) => Number(pm.get('id'))),
       switchMap((id) => this.svc.getInfo(id)),
-      map((info) => ({
-        ...info,
-        safeContent: this.sanitizer.bypassSecurityTrustHtml(info.content ?? ''),
-      })),
+      map((info) => {
+        if (!info) {
+          return null as unknown as IInfoViewer & { safeContent: SafeHtml };
+        }
+        return {
+          ...info,
+          safeContent: this.sanitizer.bypassSecurityTrustHtml(info.content ?? ''),
+        };
+      }),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 

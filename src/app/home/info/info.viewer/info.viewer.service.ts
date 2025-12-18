@@ -1,21 +1,47 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { IInfoViewer } from './info.viewer.interface';
-import { Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { AUTH_CREDENTIALS } from '../../../secrets';
+import { AuthService } from '../../../auth/auth.service';
+import { InfoViewerResponse } from './response/infoviewer.resp';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InfoViewerService {
+  private readonly http: HttpClient = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+
+  private readonly infoApi = new URL(
+    `/api/mobile_app_manager/info_view/v1`,
+    AUTH_CREDENTIALS.app_url
+  ).toString();
+
   constructor() {}
 
-  getInfo(id: number): Observable<IInfoViewer> {
-    return of({
-      title: `Info Viewer ${id}`,
-      backgroundColor: '#2a7b9b',
-      content: `<p>Hello</p>`,
-      image:
-        'https://cdn.outsideonline.com/wp-content/uploads/2021/11/boston-marathon-elite-men-start-line_h.jpg',
-      link: 'https://www.athensauthenticmarathon.gr',
-    });
+  getInfo(id: number): Observable<IInfoViewer | null> {
+    return this.http.get<InfoViewerResponse[]>(`${this.infoApi}/${id}`).pipe(
+      map((resp) => {
+        if (resp.length === 0) {
+          return null;
+        }
+        return {
+          title: resp[0]['0(page_element)'].title,
+          content: resp[0]['0(page_element)'].content,
+          image: resp[0]['0(page_element)'].primary_image
+            ? new URL(
+                `/data/download/${
+                  resp[0]['0(page_element)'].primary_image[0].name
+                }?attribute_id=cc6d340b-2728-4bdb-95c3-90feb97dbcb2&file_id=${
+                  resp[0]['0(page_element)'].primary_image[0].id
+                }&version=0&token=${this.authService.getToken()}`,
+                AUTH_CREDENTIALS.app_url
+              ).toString()
+            : null,
+          link: resp[0]['0(page_element)'].url,
+        };
+      })
+    );
   }
 }

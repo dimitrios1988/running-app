@@ -12,6 +12,7 @@
 .main-image {
   width: var(--main-image-width);
   height: auto;
+  max-height: 130px;
 }
 
 .secondary-image {

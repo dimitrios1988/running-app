@@ -32,7 +32,7 @@ export class CountdowntimerComponent implements OnInit, OnDestroy {
 
   // Expose the computed time as an observable for async pipe binding
   time$!: Observable<TimeLeft>;
-  title!: string;
+  title!: string | null;
 
   // expose targetDate for template
   targetDate!: Date;

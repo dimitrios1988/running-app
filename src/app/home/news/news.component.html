@@ -4,19 +4,24 @@
   class="news-element"
   (click)="navigateToNews()"
 >
+  @if(newsElementModel.backgroundImage){
   <img
     [src]="newsElementModel.backgroundImage"
     alt="News Header Image"
     class="background-image"
   />
+  }
+
   <div class="title-row">
     <div class="icon-column" aria-hidden="true">
+      @if(newsElementModel.icon){
       <img
         #newsIcon
         [src]="newsElementModel.icon"
         width="32"
         [alt]="newsElementModel.title"
       />
+      }
     </div>
     <div class="title-column">
       <span class="title">{{ newsElementModel.title }}</span>
