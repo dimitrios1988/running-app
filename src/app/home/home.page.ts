@@ -43,7 +43,7 @@ import { forkJoin, mergeMap, Subscription, tap } from 'rxjs';
 export class HomePage implements OnDestroy {
   private homeService = inject(HomeService);
   private router = inject(Router);
-  private settingsService = inject(SettingsService);
+  private readonly settingsService = inject(SettingsService);
   private sub: Subscription = Subscription.EMPTY;
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;

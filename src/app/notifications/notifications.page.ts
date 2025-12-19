@@ -1,4 +1,11 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -28,8 +35,9 @@ import {
   chevronForwardOutline,
 } from 'ionicons/icons';
 import { Observable, Subscription, tap } from 'rxjs';
-import { Router } from '@angular/router';
+import { OnSameUrlNavigation, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SettingsService } from '../settings/settings.service';
 
 @Component({
   selector: 'app-notifications',
@@ -60,12 +68,19 @@ export class NotificationsPage implements OnInit, OnDestroy {
   notifications?: INotification[];
   private atTop = true;
   private translateService = inject(TranslateService);
+  private readonly settingsService = inject(SettingsService);
   private notificationsService: NotificationsService =
     inject(NotificationsService);
   private notificationSub$?: Subscription;
   private router: Router = inject(Router);
+
   constructor() {
     addIcons({ chevronDownCircleOutline, chevronForwardOutline });
+    effect(() => {
+      const currentLang = this.settingsService.selectedLanguage$();
+      if (!currentLang) return;
+      this.notificationSub$ = this.loadNotifications().subscribe();
+    });
   }
 
   ngOnInit() {

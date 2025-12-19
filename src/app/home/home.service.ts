@@ -150,32 +150,22 @@ export class HomeService {
               infoResponses.length > 0
                 ? {
                     type: 'info',
-                    order: infoResponses.sort(
-                      (a, b) =>
-                        (a['0(page_element)'].order ?? 0) -
-                        (b['0(page_element)'].order ?? 0)
-                    )[0]['0(page_element)'].order,
-                    infoChildElements: infoResponses
-                      .sort(
-                        (a, b) =>
-                          (a['0(page_element)'].order ?? 0) -
-                          (b['0(page_element)'].order ?? 0)
-                      )
-                      .map((infoResponse) => ({
-                        id: infoResponse['0(page_element)'].id,
-                        link: infoResponse['0(page_element)'].url,
-                        title: infoResponse['0(page_element)'].title,
-                        subtitle: infoResponse['0(page_element)'].subtitle,
-                        opens_in_external_url:
-                          infoResponse['0(page_element)'].opens_external_url,
-                        backgroundColor: infoResponse['0(page_element)']
-                          .background_color
-                          ? `#${infoResponse['0(page_element)'].background_color}`
-                          : null,
-                        textColor: infoResponse['0(page_element)'].text_color
-                          ? `#${infoResponse['0(page_element)'].text_color}`
-                          : null,
-                      })),
+                    order: infoResponses[0]['0(page_element)'].order,
+                    infoChildElements: infoResponses.map((infoResponse) => ({
+                      id: infoResponse['0(page_element)'].id,
+                      link: infoResponse['0(page_element)'].url,
+                      title: infoResponse['0(page_element)'].title,
+                      subtitle: infoResponse['0(page_element)'].subtitle,
+                      opens_in_external_url:
+                        infoResponse['0(page_element)'].opens_external_url,
+                      backgroundColor: infoResponse['0(page_element)']
+                        .background_color
+                        ? `#${infoResponse['0(page_element)'].background_color}`
+                        : null,
+                      textColor: infoResponse['0(page_element)'].text_color
+                        ? `#${infoResponse['0(page_element)'].text_color}`
+                        : null,
+                    })),
                   }
                 : null,
             countdownTimerElementModels:
