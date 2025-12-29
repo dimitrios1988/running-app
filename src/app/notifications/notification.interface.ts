@@ -3,4 +3,5 @@ export interface INotification {
   publishedAt: Date;
   title: string | null;
   message: string | null;
+  isRead: boolean;
 }

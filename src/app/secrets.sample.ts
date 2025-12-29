@@ -4,3 +4,7 @@ export const AUTH_CREDENTIALS = {
   username: 'yourUsername',
   password: 'yourPassword',
 };
+
+export const ONESIGNAL = {
+  app_id: 'your-app-id-here',
+};

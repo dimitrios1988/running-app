@@ -15,6 +15,7 @@ import { INotification } from '../notification.interface';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { SettingsService } from '../../settings/settings.service';
 
 @Component({
   selector: 'app-notifications-viewer',
@@ -43,25 +44,27 @@ export class NotificationsViewerComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private notificationsService: NotificationsService
+    private notificationsService: NotificationsService,
+    private settingsService: SettingsService
   ) {
-    effect(() => {
+    effect((test) => {
       const id = this._notificationId();
       if (!id) {
         this.error.set('Invalid notification ID');
         this.loading.set(false);
         return;
       }
+      //this.notificationsService.markAsRead(Number(id));
 
       // Cancel previous subscription if exists
       if (this.subscription) {
-        this.subscription.unsubscribe();
+        //this.subscription.unsubscribe();
       }
 
-      this.loading.set(true);
-      this.error.set(null);
+      /* this.loading.set(true);
+      this.error.set(null); */
 
-      this.subscription = this.notificationsService
+      /* this.subscription = this.notificationsService
         .getNotificationById(Number(id))
         .subscribe({
           next: (notification) => {
@@ -77,7 +80,7 @@ export class NotificationsViewerComponent implements OnInit, OnDestroy {
             this.error.set('Failed to load notification');
             this.loading.set(false);
           },
-        });
+        }); */
     });
   }
 
@@ -85,6 +88,29 @@ export class NotificationsViewerComponent implements OnInit, OnDestroy {
     // Extract ID from route parameters
     const id = this.route.snapshot.params['id'];
     this._notificationId.set(id ?? null);
+    this.loading.set(true);
+    this.error.set(null);
+    this.subscription = this.notificationsService
+      .getNotificationById(
+        Number(id),
+        this.settingsService.selectedLanguage$() || 'en'
+      )
+      .subscribe({
+        next: (notification) => {
+          if (notification) {
+            this.notification.set(notification);
+          } else {
+            this.error.set('Notification not found');
+          }
+          this.loading.set(false);
+          this.notificationsService.markAsRead(Number(id));
+        },
+        error: (err) => {
+          console.error('Failed to load notification:', err);
+          this.error.set('Failed to load notification');
+          this.loading.set(false);
+        },
+      });
   }
 
   ngOnDestroy() {

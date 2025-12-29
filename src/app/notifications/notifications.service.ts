@@ -1,9 +1,11 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { map, Observable, of, tap } from 'rxjs';
+import { effect, inject, Injectable, signal } from '@angular/core';
+import { first, map, Observable, of, tap } from 'rxjs';
 import { INotification } from './notification.interface';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
 import { NotificationsResp } from './notifications.resp';
+import { Preferences } from '@capacitor/preferences';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +19,7 @@ export class NotificationsService {
   ).toString();
   private readonly http = inject(HttpClient);
   public readonly notifications$ = this._notifications.asReadonly();
-  constructor() {}
+  constructor(private settingsService: SettingsService) {}
 
   getNotifications(language: string): Observable<INotification[]> {
     return this.http
@@ -32,19 +34,85 @@ export class NotificationsService {
               publishedAt: new Date(
                 item['0(notification)'].published_at * 1000
               ),
+              isRead: false,
             };
           });
         }),
         tap((notifications) => {
-          this._notifications.set(notifications);
+          this.getReadNotifications().then((readIds) => {
+            notifications.forEach((notification) => {
+              if (readIds.includes(notification.id)) {
+                notification.isRead = true;
+              }
+            });
+            this._notifications.set(notifications);
+          });
         })
       );
   }
 
-  getNotificationById(id: number): Observable<INotification | undefined> {
-    const notification = this._notifications()
+  getNotificationById(id: number, language: string): Observable<INotification> {
+    try {
+      return this.http
+        .get<NotificationsResp[]>(`${this.notificationsApi}/${id}`, {
+          params: { language },
+        })
+        .pipe(
+          map((resp) => {
+            return {
+              id: resp[0]['0(notification)'].id,
+              title: resp[0]['0(notification)'].title,
+              message: resp[0]['0(notification)'].content,
+              publishedAt: new Date(
+                resp[0]['0(notification)'].published_at * 1000
+              ),
+              isRead: false,
+            };
+          })
+        );
+    } catch (error) {
+      throw new Error('Error fetching notification');
+    }
+  }
+
+  async markAsRead(id: number): Promise<void> {
+    /* const notifications = this._notifications().slice();
+    const index = notifications.findIndex((n) => n.id === id);
+    if (index !== -1) {
+      notifications[index].isRead = true;
+      await Preferences.set({
+        key: 'read_notifications',
+        value: JSON.stringify(
+          notifications.filter((n) => n.isRead).map((n) => n.id)
+        ),
+      });
+      this._notifications.set(notifications);
+    } */
+    const readIds = await this.getReadNotifications();
+    if (!readIds.includes(id)) {
+      readIds.push(id);
+      await Preferences.set({
+        key: 'read_notifications',
+        value: JSON.stringify(readIds),
+      });
+    }
+
+    const notifications = this._notifications()
       .slice()
-      .find((n) => n.id === id);
-    return of(notification);
+      .map((n) => {
+        if (n.id === id) {
+          return { ...n, isRead: true };
+        }
+        return n;
+      });
+    this._notifications.set(notifications);
+  }
+
+  async getReadNotifications(): Promise<number[]> {
+    const result = await Preferences.get({ key: 'read_notifications' });
+    if (result.value) {
+      return JSON.parse(result.value) as number[];
+    }
+    return [];
   }
 }
