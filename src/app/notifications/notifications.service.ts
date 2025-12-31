@@ -1,5 +1,5 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
-import { first, map, Observable, of, tap } from 'rxjs';
+import { map, Observable, Subscription, tap } from 'rxjs';
 import { INotification } from './notification.interface';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
@@ -12,6 +12,7 @@ import { SettingsService } from '../settings/settings.service';
 })
 export class NotificationsService {
   private readonly _notifications = signal<INotification[]>([]);
+  private notificationSub$: Subscription = Subscription.EMPTY;
 
   private readonly notificationsApi = new URL(
     `/api/mobile_app_manager/notifications/v1`,
@@ -19,7 +20,15 @@ export class NotificationsService {
   ).toString();
   private readonly http = inject(HttpClient);
   public readonly notifications$ = this._notifications.asReadonly();
-  constructor(private settingsService: SettingsService) {}
+  constructor(private settingsService: SettingsService) {
+    effect(() => {
+      const language = this.settingsService.selectedLanguage$();
+      if (language) {
+        this.notificationSub$.unsubscribe();
+        this.notificationSub$ = this.getNotifications(language).subscribe();
+      }
+    });
+  }
 
   getNotifications(language: string): Observable<INotification[]> {
     return this.http
@@ -76,18 +85,6 @@ export class NotificationsService {
   }
 
   async markAsRead(id: number): Promise<void> {
-    /* const notifications = this._notifications().slice();
-    const index = notifications.findIndex((n) => n.id === id);
-    if (index !== -1) {
-      notifications[index].isRead = true;
-      await Preferences.set({
-        key: 'read_notifications',
-        value: JSON.stringify(
-          notifications.filter((n) => n.isRead).map((n) => n.id)
-        ),
-      });
-      this._notifications.set(notifications);
-    } */
     const readIds = await this.getReadNotifications();
     if (!readIds.includes(id)) {
       readIds.push(id);

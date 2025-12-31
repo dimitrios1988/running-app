@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  effect,
+} from '@angular/core';
 import {
   IonHeader,
   IonContent,
@@ -54,7 +61,7 @@ import { SettingsService } from '../../../settings/settings.service';
     DatePipe,
   ],
 })
-export class NewsListComponent implements OnInit, OnDestroy {
+export class NewsListComponent implements OnDestroy {
   @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
   newsListItems?: INewsListItem[];
 
@@ -66,25 +73,14 @@ export class NewsListComponent implements OnInit, OnDestroy {
 
   constructor() {
     addIcons({ chevronDownCircleOutline });
-  }
-
-  private loadNews(language: string): Observable<INewsListItem[]> {
-    return this.newsService.getNewsItems(language).pipe(
-      tap((data: INewsListItem[]) => {
-        this.newsListItems = data;
-        this.checkViewportSize();
-      })
-    );
+    effect(() => {
+      this.newsListItems = this.newsService.newsList$();
+      this.checkViewportSize();
+    });
   }
 
   private checkViewportSize() {
     setTimeout(() => this.viewport?.checkViewportSize());
-  }
-
-  ngOnInit() {
-    const currentLang = this.settingsService.selectedLanguage$();
-    if (!currentLang) return;
-    this.newsListItemsSub = this.loadNews(currentLang).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -101,11 +97,12 @@ export class NewsListComponent implements OnInit, OnDestroy {
     return this.atTop;
   }
 
-  async doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
-    this.newsListItemsSub?.unsubscribe();
+  doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
     const currentLang = this.settingsService.selectedLanguage$();
     if (!currentLang) return;
-    this.newsListItemsSub = this.loadNews(currentLang)
+    this.newsListItemsSub?.unsubscribe();
+    this.newsListItemsSub = this.newsService
+      .getNewsItems(currentLang)
       .pipe(tap(() => (event.target as HTMLIonRefresherElement)?.complete()))
       .subscribe();
   }

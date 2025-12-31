@@ -4,9 +4,9 @@
       <ion-back-button></ion-back-button>
     </ion-buttons>
     @if(loading()) {
-    <ion-title>Loading...</ion-title>
+    <ion-title>{{ "NOTIFICATIONS_VIEWER.LOADING" | translate }}</ion-title>
     } @else if(error()) {
-    <ion-title>Error</ion-title>
+    <ion-title>{{ "NOTIFICATIONS_VIEWER.ERROR" | translate }}</ion-title>
     } @else {
     <ion-title>{{ "NOTIFICATIONS_VIEWER.NOTIFICATION" | translate }}</ion-title>
     }

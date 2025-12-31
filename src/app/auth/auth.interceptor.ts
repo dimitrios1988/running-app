@@ -8,7 +8,6 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError, EMPTY, of, from } from 'rxjs';
 import { catchError, switchMap, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { Preferences } from '@capacitor/preferences';
 
@@ -17,7 +16,7 @@ export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenPromise: Promise<string> | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   intercept(
     request: HttpRequest<unknown>,

@@ -43,7 +43,6 @@ import { forkJoin, mergeMap, Subscription, tap } from 'rxjs';
 export class HomePage implements OnDestroy {
   private homeService = inject(HomeService);
   private router = inject(Router);
-  private readonly settingsService = inject(SettingsService);
   private sub: Subscription = Subscription.EMPTY;
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;
@@ -51,31 +50,25 @@ export class HomePage implements OnDestroy {
   constructor() {
     addIcons({ settingsOutline });
     effect(() => {
-      const currentLang = this.settingsService.selectedLanguage$();
-      if (!currentLang) return;
-      const homeElementModel$ = this.homeService.getHomeElements(currentLang);
-
-      this.sub = homeElementModel$
-        .pipe(
-          tap((model) => {
-            if (!model) return;
-            this.headerElementModel = model.headerElementModel
-              ? model.headerElementModel
-              : undefined;
-            this.pageElementModels = [
-              ...(model.newsElementModel ? [model.newsElementModel] : []),
-              ...(model.countdownTimerElementModels ?? []),
-              ...(model.contentImageElementModels ?? []),
-              ...(model.trackingElementModel
-                ? [model.trackingElementModel]
-                : []),
-              ...(model.infoParentElementModel
-                ? [model.infoParentElementModel]
-                : []),
-            ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-          })
-        )
-        .subscribe();
+      const homeElements = this.homeService.homeElements();
+      if (homeElements) {
+        this.headerElementModel = homeElements.headerElementModel
+          ? homeElements.headerElementModel
+          : undefined;
+        this.pageElementModels = [
+          ...(homeElements.newsElementModel
+            ? [homeElements.newsElementModel]
+            : []),
+          ...(homeElements.countdownTimerElementModels ?? []),
+          ...(homeElements.contentImageElementModels ?? []),
+          ...(homeElements.trackingElementModel
+            ? [homeElements.trackingElementModel]
+            : []),
+          ...(homeElements.infoParentElementModel
+            ? [homeElements.infoParentElementModel]
+            : []),
+        ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      }
     });
   }
   ngOnDestroy(): void {

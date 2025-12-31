@@ -19,7 +19,7 @@
     orientation="vertical"
     (scrolledIndexChange)="onScroll()"
   >
-    @if(notifications && notifications.length > 0){
+    @if(notifications != null && notifications.length > 0) {
     <ion-list lines="full"
       ><ion-item
         *cdkVirtualFor="let notification of notifications; let i = index"

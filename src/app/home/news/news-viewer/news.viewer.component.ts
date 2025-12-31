@@ -1,9 +1,10 @@
 import {
   Component,
   inject,
-  ChangeDetectionStrategy,
   effect,
   OnDestroy,
+  OnInit,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -16,9 +17,9 @@ import {
 } from '@ionic/angular/standalone';
 import { NewsService } from '../news.service';
 import { INews } from './news.item';
-import { Observable, Subscription } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
-import { map, switchMap, shareReplay } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { SettingsService } from '../../../settings/settings.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-news.viewer',
@@ -32,30 +33,40 @@ import { map, switchMap, shareReplay } from 'rxjs/operators';
     IonButtons,
     IonHeader,
     IonContent,
-    AsyncPipe,
+    TranslatePipe,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NewsViewerComponent implements OnDestroy {
+export class NewsViewerComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private newsService = inject(NewsService);
-  private newsSubscription: Subscription;
-
-  // reactive pipeline: responds to route param changes, shared for template consumption
-  readonly news$: Observable<INews> = this.route.paramMap.pipe(
-    map((pm) => Number(pm.get('id'))),
-    switchMap((id) => this.newsService.getNews(id)),
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
+  private settingsService = inject(SettingsService);
+  private newsSubscription: Subscription = Subscription.EMPTY;
+  public readonly loading = signal(true);
+  public readonly error = signal<string | null>(null);
+  news: INews | null = null;
 
   constructor() {
-    this.newsSubscription = this.news$.subscribe();
     effect(() => {
-      this.newsService.news$();
-      this.newsSubscription = this.news$.subscribe();
+      this.news = this.newsService.news$();
     });
   }
+
+  ngOnInit(): void {
+    const id = Number(this.route.snapshot.params['id']);
+    this.loading.set(true);
+    this.error.set(null);
+    const selectedLanguage = this.settingsService.selectedLanguage$();
+    if (selectedLanguage) {
+      this.newsSubscription.unsubscribe();
+      this.newsSubscription = this.newsService
+        .getNews(id, selectedLanguage)
+        .subscribe();
+    }
+  }
+
   ngOnDestroy(): void {
-    this.newsSubscription.unsubscribe();
+    if (this.newsSubscription != Subscription.EMPTY) {
+      this.newsSubscription.unsubscribe();
+    }
   }
 }

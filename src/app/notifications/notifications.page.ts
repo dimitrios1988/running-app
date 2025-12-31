@@ -62,13 +62,12 @@ import { SettingsService } from '../settings/settings.service';
     CommonModule,
   ],
 })
-export class NotificationsPage implements OnInit, OnDestroy {
+export class NotificationsPage implements OnDestroy {
   @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
 
   notifications?: INotification[];
   private atTop = true;
   private translateService = inject(TranslateService);
-  private readonly settingsService = inject(SettingsService);
   private notificationsService: NotificationsService =
     inject(NotificationsService);
   private notificationSub$?: Subscription;
@@ -77,14 +76,10 @@ export class NotificationsPage implements OnInit, OnDestroy {
   constructor() {
     addIcons({ chevronDownCircleOutline, chevronForwardOutline });
     effect(() => {
-      const currentLang = this.settingsService.selectedLanguage$();
-      if (!currentLang) return;
-      this.notificationSub$ = this.loadNotifications().subscribe();
+      this.notifications =
+        this.notificationsService.notifications$() as INotification[];
+      this.checkViewportSize();
     });
-  }
-
-  ngOnInit() {
-    this.notificationSub$ = this.loadNotifications().subscribe();
   }
 
   ngOnDestroy(): void {

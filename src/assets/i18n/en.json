@@ -1,7 +1,8 @@
 {
   "TABS": {
     "HOME": "Home",
-    "NOTIFICATIONS": "Notifications"
+    "NOTIFICATIONS": "Notifications",
+    "MY_RACE": "My Race"
   },
   "SETTINGS": {
     "TITLE": "Settings",
@@ -15,6 +16,7 @@
     "PULLING_TEXT": "Pull down to refresh news",
     "REFRESHING_TEXT": "Updating news..."
   },
+  "NEWS_VIEWER": { "LOADING": "Loading...", "ERROR": "Error" },
   "NOTIFICATIONS": {
     "PULLING_TEXT": "Pull down to refresh notifications",
     "REFRESHING_TEXT": "Updating notifications...",
@@ -25,6 +27,8 @@
   "NOTIFICATIONS_VIEWER": {
     "NOTIFICATION": "Notification",
     "ERROR_LOADING": "Notification not found.",
-    "NOT_FOUND": "The notification you are trying to view does not exist."
+    "NOT_FOUND": "The notification you are trying to view does not exist.",
+    "LOADING": "Loading...",
+    "ERROR": "Error"
   }
 }

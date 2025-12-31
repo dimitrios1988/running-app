@@ -1,10 +1,11 @@
-import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { effect, inject, Injectable, signal } from '@angular/core';
+import { map, Observable, Subscription, tap } from 'rxjs';
 import { HomeElementModel } from '../shared/page.element/page.element.model';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
 import { AuthService } from '../auth/auth.service';
 import { HomeElementResponse } from './responses/home.element.resp';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +13,24 @@ import { HomeElementResponse } from './responses/home.element.resp';
 export class HomeService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
+  private readonly settingsService = inject(SettingsService);
+  private homeElementsSub = Subscription.EMPTY;
+  public readonly homeElements = signal<HomeElementModel | null>(null);
 
   private readonly pageElementsApi = new URL(
     `/api/mobile_app_manager/page_elements/v1`,
     AUTH_CREDENTIALS.app_url
   ).toString();
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const language = this.settingsService.selectedLanguage$();
+      if (language) {
+        this.homeElementsSub.unsubscribe();
+        this.homeElementsSub = this.getHomeElements(language).subscribe();
+      }
+    });
+  }
 
   getHomeElements(language: string): Observable<HomeElementModel> {
     try {
@@ -29,22 +41,23 @@ export class HomeService {
         .pipe(
           map((response: HomeElementResponse[]) => {
             const headerElementResponse = response.find(
-              (element) => element['2(element_type)'].code === 'header'
+              (element) => element['2(element_type)']?.code === 'header'
             );
             const trackingElementResponse = response.find(
-              (element) => element['2(element_type)'].code === 'tracking'
+              (element) => element['2(element_type)']?.code === 'tracking'
             );
             const newsElementsResponse = response.find(
-              (element) => element['2(element_type)'].code === 'news'
+              (element) => element['2(element_type)']?.code === 'news'
             );
             const infoResponses = response.filter(
-              (element) => element['2(element_type)'].code === 'info'
+              (element) => element['2(element_type)']?.code === 'info'
             );
             const contentImageResponses = response.filter(
-              (element) => element['2(element_type)'].code === 'content_image'
+              (element) => element['2(element_type)']?.code === 'content_image'
             );
             const countdownTimerResponses = response.filter(
-              (element) => element['2(element_type)'].code === 'countdown_timer'
+              (element) =>
+                element['2(element_type)']?.code === 'countdown_timer'
             );
             return {
               headerElementModel: headerElementResponse
@@ -217,7 +230,10 @@ export class HomeService {
                       };
                     })
                   : null,
-            };
+            } as HomeElementModel;
+          }),
+          tap((homeElements: HomeElementModel) => {
+            this.homeElements.set(homeElements);
           })
         );
     } catch (error) {

@@ -1,19 +1,25 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start"> <ion-back-button></ion-back-button></ion-buttons>
-    <ion-title>{{ (news$ | async)?.title }}</ion-title>
+    @if(loading()) {
+    <ion-title>{{ "NEWS_VIEWER.LOADING" | translate }}</ion-title>
+    } @else if(error()) {
+    <ion-title>{{ "NEWS_VIEWER.ERROR" | translate }}</ion-title>
+    } @else {
+    <ion-title>{{ news?.title }}</ion-title>
+    }
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  @if(news$ | async; as data) { @if(data.featuredImageUrl) {
+  @if(news) { @if(news.featuredImageUrl) {
   <div class="news-featured-image-container">
     <img
       class="news-featured-image"
-      [src]="data.featuredImageUrl"
+      [src]="news.featuredImageUrl"
       alt="Featured Image"
     />
   </div>
   }
-  <div class="news-viewer-content" [innerHTML]="data.content"></div>
+  <div class="news-viewer-content" [innerHTML]="news.content"></div>
   }
 </ion-content>
