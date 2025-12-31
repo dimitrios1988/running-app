@@ -22,6 +22,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SettingsService } from './app/settings/settings.service';
 import { AppConfigurationService } from './app/app.configuration.service';
 import { AuthInterceptor } from './app/auth/auth.interceptor';
+import { HttpRetryInterceptor } from './app/httpretry.interceptor';
 
 /**
  * Preloads a translation file before bootstrapping Angular.
@@ -53,6 +54,11 @@ async function preloadTranslations(
       {
         provide: HTTP_INTERCEPTORS,
         useClass: AuthInterceptor,
+        multi: true,
+      },
+      {
+        provide: HTTP_INTERCEPTORS,
+        useClass: HttpRetryInterceptor,
         multi: true,
       },
     ],
