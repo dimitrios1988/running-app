@@ -60,7 +60,15 @@ export class NewsViewerComponent implements OnInit, OnDestroy {
       this.newsSubscription.unsubscribe();
       this.newsSubscription = this.newsService
         .getNews(id, selectedLanguage)
-        .subscribe();
+        .subscribe({
+          next: () => {
+            this.loading.set(false);
+          },
+          error: () => {
+            this.error.set('ERRORS.NEWS_LOADING_ERROR');
+            this.loading.set(false);
+          },
+        });
     }
   }
 
