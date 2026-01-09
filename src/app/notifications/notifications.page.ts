@@ -1,11 +1,4 @@
-import {
-  Component,
-  effect,
-  inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -35,9 +28,8 @@ import {
   chevronForwardOutline,
 } from 'ionicons/icons';
 import { Observable, Subscription, tap } from 'rxjs';
-import { OnSameUrlNavigation, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SettingsService } from '../settings/settings.service';
 
 @Component({
   selector: 'app-notifications',
@@ -75,11 +67,14 @@ export class NotificationsPage implements OnDestroy {
 
   constructor() {
     addIcons({ chevronDownCircleOutline, chevronForwardOutline });
-    effect(() => {
-      this.notifications =
-        this.notificationsService.notifications$() as INotification[];
-      this.checkViewportSize();
-    });
+  }
+
+  ionViewWillEnter(): void {
+    this.notificationSub$ = this.loadNotifications().subscribe();
+  }
+
+  ionViewWillLeave(): void {
+    this.notificationSub$?.unsubscribe();
   }
 
   ngOnDestroy(): void {

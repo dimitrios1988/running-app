@@ -1,10 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  effect,
-  OnDestroy,
-} from '@angular/core';
+import { Component, inject, effect, OnDestroy } from '@angular/core';
 import {
   IonButtons,
   IonButton,
@@ -22,8 +16,7 @@ import {
   HeaderElementModel,
   PageElementModel,
 } from '../shared/page.element/page.element.model';
-import { SettingsService } from '../settings/settings.service';
-import { forkJoin, mergeMap, Subscription, tap } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'home-tab',
