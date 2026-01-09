@@ -1,5 +1,12 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
-import { map, Observable, Subscription, tap } from 'rxjs';
+import {
+  map,
+  Observable,
+  Subscription,
+  tap,
+  finalize,
+  shareReplay,
+} from 'rxjs';
 import { INotification } from './notification.interface';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
@@ -13,6 +20,8 @@ import { SettingsService } from '../settings/settings.service';
 export class NotificationsService {
   private readonly _notifications = signal<INotification[]>([]);
   private notificationSub$: Subscription = Subscription.EMPTY;
+  private inFlightRequests: Map<string, Observable<INotification[]>> =
+    new Map();
 
   private readonly notificationsApi = new URL(
     `/api/mobile_app_manager/notifications/v1`,
@@ -31,7 +40,13 @@ export class NotificationsService {
   }
 
   getNotifications(language: string): Observable<INotification[]> {
-    return this.http
+    const key = language;
+    const existing = this.inFlightRequests.get(key);
+    if (existing) {
+      return existing;
+    }
+
+    const request$ = this.http
       .get<NotificationsResp[]>(this.notificationsApi, { params: { language } })
       .pipe(
         map((resp) => {
@@ -56,8 +71,13 @@ export class NotificationsService {
             });
             this._notifications.set(notifications);
           });
-        })
+        }),
+        finalize(() => this.inFlightRequests.delete(key)),
+        shareReplay({ bufferSize: 1, refCount: true })
       );
+
+    this.inFlightRequests.set(key, request$);
+    return request$;
   }
 
   getNotificationById(id: number, language: string): Observable<INotification> {
