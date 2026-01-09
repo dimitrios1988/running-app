@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { MyraceGuard } from '../myrace/myrace.guard';
 
 export const routes: Routes = [
   {
@@ -40,11 +41,6 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'tab2',
-        loadComponent: () =>
-          import('../tab2/tab2.page').then((m) => m.Tab2Page),
-      },
-      {
         path: 'notifications',
         loadComponent: () =>
           import('../notifications/notifications.page').then(
@@ -57,6 +53,17 @@ export const routes: Routes = [
           import(
             '../notifications/notifications-viewer/notifications-viewer.component'
           ).then((m) => m.NotificationsViewerComponent),
+      },
+      {
+        path: 'myrace',
+        loadComponent: () =>
+          import('../myrace/myrace.page').then((m) => m.MyracePage),
+        canActivate: [MyraceGuard],
+      },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('../auth/login/login.page').then((m) => m.LoginPage),
       },
       {
         path: '',

@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>{{ "MY_RACE.MY_RACE" | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logoutRunner()">
+        <ion-icon name="exit-outline" aria-hidden="true"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">myrace</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ng-container>
+    @if(runnerInfo){
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          {{'MY_RACE.REGISTRATION_INFO' | translate}}
+        </ion-card-title>
+        <ion-card-subtitle>
+          {{ getEventName() }} - {{ getPlaceName() }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="runner-info-container">
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.FIRST_NAME' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.firstName }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.LAST_NAME' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.lastName }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.GENDER' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.gender }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.FATHERS_NAME' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.fathersName }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.EMAIL' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.email }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.DATE_OF_BIRTH' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.birthdate | date }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.NATIONALITY' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.nationality }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.BLOCK' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.block }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.BIB_NUMBER' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.bib }}</span>
+          </div>
+          <div class="runner-info">
+            <span class="title">{{'MY_RACE.CLUB' | translate}}:</span>
+            <span class="value">{{ runnerInfo.runner.club }}</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    }
+  </ng-container>
+</ion-content>

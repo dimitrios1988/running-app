@@ -30,5 +30,19 @@
     "NOT_FOUND": "Η ειδοποίηση που προσπαθείτε να δείτε δεν υπάρχει.",
     "LOADING": "Φόρτωση...",
     "ERROR": "Σφάλμα"
+  },
+  "MY_RACE": {
+    "MY_RACE": "Ο Αγώνας Μου",
+    "REGISTRATION_INFO": "Πληροφορίες Εγγραφής",
+    "FIRST_NAME": "Όνομα",
+    "LAST_NAME": "Επώνυμο",
+    "GENDER": "Φύλο",
+    "FATHERS_NAME": "Όνομα Πατέρα",
+    "EMAIL": "Email",
+    "DATE_OF_BIRTH": "Ημ/νία Γέννησης",
+    "NATIONALITY": "Εθνικότητα",
+    "BLOCK": "Block",
+    "BIB_NUMBER": "Αριθμός Συμμετοχής (Bib)",
+    "CLUB": "Ομάδα"
   }
 }

@@ -30,5 +30,19 @@
     "NOT_FOUND": "The notification you are trying to view does not exist.",
     "LOADING": "Loading...",
     "ERROR": "Error"
+  },
+  "MY_RACE": {
+    "MY_RACE": "My Race",
+    "REGISTRATION_INFO": "Registration Info",
+    "FIRST_NAME": "First Name",
+    "LAST_NAME": "Last Name",
+    "GENDER": "Gender",
+    "FATHERS_NAME": "Father's Name",
+    "EMAIL": "Email",
+    "DATE_OF_BIRTH": "Date of Birth",
+    "NATIONALITY": "Nationality",
+    "BLOCK": "Block",
+    "BIB_NUMBER": "Bib Number",
+    "CLUB": "Club"
   }
 }

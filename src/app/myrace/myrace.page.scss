@@ -1,0 +1,18 @@
+.runner-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.runner-info .title {
+    font-weight: bold;
+}
+
+.runner-info .value {
+    margin-left: 0.5rem;
+}
+
+ion-card-subtitle {
+    font-size: 1rem;
+    color: var(--ion-color-medium);
+}
