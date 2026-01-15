@@ -11,7 +11,7 @@ import {
   IonBackButton,
   IonContent,
 } from '@ionic/angular/standalone';
-import { Location, AsyncPipe } from '@angular/common';
+import { Location } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SettingsService } from './settings.service';
 import { AppConfigurationService } from '../app.configuration.service';

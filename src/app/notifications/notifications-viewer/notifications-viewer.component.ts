@@ -10,7 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ActivatedRoute } from '@angular/router';
 import { NotificationsService } from '../notifications.service';
-import { signal, effect } from '@angular/core';
+import { signal } from '@angular/core';
 import { INotification } from '../notification.interface';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';

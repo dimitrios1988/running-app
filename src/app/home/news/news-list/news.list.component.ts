@@ -1,11 +1,4 @@
-import {
-  Component,
-  inject,
-  OnInit,
-  ViewChild,
-  OnDestroy,
-  effect,
-} from '@angular/core';
+import { Component, inject, ViewChild, OnDestroy, effect } from '@angular/core';
 import {
   IonHeader,
   IonContent,
@@ -34,7 +27,7 @@ import {
 import { addIcons } from 'ionicons';
 import { chevronDownCircleOutline } from 'ionicons/icons';
 import { DatePipe } from '@angular/common';
-import { Observable, Subscription, tap } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { SettingsService } from '../../../settings/settings.service';
 
 @Component({

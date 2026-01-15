@@ -5,7 +5,6 @@ import {
   HttpInterceptor,
   HttpRequest,
   HttpErrorResponse,
-  HTTP_INTERCEPTORS,
 } from '@angular/common/http';
 import { Observable, timer } from 'rxjs';
 import { retry } from 'rxjs/operators';
