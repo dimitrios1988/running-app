@@ -17,6 +17,7 @@ import {
   PageElementModel,
 } from '../shared/page.element/page.element.model';
 import { Subscription } from 'rxjs';
+import { SettingsService } from '../settings/settings.service';
 
 @Component({
   selector: 'home-tab',
@@ -36,39 +37,57 @@ import { Subscription } from 'rxjs';
 export class HomePage implements OnDestroy {
   private homeService = inject(HomeService);
   private router = inject(Router);
-  private sub: Subscription = Subscription.EMPTY;
+  private settingsService = inject(SettingsService);
+  private homeElementsSub: Subscription = Subscription.EMPTY;
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;
 
   constructor() {
     addIcons({ settingsOutline });
     effect(() => {
-      const homeElements = this.homeService.homeElements();
-      if (homeElements) {
-        this.headerElementModel = homeElements.headerElementModel
-          ? homeElements.headerElementModel
-          : undefined;
-        this.pageElementModels = [
-          ...(homeElements.newsElementModel
-            ? [homeElements.newsElementModel]
-            : []),
-          ...(homeElements.countdownTimerElementModels ?? []),
-          ...(homeElements.contentImageElementModels ?? []),
-          ...(homeElements.trackingElementModel
-            ? [homeElements.trackingElementModel]
-            : []),
-          ...(homeElements.infoParentElementModel
-            ? [homeElements.infoParentElementModel]
-            : []),
-        ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-      }
+      this.homeElementsSub.unsubscribe();
+      this.populateHomeElements();
     });
   }
+
+  ionViewWillEnter(): void {
+    this.homeElementsSub = this.homeService
+      .getHomeElements(this.settingsService.selectedLanguage$()!)
+      .subscribe();
+    this.populateHomeElements();
+  }
+
+  ionViewWillLeave(): void {
+    this.homeElementsSub.unsubscribe();
+  }
+
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.homeElementsSub.unsubscribe();
   }
 
   navigateToSettings() {
     void this.router.navigate(['/tabs/home/settings']);
+  }
+
+  populateHomeElements(): void {
+    const homeElements = this.homeService.homeElements();
+    if (homeElements) {
+      this.headerElementModel = homeElements.headerElementModel
+        ? homeElements.headerElementModel
+        : undefined;
+      this.pageElementModels = [
+        ...(homeElements.newsElementModel
+          ? [homeElements.newsElementModel]
+          : []),
+        ...(homeElements.countdownTimerElementModels ?? []),
+        ...(homeElements.contentImageElementModels ?? []),
+        ...(homeElements.trackingElementModel
+          ? [homeElements.trackingElementModel]
+          : []),
+        ...(homeElements.infoParentElementModel
+          ? [homeElements.infoParentElementModel]
+          : []),
+      ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
   }
 }
