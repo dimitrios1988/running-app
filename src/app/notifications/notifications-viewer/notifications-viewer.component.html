@@ -6,7 +6,7 @@
     @if(loading()) {
     <ion-title>{{ "NOTIFICATIONS_VIEWER.LOADING" | translate }}</ion-title>
     } @else if(error()) {
-    <ion-title>{{ "NOTIFICATIONS_VIEWER.ERROR" | translate }}</ion-title>
+    <ion-title>{{ "NOTIFICATIONS_VIEWER.ERRORS.ERROR" | translate }}</ion-title>
     } @else {
     <ion-title>{{ "NOTIFICATIONS_VIEWER.NOTIFICATION" | translate }}</ion-title>
     }
@@ -19,7 +19,7 @@
   </div>
   } @else if(error()) {
   <div class="error-container">
-    <p>{{ "NOTIFICATIONS_VIEWER.ERROR_LOADING" | translate }}</p>
+    <p>{{ "NOTIFICATIONS_VIEWER.ERRORS.ERROR_LOADING" | translate }}</p>
   </div>
   } @else if(notification()) {
   <div class="notification-container">

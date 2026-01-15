@@ -1,11 +1,21 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
-import { map, Observable, Subscription, tap } from 'rxjs';
+import {
+  catchError,
+  map,
+  Observable,
+  shareReplay,
+  Subscription,
+  tap,
+  throwError,
+} from 'rxjs';
 import { HomeElementModel } from '../shared/page.element/page.element.model';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
 import { AuthService } from '../auth/auth.service';
 import { HomeElementResponse } from './responses/home.element.resp';
 import { SettingsService } from '../settings/settings.service';
+import { ToastService } from '../shared/services/toast.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +24,8 @@ export class HomeService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly settingsService = inject(SettingsService);
+  private readonly toastService = inject(ToastService);
+  private readonly translateService = inject(TranslateService);
   private homeElementsSub = Subscription.EMPTY;
   public readonly homeElements = signal<HomeElementModel | null>(null);
 
@@ -234,6 +246,14 @@ export class HomeService {
           }),
           tap((homeElements: HomeElementModel) => {
             this.homeElements.set(homeElements);
+          }),
+          shareReplay({ bufferSize: 1, refCount: true }),
+          catchError((error) => {
+            const errorMessage = this.translateService.instant(
+              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS'
+            );
+            this.toastService.showError(errorMessage);
+            return throwError(() => error);
           })
         );
     } catch (error) {

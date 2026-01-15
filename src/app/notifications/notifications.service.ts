@@ -6,6 +6,8 @@ import {
   tap,
   finalize,
   shareReplay,
+  catchError,
+  throwError,
 } from 'rxjs';
 import { INotification } from './notification.interface';
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +15,8 @@ import { AUTH_CREDENTIALS } from '../secrets';
 import { NotificationsResp } from './notifications.resp';
 import { Preferences } from '@capacitor/preferences';
 import { SettingsService } from '../settings/settings.service';
+import { ToastService } from '../shared/services/toast.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root',
@@ -22,7 +26,8 @@ export class NotificationsService {
   private notificationSub$: Subscription = Subscription.EMPTY;
   private inFlightRequests: Map<string, Observable<INotification[]>> =
     new Map();
-
+  private readonly toastService = inject(ToastService);
+  private readonly translateService = inject(TranslateService);
   private readonly notificationsApi = new URL(
     `/api/mobile_app_manager/notifications/v1`,
     AUTH_CREDENTIALS.app_url
@@ -72,6 +77,13 @@ export class NotificationsService {
             this._notifications.set(notifications);
           });
         }),
+        catchError((error) => {
+          const errorMessage = this.translateService.instant(
+            'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS'
+          );
+          this.toastService.showError(errorMessage);
+          return throwError(() => error);
+        }),
         finalize(() => this.inFlightRequests.delete(key)),
         shareReplay({ bufferSize: 1, refCount: true })
       );
@@ -97,6 +109,13 @@ export class NotificationsService {
               ),
               isRead: false,
             };
+          }),
+          catchError((error) => {
+            const errorMessage = this.translateService.instant(
+              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS'
+            );
+            this.toastService.showError(errorMessage);
+            return throwError(() => error);
           })
         );
     } catch (error) {

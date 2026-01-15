@@ -4,6 +4,11 @@
     "NOTIFICATIONS": "Notifications",
     "MY_RACE": "My Race"
   },
+  "HOME": {
+    "ERRORS": {
+      "FAILED_TO_LOAD_HOME_ELEMENTS": "Failed to load home elements. Please check your internet connection and try again later."
+    }
+  },
   "SETTINGS": {
     "TITLE": "Settings",
     "SELECT_LANGUAGE": "Select Language",
@@ -14,7 +19,10 @@
   "NEWS_LIST": {
     "TITLE": "News",
     "PULLING_TEXT": "Pull down to refresh news",
-    "REFRESHING_TEXT": "Updating news..."
+    "REFRESHING_TEXT": "Updating news...",
+    "ERRORS": {
+      "FAILED_TO_LOAD_NEWS": "Failed to load news. Please check your internet connection and try again later."
+    }
   },
   "NEWS_VIEWER": { "LOADING": "Loading...", "ERROR": "Error" },
   "NOTIFICATIONS": {
@@ -26,10 +34,13 @@
   },
   "NOTIFICATIONS_VIEWER": {
     "NOTIFICATION": "Notification",
-    "ERROR_LOADING": "Notification not found.",
     "NOT_FOUND": "The notification you are trying to view does not exist.",
     "LOADING": "Loading...",
-    "ERROR": "Error"
+    "ERRORS": {
+      "FAILED_TO_LOAD_NOTIFICATION": "Failed to load notification. Please check your internet connection and try again later.",
+      "ERROR": "Error",
+      "ERROR_LOADING": "Notification not found."
+    }
   },
   "MY_RACE": {
     "MY_RACE": "My Race",

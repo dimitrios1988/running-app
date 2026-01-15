@@ -1,6 +1,13 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
 import { INewsListItem } from './news-list/news.list.interface';
-import { Observable, tap, map, Subscription } from 'rxjs';
+import {
+  Observable,
+  tap,
+  map,
+  Subscription,
+  catchError,
+  throwError,
+} from 'rxjs';
 import { INews } from './news-viewer/news.item';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../auth/auth.service';
@@ -8,10 +15,11 @@ import { AUTH_CREDENTIALS } from '../../../app/secrets';
 import { NewsListResponse } from './responses/news.list.resp';
 import { NewsItemResponse } from './responses/news.item.resp';
 import { SettingsService } from '../../settings/settings.service';
+import { TranslateService } from '@ngx-translate/core';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Injectable({ providedIn: 'root' })
 export class NewsService {
-  // Using a signal makes it reactive across components if needed
   private readonly _newsList = signal<INewsListItem[]>([]);
   public readonly newsList$ = this._newsList.asReadonly();
   private readonly _news = signal<INews | null>(null);
@@ -19,6 +27,8 @@ export class NewsService {
   private newsListSub$: Subscription = Subscription.EMPTY;
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
+  private readonly toastService = inject(ToastService);
+  private readonly translateService = inject(TranslateService);
 
   constructor(private settingsService: SettingsService) {
     effect(() => {
@@ -62,6 +72,13 @@ export class NewsService {
         }),
         tap((items: INewsListItem[]) => {
           this._newsList.set(items);
+        }),
+        catchError((error) => {
+          const errorMessage = this.translateService.instant(
+            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS'
+          );
+          this.toastService.showError(errorMessage);
+          return throwError(() => error);
         })
       );
   }
@@ -98,6 +115,13 @@ export class NewsService {
         }),
         tap((news: INews) => {
           this._news.set(news);
+        }),
+        catchError((error) => {
+          const errorMessage = this.translateService.instant(
+            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS'
+          );
+          this.toastService.showError(errorMessage);
+          return throwError(() => error);
         })
       );
   }
