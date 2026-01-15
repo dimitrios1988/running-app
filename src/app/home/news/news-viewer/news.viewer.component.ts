@@ -20,6 +20,7 @@ import { INews } from './news.item';
 import { Subscription } from 'rxjs';
 import { SettingsService } from '../../../settings/settings.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-news.viewer',
@@ -41,13 +42,22 @@ export class NewsViewerComponent implements OnInit, OnDestroy {
   private newsService = inject(NewsService);
   private settingsService = inject(SettingsService);
   private newsSubscription: Subscription = Subscription.EMPTY;
+  private sanitizer = inject(DomSanitizer);
   public readonly loading = signal(true);
   public readonly error = signal<string | null>(null);
-  news: INews | null = null;
+  news: (INews & { safeContent: SafeHtml }) | null = null;
 
   constructor() {
     effect(() => {
-      this.news = this.newsService.news$();
+      const news = this.newsService.news$();
+      if (news) {
+        this.news = {
+          ...news,
+          safeContent: this.sanitizer.bypassSecurityTrustHtml(
+            news.content ?? ''
+          ),
+        };
+      }
     });
   }
 
@@ -61,11 +71,10 @@ export class NewsViewerComponent implements OnInit, OnDestroy {
       this.newsSubscription = this.newsService
         .getNews(id, selectedLanguage)
         .subscribe({
-          next: () => {
-            this.loading.set(false);
-          },
           error: () => {
             this.error.set('ERRORS.NEWS_LOADING_ERROR');
+          },
+          complete: () => {
             this.loading.set(false);
           },
         });
