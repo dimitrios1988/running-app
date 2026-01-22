@@ -55,5 +55,10 @@
     "BLOCK": "Block",
     "BIB_NUMBER": "Bib Number",
     "CLUB": "Club"
+  },
+  "AUTH": {
+    "ERRORS": {
+      "INVALID_CREDENTIALS": "Invalid email or bib number. Please try again."
+    }
   }
 }

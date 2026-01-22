@@ -55,5 +55,10 @@
     "BLOCK": "Block",
     "BIB_NUMBER": "Αριθμός Συμμετοχής (Bib)",
     "CLUB": "Ομάδα"
+  },
+  "AUTH": {
+    "ERRORS": {
+      "INVALID_CREDENTIALS": "Μη έγκυρο email ή αριθμός συμμετοχής (bib). Παρακαλώ δοκιμάστε ξανά."
+    }
   }
 }
