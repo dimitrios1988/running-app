@@ -10,6 +10,7 @@ interface _1event {
 }
 
 interface _0runner {
+  uuid: string;
   bib: string;
   birthdate: number | null;
   block: number | null;
