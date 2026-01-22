@@ -50,7 +50,7 @@ export class OneSignalService {
     });
 
     effect(() => {
-      const user_uuid = this.authService.userUUid();
+      const user_uuid = this.authService.userUUID();
       if (user_uuid && user_uuid != '') {
         this.setSubscriberUUID(user_uuid);
       } else {

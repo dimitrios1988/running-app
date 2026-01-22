@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -12,7 +12,8 @@ import { LoginRunnerResponse } from './responses/login-runner.resp';
 })
 export class AuthService {
   private token: string = '';
-  private userUuid: string = '';
+  private userUUID_ = signal<string>('');
+  public readonly userUUID = this.userUUID_.asReadonly();
 
   constructor(private http: HttpClient) {
     Preferences.get({ key: 'access_token' }).then((value) => {
@@ -22,7 +23,7 @@ export class AuthService {
     });
     Preferences.get({ key: 'user_uuid' }).then((value) => {
       if (value.value) {
-        this.userUuid = value.value;
+        this.userUUID_.set(value.value);
       }
     });
   }
@@ -41,7 +42,7 @@ export class AuthService {
         });
         this.token = response.token;
         return response;
-      })
+      }),
     );
   }
 
@@ -59,7 +60,7 @@ export class AuthService {
   loginRunner(bib: string, email: string): Observable<LoginRunnerResponse[]> {
     const url = new URL(
       `/api/mobile_app_manager/login_runner/v1`,
-      AUTH_CREDENTIALS.app_url
+      AUTH_CREDENTIALS.app_url,
     ).toString();
     return this.http
       .get<LoginRunnerResponse[]>(url, {
@@ -75,20 +76,20 @@ export class AuthService {
             key: 'user_uuid',
             value: response[0]['0(runner)'].uuid,
           });
-          this.userUuid = response[0]['0(runner)'].uuid;
+          this.userUUID_.set(response[0]['0(runner)'].uuid);
           return response;
-        })
+        }),
       );
   }
 
   getRunnerUUID(): string {
-    return this.userUuid;
+    return this.userUUID_();
   }
 
   async logoutRunner(): Promise<void> {
     await Preferences.remove({
       key: 'user_uuid',
     });
-    this.userUuid = '';
+    this.userUUID_.set('');
   }
 }
