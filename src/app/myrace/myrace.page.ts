@@ -95,7 +95,6 @@ export class MyracePage implements OnInit, OnDestroy {
 
   logoutRunner() {
     this.authService.logoutRunner().then(() => {
-      // You can add additional logic here if needed after logout
       this.router.navigate(['/tabs/home']);
     });
   }
