@@ -4,6 +4,8 @@ import { IonicModule } from '@ionic/angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../../shared/services/toast.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
@@ -21,7 +23,9 @@ export class LoginPage {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private toastController: ToastService,
+    private translateService: TranslateService,
   ) {}
 
   onSubmit() {
@@ -32,7 +36,12 @@ export class LoginPage {
         if (this.auth.getRunnerUUID() !== '')
           this.router.navigateByUrl('/tabs/myrace', { replaceUrl: true });
       },
-      error: () => alert('Login failed: check bib and email'),
+      error: () => {
+        const message = this.translateService.instant(
+          'AUTH.ERRORS.INVALID_CREDENTIALS',
+        );
+        this.toastController.showError(message);
+      },
     });
   }
 }
