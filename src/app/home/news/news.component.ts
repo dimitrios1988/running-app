@@ -25,19 +25,19 @@ export class NewsComponent implements OnInit {
       const backgroundRgb = hexToRgb(this.newsElementModel.backgroundColor);
       this.newsElement.nativeElement.style.setProperty(
         '--bg-color',
-        `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
+        `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`,
       );
     } else {
       this.newsElement.nativeElement.style.setProperty(
         '--bg-color',
-        'transparent'
+        'transparent',
       );
     }
     if (this.newsElementModel.textColor) {
       const filterColor = cssFilterFromHex(this.newsElementModel.textColor);
       this.newsElement.nativeElement.style.setProperty(
         '--filter-color',
-        filterColor
+        filterColor,
       );
     }
   }

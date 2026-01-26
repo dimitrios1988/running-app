@@ -31,7 +31,7 @@ export class HomeService {
 
   private readonly pageElementsApi = new URL(
     `/api/mobile_app_manager/page_elements/v1`,
-    AUTH_CREDENTIALS.app_url
+    AUTH_CREDENTIALS.app_url,
   ).toString();
 
   constructor() {
@@ -53,23 +53,23 @@ export class HomeService {
         .pipe(
           map((response: HomeElementResponse[]) => {
             const headerElementResponse = response.find(
-              (element) => element['2(element_type)']?.code === 'header'
+              (element) => element['2(element_type)']?.code === 'header',
             );
             const trackingElementResponse = response.find(
-              (element) => element['2(element_type)']?.code === 'tracking'
+              (element) => element['2(element_type)']?.code === 'tracking',
             );
             const newsElementsResponse = response.find(
-              (element) => element['2(element_type)']?.code === 'news'
+              (element) => element['2(element_type)']?.code === 'news',
             );
             const infoResponses = response.filter(
-              (element) => element['2(element_type)']?.code === 'info'
+              (element) => element['2(element_type)']?.code === 'info',
             );
             const contentImageResponses = response.filter(
-              (element) => element['2(element_type)']?.code === 'content_image'
+              (element) => element['2(element_type)']?.code === 'content_image',
             );
             const countdownTimerResponses = response.filter(
               (element) =>
-                element['2(element_type)']?.code === 'countdown_timer'
+                element['2(element_type)']?.code === 'countdown_timer',
             );
             return {
               headerElementModel: headerElementResponse
@@ -84,7 +84,7 @@ export class HomeService {
                             headerElementResponse['0(page_element)']
                               .primary_image[0].id
                           }&version=0&token=${this.authService.getToken()}`,
-                          AUTH_CREDENTIALS.app_url
+                          AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
                     mainImagePosition:
@@ -103,7 +103,7 @@ export class HomeService {
                             headerElementResponse['0(page_element)']
                               .secondary_image[0].id
                           }&version=0&token=${this.authService.getToken()}`,
-                          AUTH_CREDENTIALS.app_url
+                          AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
                     secondaryImageWidth: `${
@@ -139,10 +139,14 @@ export class HomeService {
                             trackingElementResponse['0(page_element)']
                               .primary_image[0].id
                           }&version=0&token=${this.authService.getToken()}`,
-                          AUTH_CREDENTIALS.app_url
+                          AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
-                    icon: 'https://unpkg.com/ionicons@7.1.0/dist/svg/analytics-outline.svg',
+                    icon: 'https://unpkg.com/ionicons/dist/svg/analytics-outline.svg',
+                    link: trackingElementResponse?.['0(page_element)'].url,
+                    opens_in_external_url:
+                      trackingElementResponse?.['0(page_element)']
+                        .opens_external_url,
                   }
                 : null,
               newsElementModel: newsElementsResponse
@@ -169,10 +173,10 @@ export class HomeService {
                             newsElementsResponse['0(page_element)']
                               .primary_image[0].id
                           }&version=0&token=${this.authService.getToken()}`,
-                          AUTH_CREDENTIALS.app_url
+                          AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
-                    icon: 'https://unpkg.com/ionicons@7.1.0/dist/svg/analytics-outline.svg',
+                    icon: 'https://unpkg.com/ionicons/dist/svg/analytics-outline.svg',
                   }
                 : null,
               infoParentElementModel:
@@ -234,7 +238,7 @@ export class HomeService {
                               }?attribute_id=cc6d340b-2728-4bdb-95c3-90feb97dbcb2&file_id=${
                                 response['0(page_element)'].primary_image[0].id
                               }&version=0&token=${this.authService.getToken()}`,
-                              AUTH_CREDENTIALS.app_url
+                              AUTH_CREDENTIALS.app_url,
                             ).toString()
                           : null,
                         altText: response['0(page_element)'].title,
@@ -250,11 +254,11 @@ export class HomeService {
           shareReplay({ bufferSize: 1, refCount: true }),
           catchError((error) => {
             const errorMessage = this.translateService.instant(
-              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS'
+              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS',
             );
             this.toastService.showError(errorMessage);
             return throwError(() => error);
-          })
+          }),
         );
     } catch (error) {
       console.error('Error in getHomeElements:', error);

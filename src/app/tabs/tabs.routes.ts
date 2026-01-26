@@ -16,43 +16,50 @@ export const routes: Routes = [
         path: 'home/info/viewer/:id',
         loadComponent: () =>
           import('../home/info/info.viewer/info.viewer.component').then(
-            (m) => m.InfoViewerComponent
+            (m) => m.InfoViewerComponent,
           ),
       },
       {
         path: 'home/news',
         loadComponent: () =>
           import('../home/news/news-list/news.list.component').then(
-            (m) => m.NewsListComponent
+            (m) => m.NewsListComponent,
           ),
       },
       {
         path: 'home/news/viewer/:id',
         loadComponent: () =>
           import('../home/news/news-viewer/news.viewer.component').then(
-            (m) => m.NewsViewerComponent
+            (m) => m.NewsViewerComponent,
           ),
       },
       {
         path: 'home/settings',
         loadComponent: () =>
           import('../settings/settings.component').then(
-            (m) => m.SettingsComponent
+            (m) => m.SettingsComponent,
+          ),
+      },
+      {
+        path: 'home/tracking/viewer',
+        loadComponent: () =>
+          import('../home/tracking/tracking-viewer/tracking-viewer.component').then(
+            (m) => m.TrackingViewerComponent,
           ),
       },
       {
         path: 'notifications',
         loadComponent: () =>
           import('../notifications/notifications.page').then(
-            (m) => m.NotificationsPage
+            (m) => m.NotificationsPage,
           ),
       },
       {
         path: 'notifications/viewer/:id',
         loadComponent: () =>
-          import(
-            '../notifications/notifications-viewer/notifications-viewer.component'
-          ).then((m) => m.NotificationsViewerComponent),
+          import('../notifications/notifications-viewer/notifications-viewer.component').then(
+            (m) => m.NotificationsViewerComponent,
+          ),
       },
       {
         path: 'myrace',
