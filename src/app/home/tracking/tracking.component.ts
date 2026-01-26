@@ -12,6 +12,8 @@ import { cssFilterFromHex, hexToRgb } from '../../shared/color.utils';
 import { TrackingElementModel } from '../../shared/page.element/page.element.model';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
+import { Browser } from '@capacitor/browser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tracking',
@@ -27,7 +29,7 @@ export class TrackingComponent implements OnChanges {
   @HostBinding('style.--bg-color') hostBgColor?: string;
   @HostBinding('style.--filter-color') hostFilterColor?: string;
 
-  constructor() {
+  constructor(private router: Router) {
     addIcons({ chevronForwardOutline });
   }
 
@@ -37,8 +39,23 @@ export class TrackingComponent implements OnChanges {
     }
   }
 
-  onClick() {
-    this.open.emit();
+  async onClick() {
+    if (
+      this.trackingElementModel?.link &&
+      this.trackingElementModel?.opens_in_external_url
+    ) {
+      try {
+        await Browser.open({ url: this.trackingElementModel?.link });
+      } catch {
+        window.open(
+          this.trackingElementModel?.link,
+          '_blank',
+          'noopener,noreferrer',
+        );
+      }
+    } else {
+      this.router.navigate(['/tabs/home/tracking/viewer']);
+    }
   }
 
   private updateCssVars() {

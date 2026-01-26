@@ -15,6 +15,9 @@
     "SELECT_LANGUAGE": "Επιλέξτε Γλώσσα",
     "UNITS": "Μονάδες Μέτρησης"
   },
+  "TRACKING_VIEWER": {
+    "TRACKING": "Παρακολούθηση"
+  },
   "INFO_VIEWER": { "MORE_INFO": "Περισσότερες Πληροφορίες" },
   "NEWS_LIST": {
     "TITLE": "Ειδήσεις",

@@ -37,6 +37,8 @@ export interface TrackingElementModel extends BasePageElement {
   textColor: string | null;
   backgroundImage: string | null;
   icon: string | null;
+  opens_in_external_url: boolean;
+  link: string | null;
 }
 
 export interface NewsElementModel extends BasePageElement {
