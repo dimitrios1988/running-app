@@ -47,6 +47,14 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="{{ 'HOME.PULLING_TEXT' | translate }}"
+      refreshingSpinner="circles"
+      refreshingText="{{ 'HOME.REFRESHING_TEXT' | translate }}"
+    ></ion-refresher-content>
+  </ion-refresher>
   <div class="element-container">
     @for (el of (pageElementModels ? pageElementModels : []); track $index) {
     <app-page-element [element]="el"></app-page-element>

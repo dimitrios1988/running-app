@@ -7,7 +7,9 @@
   "HOME": {
     "ERRORS": {
       "FAILED_TO_LOAD_HOME_ELEMENTS": "Failed to load home elements. Please check your internet connection and try again later."
-    }
+    },
+    "PULLING_TEXT": "Pull down to refresh",
+    "REFRESHING_TEXT": "Updating..."
   },
   "SETTINGS": {
     "TITLE": "Settings",

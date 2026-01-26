@@ -6,6 +6,8 @@ import {
   IonHeader,
   IonToolbar,
   IonContent,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { settingsOutline } from 'ionicons/icons';
@@ -18,11 +20,15 @@ import {
 } from '../shared/page.element/page.element.model';
 import { Subscription } from 'rxjs';
 import { SettingsService } from '../settings/settings.service';
+import { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'home-tab',
   standalone: true,
   imports: [
+    IonRefresherContent,
+    IonRefresher,
     IonButtons,
     IonButton,
     IonIcon,
@@ -30,6 +36,7 @@ import { SettingsService } from '../settings/settings.service';
     IonToolbar,
     IonContent,
     PageElementComponent,
+    TranslatePipe,
   ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
@@ -89,5 +96,15 @@ export class HomePage implements OnDestroy {
           : []),
       ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
+  }
+
+  doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
+    this.homeElementsSub.unsubscribe();
+    this.homeElementsSub = this.homeService
+      .getHomeElements(this.settingsService.selectedLanguage$()!)
+      .subscribe(() => {
+        (event.target as HTMLIonRefresherElement)?.complete();
+      });
+    this.populateHomeElements();
   }
 }

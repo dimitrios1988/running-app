@@ -1,6 +1,7 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
 import {
   catchError,
+  finalize,
   map,
   Observable,
   shareReplay,
@@ -33,6 +34,8 @@ export class HomeService {
     `/api/mobile_app_manager/page_elements/v1`,
     AUTH_CREDENTIALS.app_url,
   ).toString();
+  private inFlightRequests: Map<string, Observable<HomeElementModel>> =
+    new Map();
 
   constructor() {
     effect(() => {
@@ -46,7 +49,12 @@ export class HomeService {
 
   getHomeElements(language: string): Observable<HomeElementModel> {
     try {
-      return this.http
+      const key = language;
+      const existing = this.inFlightRequests.get(key);
+      if (existing) {
+        return existing;
+      }
+      const request$ = this.http
         .get<HomeElementResponse[]>(this.pageElementsApi, {
           params: { language },
         })
@@ -251,7 +259,6 @@ export class HomeService {
           tap((homeElements: HomeElementModel) => {
             this.homeElements.set(homeElements);
           }),
-          shareReplay({ bufferSize: 1, refCount: true }),
           catchError((error) => {
             const errorMessage = this.translateService.instant(
               'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS',
@@ -259,7 +266,11 @@ export class HomeService {
             this.toastService.showError(errorMessage);
             return throwError(() => error);
           }),
+          finalize(() => this.inFlightRequests.delete(key)),
+          shareReplay({ bufferSize: 1, refCount: true }),
         );
+      this.inFlightRequests.set(key, request$);
+      return request$;
     } catch (error) {
       console.error('Error in getHomeElements:', error);
       throw error;
