@@ -22,6 +22,8 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { exitOutline } from 'ionicons/icons';
@@ -31,6 +33,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MyRaceService } from './myrace.service';
 import { IRunner } from './runner.interface';
 import { SettingsService } from '../settings/settings.service';
+import { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
 
 @Component({
   selector: 'app-myrace',
@@ -38,6 +41,8 @@ import { SettingsService } from '../settings/settings.service';
   styleUrls: ['./myrace.page.scss'],
   standalone: true,
   imports: [
+    IonRefresherContent,
+    IonRefresher,
     IonCardContent,
     IonCardSubtitle,
     IonCardTitle,
@@ -61,7 +66,7 @@ export class MyracePage implements OnInit, OnDestroy {
   private myRaceService = inject(MyRaceService);
   private router = inject(Router);
   private stopEffect?: EffectRef;
-  private runnerSub?: Subscription;
+  private runnerSub: Subscription = Subscription.EMPTY;
   runnerInfo!: IRunner;
 
   constructor() {
@@ -95,7 +100,7 @@ export class MyracePage implements OnInit, OnDestroy {
 
   logoutRunner() {
     this.authService.logoutRunner().then(() => {
-      this.router.navigate(['/tabs/home']);
+      this.router.navigate(['/tabs/login']);
     });
   }
 
@@ -108,5 +113,14 @@ export class MyracePage implements OnInit, OnDestroy {
     return this.settingsService.selectedLanguage$() === 'el'
       ? this.runnerInfo.event.nameGr
       : this.runnerInfo.event.nameEn;
+  }
+
+  doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
+    this.runnerSub.unsubscribe();
+    this.runnerSub = this.myRaceService
+      .getRunnerInfo(this.runnerInfo.runner.uuid)
+      .subscribe(() => {
+        (event.target as HTMLIonRefresherElement)?.complete();
+      });
   }
 }

@@ -15,6 +15,14 @@
       <ion-title size="large">{{ "MY_RACE.MY_RACE" | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="{{ 'HOME.PULLING_TEXT' | translate }}"
+      refreshingSpinner="circles"
+      refreshingText="{{ 'HOME.REFRESHING_TEXT' | translate }}"
+    ></ion-refresher-content>
+  </ion-refresher>
   <ng-container>
     @if(runnerInfo){
     <ion-card>
