@@ -14,11 +14,15 @@
   width: var(--main-image-width);
   height: auto;
   max-height: 130px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .secondary-image {
   width: var(--secondary-image-width);
   height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .center-header-image {
@@ -28,10 +32,7 @@
   align-items: center;
 }
 
-.homepage-toolbar {
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
+
 
 ion-toolbar.homepage-toolbar {
   background: var(--ion-toolbar-background);
