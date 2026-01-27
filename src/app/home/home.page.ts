@@ -17,7 +17,7 @@ import {
   IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { settingsOutline } from 'ionicons/icons';
+import { chevronDownCircleOutline, settingsOutline } from 'ionicons/icons';
 import { PageElementComponent } from '../shared/page.element/page.element.component';
 import { HomeService } from './home.service';
 import { Router } from '@angular/router';
@@ -59,7 +59,7 @@ export class HomePage implements OnDestroy {
   headerElementModel?: HeaderElementModel;
 
   constructor() {
-    addIcons({ settingsOutline });
+    addIcons({ settingsOutline, chevronDownCircleOutline });
     effect(() => {
       this.homeElementsSub.unsubscribe();
       this.populateHomeElements();
