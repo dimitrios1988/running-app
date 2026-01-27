@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { IRunner } from './runner.interface';
 import { AUTH_CREDENTIALS } from '../secrets';
-import { catchError, map, Observable, tap } from 'rxjs';
+import { catchError, finalize, map, Observable, shareReplay, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { RunnerInfoResponse } from './runner.info.resp';
 import { AuthService } from '../auth/auth.service';
@@ -16,10 +16,16 @@ export class MyRaceService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly inFlightRequests: Map<string, Observable<IRunner>> =
+    new Map();
 
   constructor() {}
 
   getRunnerInfo(uuid: string): Observable<IRunner> {
+    const key = uuid;
+    if (this.inFlightRequests.has(key)) {
+      return this.inFlightRequests.get(key)!;
+    }
     const runnerInfoApi = new URL(
       `/api/mobile_app_manager/get_runner_info/v1`,
       AUTH_CREDENTIALS.app_url,
@@ -61,11 +67,16 @@ export class MyRaceService {
         tap((runner: IRunner) => {
           this._runner.set(runner);
         }),
+
         catchError((error) => {
           this.authService.logoutRunner();
           this.router.navigate(['/tabs/login']);
           throw error;
         }),
+        finalize(() => {
+          this.inFlightRequests.delete(key);
+        }),
+        shareReplay({ bufferSize: 1, refCount: true }),
       );
   }
 }
