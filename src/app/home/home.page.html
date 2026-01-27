@@ -1,6 +1,8 @@
 <ion-header>
   <ion-toolbar
     style="--main-image-width: {{ headerElementModel?.mainImageWidth?? '0px'}}; --secondary-image-width: {{ headerElementModel?.secondaryImageWidth ?? '0px' }};"
+    class="homepage-toolbar"
+    #homepageToolbar
   >
     <!-- Centered main image if no secondary image -->
     @if ( (headerElementModel?.secondaryImage?.trim() === '' ||

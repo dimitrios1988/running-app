@@ -1,4 +1,11 @@
-import { Component, inject, effect, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  effect,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import {
   IonButtons,
   IonButton,
@@ -46,6 +53,8 @@ export class HomePage implements OnDestroy {
   private router = inject(Router);
   private settingsService = inject(SettingsService);
   private homeElementsSub: Subscription = Subscription.EMPTY;
+  @ViewChild('homepageToolbar', { read: ElementRef })
+  homepageToolbarElement!: ElementRef;
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;
 
@@ -95,6 +104,15 @@ export class HomePage implements OnDestroy {
           ? [homeElements.infoParentElementModel]
           : []),
       ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+    if (
+      this.headerElementModel?.backgroundColor &&
+      this.headerElementModel?.backgroundColor.trim() !== ''
+    ) {
+      this.homepageToolbarElement?.nativeElement.style.setProperty(
+        '--background',
+        this.headerElementModel?.backgroundColor,
+      );
     }
   }
 

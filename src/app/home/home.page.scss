@@ -2,6 +2,7 @@
   --main-image-width: 0px;
   --secondary-image-width: 0px;
 }
+
 .element-container {
   display: flex;
   flex-direction: column;
@@ -25,4 +26,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.homepage-toolbar {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+ion-toolbar.homepage-toolbar {
+  background: var(--ion-toolbar-background);
 }

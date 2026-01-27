@@ -27,6 +27,7 @@ export interface HeaderElementModel {
   mainImageWidth: string | null;
   secondaryImage: string | null;
   secondaryImageWidth: string | null;
+  backgroundColor: string | null;
 }
 
 export interface TrackingElementModel extends BasePageElement {

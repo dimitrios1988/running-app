@@ -118,6 +118,10 @@ export class HomeService {
                       headerElementResponse['0(page_element)']
                         .secondary_image_width ?? '0'
                     }%`,
+                    backgroundColor: headerElementResponse['0(page_element)']
+                      .background_color
+                      ? `#${headerElementResponse['0(page_element)'].background_color}`
+                      : null,
                   }
                 : null,
               trackingElementModel: trackingElementResponse
