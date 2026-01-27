@@ -6,14 +6,15 @@ import { Preferences } from '@capacitor/preferences';
 import { AUTH_CREDENTIALS } from '../secrets';
 import { LoginResponse } from './responses/login.resp';
 import { LoginRunnerResponse } from './responses/login-runner.resp';
+import { UserPayload } from './responses/user-payload';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private token: string = '';
-  private userUUID_ = signal<string>('');
-  public readonly userUUID = this.userUUID_.asReadonly();
+  private userPayload_ = signal<UserPayload | null>(null);
+  public userPayload = this.userPayload_.asReadonly();
 
   constructor(private http: HttpClient) {
     Preferences.get({ key: 'access_token' }).then((value) => {
@@ -21,9 +22,9 @@ export class AuthService {
         this.token = value.value;
       }
     });
-    Preferences.get({ key: 'user_uuid' }).then((value) => {
+    Preferences.get({ key: 'user_payload' }).then((value) => {
       if (value.value) {
-        this.userUUID_.set(value.value);
+        this.userPayload_.set(JSON.parse(value.value) as UserPayload);
       }
     });
   }
@@ -72,24 +73,32 @@ export class AuthService {
       .pipe(
         map((response) => {
           // Store tokens
+          const userPayload = {
+            uuid: response[0]['0(runner)'].uuid,
+            email: response[0]['0(runner)'].email,
+          };
           Preferences.set({
-            key: 'user_uuid',
-            value: response[0]['0(runner)'].uuid,
+            key: 'user_payload',
+            value: JSON.stringify(userPayload),
           });
-          this.userUUID_.set(response[0]['0(runner)'].uuid);
+          this.userPayload_.set(userPayload);
           return response;
         }),
       );
   }
 
-  getRunnerUUID(): string {
-    return this.userUUID_();
+  getRunnerUUID(): string | null {
+    const payload = this.userPayload_();
+    if (payload !== null) {
+      return payload.uuid;
+    }
+    return null;
   }
 
   async logoutRunner(): Promise<void> {
     await Preferences.remove({
-      key: 'user_uuid',
+      key: 'user_payload',
     });
-    this.userUUID_.set('');
+    this.userPayload_.set(null);
   }
 }
