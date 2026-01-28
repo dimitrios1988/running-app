@@ -58,7 +58,7 @@
     ></ion-refresher-content>
   </ion-refresher>
   <div class="element-container">
-    @for (el of (pageElementModels ? pageElementModels : []); track $index) {
+    @for (el of (pageElementModels ? pageElementModels : []); track el) {
     <app-page-element [element]="el"></app-page-element>
     }
   </div>
