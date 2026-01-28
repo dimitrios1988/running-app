@@ -3,7 +3,6 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  ChangeDetectionStrategy,
   HostBinding,
 } from '@angular/core';
 import { CountdownTimerElementModel } from '../../shared/page.element/page.element.model';
@@ -11,6 +10,7 @@ import { cssFilterFromHex } from '../../../app/shared/color.utils';
 import { interval, Observable, of, Subject } from 'rxjs';
 import { map, startWith, takeUntil, shareReplay } from 'rxjs/operators';
 import { DatePipe, AsyncPipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface TimeLeft {
   days: number;
@@ -24,8 +24,7 @@ interface TimeLeft {
   standalone: true,
   templateUrl: './countdowntimer.component.html',
   styleUrls: ['./countdowntimer.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, AsyncPipe],
+  imports: [DatePipe, AsyncPipe, TranslatePipe],
 })
 export class CountdowntimerComponent implements OnInit, OnDestroy {
   @Input() countdownTimerElementModel!: CountdownTimerElementModel;
@@ -67,7 +66,7 @@ export class CountdowntimerComponent implements OnInit, OnDestroy {
       startWith(0),
       map(() => this.calculateTimeLeft(new Date(), this.targetDate)),
       takeUntil(this.destroy$),
-      shareReplay({ bufferSize: 1, refCount: true })
+      shareReplay({ bufferSize: 1, refCount: true }),
     );
   }
 
