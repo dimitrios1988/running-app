@@ -75,7 +75,6 @@ export class AuthService {
           // Store tokens
           const userPayload = {
             uuid: response[0]['0(runner)'].uuid,
-            email: response[0]['0(runner)'].email,
           };
           Preferences.set({
             key: 'user_payload',

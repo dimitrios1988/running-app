@@ -4,5 +4,4 @@ export interface LoginRunnerResponse {
 
 interface _0runner {
   uuid: string;
-  email: string;
 }

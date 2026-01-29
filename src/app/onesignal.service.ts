@@ -53,7 +53,6 @@ export class OneSignalService {
       const userPayload = this.authService.userPayload();
       if (userPayload) {
         this.setSubscriberUUID(userPayload.uuid);
-        this.setSubscriberEmail(userPayload.email);
       } else {
         this.logoutSubscriber();
       }
@@ -71,12 +70,6 @@ export class OneSignalService {
   setSubscriberUUID(uuid: string) {
     try {
       OneSignal.login(uuid);
-    } catch (error) {}
-  }
-
-  setSubscriberEmail(email: string) {
-    try {
-      OneSignal.User.addEmail(email);
     } catch (error) {}
   }
 
