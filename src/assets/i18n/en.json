@@ -21,7 +21,10 @@
     "TITLE": "Settings",
     "SELECT_LANGUAGE": "Select Language",
     "LANGUAGE": "Language",
-    "UNITS": "Units"
+    "UNITS": "Units",
+    "NOTIFICATIONS": "Notifications",
+    "ENABLED": "Enabled",
+    "DISABLED": "Disabled"
   },
   "TRACKING_VIEWER": {
     "TRACKING": "Tracking"

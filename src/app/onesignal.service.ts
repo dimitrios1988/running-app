@@ -20,6 +20,7 @@ export class OneSignalService {
       OneSignal.Notifications.requestPermission(false).then(
         (accepted: boolean) => {
           console.log('User accepted notifications: ' + accepted);
+          this.settingsService.setNotificationsEnabled(accepted);
         },
       );
       OneSignal.Notifications.addEventListener(
@@ -45,6 +46,31 @@ export class OneSignalService {
           this.setSubscriberLanguage(selectedLanguage);
         } catch (error) {
           //console.error('OneSignal setLanguage error:', error);
+        }
+      }
+    });
+
+    effect(() => {
+      const notificationsEnabled = this.settingsService.notificationsEnabled$();
+      console.log(
+        'OneSignalService notificationsEnabled effect:',
+        notificationsEnabled,
+      );
+      if (notificationsEnabled) {
+        OneSignal.Notifications.requestPermission(false).then(
+          (accepted: boolean) => {
+            console.log('User accepted notifications: ' + accepted);
+            OneSignal.User.pushSubscription.optIn();
+          },
+          (error: any) => {
+            console.error('OneSignal requestPermission error:', error);
+          },
+        );
+      } else {
+        try {
+          OneSignal.User.pushSubscription.optOut();
+        } catch (error) {
+          console.error('OneSignal optOut error:', error);
         }
       }
     });

@@ -40,9 +40,11 @@ export class SettingsComponent implements OnInit {
   private settingsService = inject(SettingsService);
   public appConfiguration = inject(AppConfigurationService).appConfiguration;
   currentLang: string | null;
+  notificationsEnabled: boolean = false;
 
   constructor(private translate: TranslateService) {
     this.currentLang = this.settingsService.selectedLanguage$();
+    this.notificationsEnabled = this.settingsService.notificationsEnabled$();
   }
 
   goBack() {
@@ -56,6 +58,11 @@ export class SettingsComponent implements OnInit {
       // Language preference saved
       this.switchLanguage(lang);
     });
+  }
+
+  notificationsOptionChanged(event: boolean) {
+    const enabled = event;
+    this.settingsService.setNotificationsEnabled(enabled);
   }
 
   switchLanguage(lang: string) {

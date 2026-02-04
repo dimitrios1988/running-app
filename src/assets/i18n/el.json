@@ -21,7 +21,10 @@
     "TITLE": "Ρυθμίσεις",
     "LANGUAGE": "Γλώσσα",
     "SELECT_LANGUAGE": "Επιλέξτε Γλώσσα",
-    "UNITS": "Μονάδες Μέτρησης"
+    "UNITS": "Μονάδες Μέτρησης",
+    "NOTIFICATIONS": "Ειδοποιήσεις",
+    "ENABLED": "Ενεργοποιημένες",
+    "DISABLED": "Απενεργοποιημένες"
   },
   "TRACKING_VIEWER": {
     "TRACKING": "Παρακολούθηση"
