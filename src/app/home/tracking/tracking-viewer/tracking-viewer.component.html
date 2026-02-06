@@ -14,7 +14,7 @@
       </ion-title>
     </ion-toolbar>
   </ion-header>
-  <div class="tracking-viewer-container">
-    <iframe [src]="sanitizedUrl" width="100%" height="100%" title="Tracking viewer"></iframe>
+  <div class="tracking-viewer-frame">
+    <iframe #trackingFrame title="Tracking Frame"></iframe>
   </div>
 </ion-content>

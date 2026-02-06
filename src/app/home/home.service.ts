@@ -159,6 +159,7 @@ export class HomeService {
                     opens_in_external_url:
                       trackingElementResponse?.['0(page_element)']
                         .opens_external_url,
+                    code: trackingElementResponse?.['0(page_element)'].code,
                   }
                 : null,
               newsElementModel: newsElementsResponse

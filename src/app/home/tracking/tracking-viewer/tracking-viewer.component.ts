@@ -1,5 +1,10 @@
-import { Component, effect, inject, OnInit } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -28,18 +33,18 @@ import { HomeService } from '../../home.service';
 })
 export class TrackingViewerComponent implements OnInit {
   private readonly homeService = inject(HomeService);
-  private readonly sanitizer = inject(DomSanitizer);
-  sanitizedUrl: SafeResourceUrl =
-    this.sanitizer.bypassSecurityTrustResourceUrl('');
 
-  constructor() {
-    effect(() => {
-      const tracking_link =
-        this.homeService.homeElements()?.trackingElementModel?.link || '';
-      this.sanitizedUrl =
-        this.sanitizer.bypassSecurityTrustResourceUrl(tracking_link);
-    });
-  }
+  @ViewChild('trackingFrame') trackingFrame!: ElementRef<HTMLIFrameElement>;
+
+  constructor() {}
 
   ngOnInit() {}
+
+  ionViewDidEnter(): void {
+    const code =
+      this.homeService.homeElements()?.trackingElementModel?.code || '';
+    if (code && this.trackingFrame) {
+      this.trackingFrame.nativeElement.srcdoc = code;
+    }
+  }
 }

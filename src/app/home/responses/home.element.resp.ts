@@ -23,7 +23,7 @@ interface _1language {
 interface _0pageelement {
   background_color: null | string;
   id: number;
-  opens_external_url: boolean;
+  opens_external_url: boolean | null;
   order: null | number;
   primary_image: PrimaryImage[] | null;
   primary_image_width: null | number;
@@ -34,6 +34,7 @@ interface _0pageelement {
   timer: number | null;
   title: null | string;
   url: string | null;
+  code: string | null;
 }
 
 interface PrimaryImage {

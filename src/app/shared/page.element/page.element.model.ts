@@ -40,6 +40,7 @@ export interface TrackingElementModel extends BasePageElement {
   icon: string | null;
   opens_in_external_url: boolean;
   link: string | null;
+  code: string | null;
 }
 
 export interface NewsElementModel extends BasePageElement {
