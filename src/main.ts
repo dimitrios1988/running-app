@@ -1,3 +1,4 @@
+import { provideZoneChangeDetection } from "@angular/core";
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
   RouteReuseStrategy,
@@ -41,7 +42,7 @@ async function preloadTranslations(
 (async () => {
   const appRef = await bootstrapApplication(AppComponent, {
     providers: [
-      { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+      provideZoneChangeDetection(),{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
       provideIonicAngular(),
       provideRouter(routes, withPreloading(PreloadAllModules)),
       provideHttpClient(withInterceptorsFromDi()),
