@@ -7,6 +7,8 @@ import {
   Subscription,
   catchError,
   throwError,
+  finalize,
+  shareReplay,
 } from 'rxjs';
 import { INews } from './news-viewer/news.item';
 import { HttpClient } from '@angular/common/http';
@@ -29,6 +31,8 @@ export class NewsService {
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
+  private inFlightRequests: Map<string, Observable<INewsListItem[]>> =
+    new Map();
 
   constructor(private settingsService: SettingsService) {
     effect(() => {
@@ -41,11 +45,16 @@ export class NewsService {
   }
 
   getNewsItems(language: string): Observable<INewsListItem[]> {
+    const key = language;
+    const existing = this.inFlightRequests.get(key);
+    if (existing) {
+      return existing;
+    }
     const newsItemsApi = new URL(
       `/api/mobile_app_manager/news_items/v1`,
-      AUTH_CREDENTIALS.app_url
+      AUTH_CREDENTIALS.app_url,
     ).toString();
-    return this.http
+    const request$ = this.http
       .get<NewsListResponse[]>(newsItemsApi, {
         params: { language },
       })
@@ -64,7 +73,7 @@ export class NewsService {
                     }?attribute_id=9ec4d1de-8886-4eb4-b501-6128916a3124&file_id=${
                       item['0(post)'].header_image[0].id
                     }&version=0&token=${this.authService.getToken()}`,
-                    AUTH_CREDENTIALS.app_url
+                    AUTH_CREDENTIALS.app_url,
                   ).toString()
                 : null,
             publishedDate: new Date(item['0(post)'].published_at * 1000),
@@ -75,18 +84,22 @@ export class NewsService {
         }),
         catchError((error) => {
           const errorMessage = this.translateService.instant(
-            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS'
+            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS',
           );
           this.toastService.showError(errorMessage);
           return throwError(() => error);
-        })
+        }),
+        finalize(() => this.inFlightRequests.delete(key)),
+        shareReplay({ bufferSize: 1, refCount: true }),
       );
+    this.inFlightRequests.set(key, request$);
+    return request$;
   }
 
   getNews(id: number, language: string): Observable<INews> {
     const newsItemApi = new URL(
       `/api/mobile_app_manager/news_item/v1/${id}`,
-      AUTH_CREDENTIALS.app_url
+      AUTH_CREDENTIALS.app_url,
     ).toString();
     return this.http
       .get<NewsItemResponse[]>(newsItemApi, {
@@ -108,7 +121,7 @@ export class NewsService {
                     }?attribute_id=9ec4d1de-8886-4eb4-b501-6128916a3124&file_id=${
                       item.header_image[0].id
                     }&version=0&token=${this.authService.getToken()}`,
-                    AUTH_CREDENTIALS.app_url
+                    AUTH_CREDENTIALS.app_url,
                   ).toString()
                 : null,
           };
@@ -118,11 +131,11 @@ export class NewsService {
         }),
         catchError((error) => {
           const errorMessage = this.translateService.instant(
-            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS'
+            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS',
           );
           this.toastService.showError(errorMessage);
           return throwError(() => error);
-        })
+        }),
       );
   }
 }

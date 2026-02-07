@@ -76,6 +76,16 @@ export class NewsListComponent implements OnDestroy {
     setTimeout(() => this.viewport?.checkViewportSize());
   }
 
+  ionViewWillEnter(): void {
+    this.newsListItemsSub = this.newsService
+      .getNewsItems(this.settingsService.selectedLanguage$()!)
+      .subscribe();
+    this.checkViewportSize();
+  }
+
+  ionViewWillLeave(): void {
+    this.newsListItemsSub?.unsubscribe();
+  }
   ngOnDestroy(): void {
     this.newsListItemsSub?.unsubscribe();
   }
