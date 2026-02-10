@@ -30,6 +30,7 @@ import {
 import { Observable, Subscription, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MyRaceService } from '../myrace/myrace.service';
 
 @Component({
   selector: 'app-notifications',
@@ -60,6 +61,7 @@ export class NotificationsPage implements OnDestroy {
   notifications?: INotification[];
   private atTop = true;
   private translateService = inject(TranslateService);
+  private myRaceService = inject(MyRaceService);
   private notificationsService: NotificationsService =
     inject(NotificationsService);
   private notificationSub$?: Subscription;
@@ -83,12 +85,15 @@ export class NotificationsPage implements OnDestroy {
 
   private loadNotifications(): Observable<INotification[]> {
     return this.notificationsService
-      .getNotifications(this.translateService.getCurrentLang())
+      .getNotifications(
+        this.translateService.getCurrentLang(),
+        this.myRaceService.runner$()?.event?.id,
+      )
       .pipe(
         tap((data: INotification[]) => {
           this.notifications = data;
           this.checkViewportSize();
-        })
+        }),
       );
   }
 

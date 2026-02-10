@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable, signal } from '@angular/core';
 import { IRunner } from './runner.interface';
 import { AUTH_CREDENTIALS } from '../secrets';
 import { catchError, finalize, map, Observable, shareReplay, tap } from 'rxjs';
@@ -19,7 +19,14 @@ export class MyRaceService {
   private readonly inFlightRequests: Map<string, Observable<IRunner>> =
     new Map();
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const payload = this.authService.userPayload();
+      if (!payload) {
+        this._runner.set(null);
+      }
+    });
+  }
 
   getRunnerInfo(uuid: string): Observable<IRunner> {
     const key = uuid;
@@ -57,6 +64,7 @@ export class MyRaceService {
             event: {
               nameEn: response[0]['1(event)'].name_en,
               nameGr: response[0]['1(event)'].name_gr,
+              id: response[0]['1(event)'].id,
             },
             place: {
               nameGr: response[0]['2(category)'].name_gr,

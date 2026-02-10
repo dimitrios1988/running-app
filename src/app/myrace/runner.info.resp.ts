@@ -7,6 +7,7 @@ export interface RunnerInfoResponse {
 interface _1event {
   name_en: string | null;
   name_gr: string | null;
+  id: number;
 }
 
 interface _0runner {

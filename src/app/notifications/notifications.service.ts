@@ -30,7 +30,7 @@ export class NotificationsService {
   private readonly translateService = inject(TranslateService);
   private readonly notificationsApi = new URL(
     `/api/mobile_app_manager/notifications/v1`,
-    AUTH_CREDENTIALS.app_url
+    AUTH_CREDENTIALS.app_url,
   ).toString();
   private readonly http = inject(HttpClient);
   public readonly notifications$ = this._notifications.asReadonly();
@@ -44,52 +44,60 @@ export class NotificationsService {
     });
   }
 
-  getNotifications(language: string): Observable<INotification[]> {
-    const key = language;
+  getNotifications(
+    language: string,
+    eventId?: number,
+  ): Observable<INotification[]> {
+    const key = `${language}-${eventId}`;
     const existing = this.inFlightRequests.get(key);
     if (existing) {
       return existing;
     }
-
-    const request$ = this.http
-      .get<NotificationsResp[]>(this.notificationsApi, { params: { language } })
-      .pipe(
-        map((resp) => {
-          return resp.map((item) => {
-            return {
-              id: item['0(notification)'].id,
-              title: item['0(notification)'].title,
-              message: item['0(notification)'].content,
-              publishedAt: new Date(
-                item['0(notification)'].published_at * 1000
-              ),
-              isRead: false,
-            };
+    let request$: Observable<NotificationsResp[]>;
+    if (eventId) {
+      request$ = this.http.get<NotificationsResp[]>(this.notificationsApi, {
+        params: { language, event: eventId },
+      });
+    } else {
+      request$ = this.http.get<NotificationsResp[]>(this.notificationsApi, {
+        params: { language },
+      });
+    }
+    const pipedRequest$ = request$.pipe(
+      map((resp) => {
+        return resp.map((item) => {
+          return {
+            id: item['0(notification)'].id,
+            title: item['0(notification)'].title,
+            message: item['0(notification)'].content,
+            publishedAt: new Date(item['0(notification)'].published_at * 1000),
+            isRead: false,
+          };
+        });
+      }),
+      tap((notifications) => {
+        this.getReadNotifications().then((readIds) => {
+          notifications.forEach((notification) => {
+            if (readIds.includes(notification.id)) {
+              notification.isRead = true;
+            }
           });
-        }),
-        tap((notifications) => {
-          this.getReadNotifications().then((readIds) => {
-            notifications.forEach((notification) => {
-              if (readIds.includes(notification.id)) {
-                notification.isRead = true;
-              }
-            });
-            this._notifications.set(notifications);
-          });
-        }),
-        catchError((error) => {
-          const errorMessage = this.translateService.instant(
-            'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS'
-          );
-          this.toastService.showError(errorMessage);
-          return throwError(() => error);
-        }),
-        finalize(() => this.inFlightRequests.delete(key)),
-        shareReplay({ bufferSize: 1, refCount: true })
-      );
+          this._notifications.set(notifications);
+        });
+      }),
+      catchError((error) => {
+        const errorMessage = this.translateService.instant(
+          'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS',
+        );
+        this.toastService.showError(errorMessage);
+        return throwError(() => error);
+      }),
+      finalize(() => this.inFlightRequests.delete(key)),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
 
-    this.inFlightRequests.set(key, request$);
-    return request$;
+    this.inFlightRequests.set(key, pipedRequest$);
+    return pipedRequest$;
   }
 
   getNotificationById(id: number, language: string): Observable<INotification> {
@@ -105,18 +113,18 @@ export class NotificationsService {
               title: resp[0]['0(notification)'].title,
               message: resp[0]['0(notification)'].content,
               publishedAt: new Date(
-                resp[0]['0(notification)'].published_at * 1000
+                resp[0]['0(notification)'].published_at * 1000,
               ),
               isRead: false,
             };
           }),
           catchError((error) => {
             const errorMessage = this.translateService.instant(
-              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS'
+              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS',
             );
             this.toastService.showError(errorMessage);
             return throwError(() => error);
-          })
+          }),
         );
     } catch (error) {
       throw new Error('Error fetching notification');

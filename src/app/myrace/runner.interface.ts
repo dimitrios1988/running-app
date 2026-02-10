@@ -5,6 +5,7 @@ export interface IRunner {
 }
 
 interface _1event {
+  id: number;
   nameEn: string | null;
   nameGr: string | null;
 }
