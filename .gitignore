@@ -71,3 +71,5 @@ Thumbs.db
 
 # Secrets File
 src/app/secrets.ts
+resources/ios/**/*
+resources/android/**/*
