@@ -22,6 +22,7 @@ interface _0runner {
   gender: string | null;
   nationality: string | null;
   last_name: string | null;
+  age_group: string | null;
 }
 
 interface _2category {

@@ -60,6 +60,7 @@ export class MyRaceService {
               gender: response[0]['0(runner)'].gender,
               lastName: response[0]['0(runner)'].last_name,
               nationality: response[0]['0(runner)'].nationality,
+              ageGroup: response[0]['0(runner)'].age_group,
             },
             event: {
               nameEn: response[0]['1(event)'].name_en,

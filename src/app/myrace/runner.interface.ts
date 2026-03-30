@@ -22,6 +22,7 @@ interface _0runner {
   gender: string | null;
   nationality: string | null;
   lastName: string | null;
+  ageGroup: string | null;
 }
 
 interface _place {

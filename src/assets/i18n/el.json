@@ -68,7 +68,8 @@
     "NATIONALITY": "Εθνικότητα",
     "BLOCK": "Block",
     "BIB_NUMBER": "Αριθμός Συμμετοχής (Bib)",
-    "CLUB": "Ομάδα"
+    "CLUB": "Ομάδα",
+    "AGE_GROUP": "Ηλικιακή Κατηγορία"
   },
   "AUTH": {
     "ERRORS": {

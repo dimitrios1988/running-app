@@ -68,7 +68,8 @@
     "NATIONALITY": "Nationality",
     "BLOCK": "Block",
     "BIB_NUMBER": "Bib Number",
-    "CLUB": "Club"
+    "CLUB": "Club",
+    "AGE_GROUP": "Age Group"
   },
   "AUTH": {
     "ERRORS": {
