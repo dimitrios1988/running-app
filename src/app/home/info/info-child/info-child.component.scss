@@ -1,6 +1,8 @@
 :host {
   --bg-color: blue;
   --text-color: #ece4e4;
+  --title-size: 1.3rem;
+  --subtitle-size: 0.9rem;
   --filter-color: invert(100%) sepia(38%) saturate(1590%)
     hue-rotate(292deg) brightness(109%) contrast(86%);
 }
@@ -22,13 +24,14 @@
 }
 
 .title {
-    font-size: 1.3rem;
+    font-size: var(--title-size);
     font-weight: 500;
+    letter-spacing: 0.02rem;
     color: var(--text-color);
 }
 
 .subtitle {
-    font-size: 0.9rem;
+    font-size: var(--subtitle-size);
     color: var(--text-color);
     font-weight: 500;
 }

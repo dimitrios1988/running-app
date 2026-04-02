@@ -2,7 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
-import { cssFilterFromHex, hexToRgb } from '../../shared/color.utils';
+import { hexToCssFilter, hexToRgb } from '../../shared/color.utils';
 import { Router } from '@angular/router';
 import { NewsElementModel } from '../../shared/page.element/page.element.model';
 
@@ -34,10 +34,26 @@ export class NewsComponent implements OnInit {
       );
     }
     if (this.newsElementModel.textColor) {
-      const filterColor = cssFilterFromHex(this.newsElementModel.textColor);
+      this.newsElement.nativeElement.style.setProperty(
+        '--text-color',
+        `${this.newsElementModel.textColor}`,
+      );
+      const filterColor = hexToCssFilter(this.newsElementModel.textColor);
       this.newsElement.nativeElement.style.setProperty(
         '--filter-color',
         filterColor,
+      );
+    }
+    if (this.newsElementModel.title_size) {
+      this.newsElement.nativeElement.style.setProperty(
+        '--title-size',
+        `${this.newsElementModel.title_size}rem`,
+      );
+    }
+    if (this.newsElementModel.subtitle_size) {
+      this.newsElement.nativeElement.style.setProperty(
+        '--subtitle-size',
+        `${this.newsElementModel.subtitle_size}rem`,
       );
     }
   }

@@ -33,7 +33,9 @@ export interface HeaderElementModel {
 export interface TrackingElementModel extends BasePageElement {
   type: 'tracking';
   title: string | null;
+  title_size: number | null;
   subtitle: string | null;
+  subtitle_size: number | null;
   backgroundColor: string | null;
   textColor: string | null;
   backgroundImage: string | null;
@@ -46,7 +48,9 @@ export interface TrackingElementModel extends BasePageElement {
 export interface NewsElementModel extends BasePageElement {
   type: 'news';
   title: string | null;
+  title_size: number | null;
   subtitle: string | null;
+  subtitle_size: number | null;
   backgroundColor: string | null;
   textColor: string | null;
   backgroundImage: string | null;
@@ -62,7 +66,9 @@ export interface InfoChildElementModel {
   id: number;
   link: string | null;
   title: string | null;
+  title_size: number | null;
   subtitle: string | null;
+  subtitle_size: number | null;
   backgroundColor: string | null;
   textColor: string | null;
   opens_in_external_url: boolean;
@@ -75,6 +81,7 @@ export interface CountdownTimerElementModel extends BasePageElement {
   backgroundColor: string | null;
   textColor: string | null;
   title: string | null;
+  title_size: number | null;
 }
 
 export interface ContentImageElementModel extends BasePageElement {

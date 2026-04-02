@@ -30,9 +30,11 @@ interface _0pageelement {
   secondary_image: PrimaryImage[] | null;
   secondary_image_width: null | number;
   subtitle: null | string;
+  subtitle_size: null | number;
   text_color: null | string;
   timer: number | null;
   title: null | string;
+  title_size: null | number;
   url: string | null;
   code: string | null;
 }

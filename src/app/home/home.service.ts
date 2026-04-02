@@ -129,8 +129,13 @@ export class HomeService {
                     type: 'tracking',
                     order: trackingElementResponse?.['0(page_element)'].order,
                     title: trackingElementResponse?.['0(page_element)'].title,
+                    title_size:
+                      trackingElementResponse?.['0(page_element)'].title_size,
                     subtitle:
                       trackingElementResponse?.['0(page_element)'].subtitle,
+                    subtitle_size:
+                      trackingElementResponse?.['0(page_element)']
+                        .subtitle_size,
                     backgroundColor: trackingElementResponse?.[
                       '0(page_element)'
                     ].background_color
@@ -167,7 +172,11 @@ export class HomeService {
                     type: 'news',
                     order: newsElementsResponse['0(page_element)'].order,
                     title: newsElementsResponse['0(page_element)'].title,
+                    title_size:
+                      newsElementsResponse['0(page_element)'].title_size,
                     subtitle: newsElementsResponse['0(page_element)'].subtitle,
+                    subtitle_size:
+                      newsElementsResponse['0(page_element)'].subtitle_size,
                     backgroundColor: newsElementsResponse['0(page_element)']
                       .background_color
                       ? `#${newsElementsResponse['0(page_element)'].background_color}`
@@ -201,7 +210,10 @@ export class HomeService {
                         id: infoResponse['0(page_element)'].id,
                         link: infoResponse['0(page_element)'].url,
                         title: infoResponse['0(page_element)'].title,
+                        title_size: infoResponse['0(page_element)'].title_size,
                         subtitle: infoResponse['0(page_element)'].subtitle,
+                        subtitle_size:
+                          infoResponse['0(page_element)'].subtitle_size,
                         opens_in_external_url:
                           infoResponse['0(page_element)'].opens_external_url,
                         backgroundColor: infoResponse['0(page_element)']
@@ -233,6 +245,7 @@ export class HomeService {
                           ? `#${response['0(page_element)'].text_color}`
                           : null,
                         title: response['0(page_element)'].title,
+                        title_size: response['0(page_element)'].title_size,
                       };
                     })
                   : null,

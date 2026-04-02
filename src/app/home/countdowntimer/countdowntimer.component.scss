@@ -1,6 +1,7 @@
 :host {
   --bg-color: blue;
   --text-color: #ece4e4;
+  --title-size: inherit;
   display: block;
 }
 
@@ -9,13 +10,18 @@
   text-align: center;
   background-color: var(--bg-color);
   width: 100%;
-  color: var(--text-color);
+  color: var(--text-color);  
   border-radius: 6px;
   padding: 0.7rem;
 }
 
 .countdown-timer-element > p {
   margin: 5px 0 15px 0;
+}
+
+.countdown-timer-element > h4 {
+  font-size: var(--title-size);
+  letter-spacing: 0.02rem;
 }
 
 .wrapper {

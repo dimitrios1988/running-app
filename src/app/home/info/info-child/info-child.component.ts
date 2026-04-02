@@ -33,17 +33,29 @@ export class InfoChildComponent implements OnInit {
   ngOnInit() {
     if (this.infoChildElementModel?.backgroundColor) {
       const backgroundRgb = hexToRgb(
-        this.infoChildElementModel?.backgroundColor
+        this.infoChildElementModel?.backgroundColor,
       );
       this.infoChildElement.nativeElement.style.setProperty(
         '--bg-color',
-        `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`
+        `rgba(${backgroundRgb?.r}, ${backgroundRgb?.g}, ${backgroundRgb?.b}, 0.8)`,
       );
     }
     if (this.infoChildElementModel?.textColor) {
       this.infoChildElement.nativeElement.style.setProperty(
         '--text-color',
-        this.infoChildElementModel?.textColor
+        this.infoChildElementModel?.textColor,
+      );
+    }
+    if (this.infoChildElementModel?.title_size) {
+      this.infoChildElement.nativeElement.style.setProperty(
+        '--title-size',
+        `${this.infoChildElementModel?.title_size}rem`,
+      );
+    }
+    if (this.infoChildElementModel?.subtitle_size) {
+      this.infoChildElement.nativeElement.style.setProperty(
+        '--subtitle-size',
+        `${this.infoChildElementModel?.subtitle_size}rem`,
       );
     }
   }

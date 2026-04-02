@@ -6,7 +6,7 @@ import {
   HostBinding,
 } from '@angular/core';
 import { CountdownTimerElementModel } from '../../shared/page.element/page.element.model';
-import { cssFilterFromHex } from '../../../app/shared/color.utils';
+import { hexToCssFilter } from '../../../app/shared/color.utils';
 import { interval, Observable, of, Subject } from 'rxjs';
 import { map, startWith, takeUntil, shareReplay } from 'rxjs/operators';
 import { DatePipe, AsyncPipe } from '@angular/common';
@@ -39,6 +39,8 @@ export class CountdowntimerComponent implements OnInit, OnDestroy {
   // bind computed CSS filter to host style variable
   @HostBinding('style.--filter-color') filterColor?: string;
   @HostBinding('style.--bg-color') bgColor?: string;
+  @HostBinding('style.--title-size') titleSize?: string;
+  @HostBinding('style.--text-color') textColor?: string;
 
   private destroy$ = new Subject<void>();
 
@@ -55,10 +57,14 @@ export class CountdowntimerComponent implements OnInit, OnDestroy {
     this.targetDate = new Date(model.targetDateTime);
 
     if (model.textColor) {
-      this.filterColor = cssFilterFromHex(model.textColor);
+      this.filterColor = hexToCssFilter(model.textColor);
+      this.textColor = model.textColor;
     }
     if (model.backgroundColor) {
       this.bgColor = model.backgroundColor;
+    }
+    if (model.title_size) {
+      this.titleSize = `${model.title_size}rem`;
     }
 
     // emit every second, start immediately
