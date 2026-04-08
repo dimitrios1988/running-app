@@ -111,7 +111,7 @@ export class NotificationsPage implements OnDestroy {
   onScroll() {
     if (!this.viewport) return;
     const offset = this.viewport?.measureScrollOffset('top');
-    this.atTop = offset! <= 300;
+    this.atTop = offset! <= 115;
   }
 
   isAtTop() {

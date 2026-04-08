@@ -2,14 +2,13 @@
 ion-content.virtual-wrapper {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 112px); /* adjust if your toolbar height differs */
   padding: 0;
   box-sizing: border-box;
 }
 
 /* CDK viewport must fill the available space */
 .scroll-viewport {
-  height: 100%;
+  height: calc(100dvh - 112px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
   width: 100%;
   overflow: auto;
   box-sizing: border-box;
@@ -29,6 +28,10 @@ ion-content.virtual-wrapper {
   display: flex ;
   flex-direction: column;
   border-bottom: 2px;
+}
+
+ion-list{
+  padding-bottom: 0;
 }
 
 ion-label strong {

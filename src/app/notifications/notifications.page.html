@@ -22,7 +22,7 @@
   </ion-refresher>
   <cdk-virtual-scroll-viewport
     class="scroll-viewport"
-    itemSize="64"
+    itemSize="115"
     orientation="vertical"
     (scrolledIndexChange)="onScroll()"
   >
@@ -41,7 +41,9 @@
         }
         <ion-label>
           <strong>{{ notification.title }}</strong>
-          <ion-text color="medium">{{ notification.message }}</ion-text>
+          <ion-text color="medium"
+            >{{ notification.message?.slice(0, 50) + '...' }}</ion-text
+          >
         </ion-label>
         <div class="metadata-end-wrapper" slot="end">
           <ion-note color="medium"
