@@ -57,13 +57,24 @@ export class OneSignalService {
         notificationsEnabled,
       );
       if (notificationsEnabled) {
-        OneSignal.Notifications.requestPermission(false).then(
-          (accepted: boolean) => {
-            console.log('User accepted notifications: ' + accepted);
-            OneSignal.User.pushSubscription.optIn();
-          },
-          (error: any) => {
-            console.error('OneSignal requestPermission error:', error);
+        OneSignal.Notifications.canRequestPermission().then(
+          (canRequest: boolean) => {
+            if (!canRequest) {
+              OneSignal.Notifications.requestPermission(true).then(
+                (accepted: boolean) => {
+                  console.log('User accepted notifications: ' + accepted);
+                  OneSignal.User.pushSubscription.optIn();
+                  const selectedLanguage =
+                    this.settingsService.selectedLanguage$();
+                  if (selectedLanguage) {
+                    this.setSubscriberLanguage(selectedLanguage);
+                  }
+                },
+                (error: any) => {
+                  console.error('OneSignal requestPermission error:', error);
+                },
+              );
+            }
           },
         );
       } else {
@@ -79,6 +90,10 @@ export class OneSignalService {
       const userPayload = this.authService.userPayload();
       if (userPayload) {
         this.setSubscriberUUID(userPayload.uuid);
+        const selectedLanguage = this.settingsService.selectedLanguage$();
+        if (selectedLanguage) {
+          this.setSubscriberLanguage(selectedLanguage);
+        }
       } else {
         this.logoutSubscriber();
       }
