@@ -5,12 +5,13 @@
 
 ion-content.virtual-wrapper {
   --background: var(--ion-background-color);
-  height: calc(100vh - 114px);
+  
   padding: 0;
 }
 
 .scroll-viewport {
-  height: 100%;
+  margin-top: 8px;
+  height: calc(100dvh - 112px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
   width: 100%;
   overflow: auto;
   box-sizing: border-box;
