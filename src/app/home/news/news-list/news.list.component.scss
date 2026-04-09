@@ -9,7 +9,6 @@ ion-content.virtual-wrapper {
 }
 
 .scroll-viewport {
-  margin-top: 8px;
   height: calc(100dvh - 112px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
   width: 100%;
   overflow: auto;
