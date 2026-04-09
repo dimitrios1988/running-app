@@ -1,25 +1,25 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start"> <ion-back-button></ion-back-button></ion-buttons>
-    @if(loading()) {
-    <ion-title>{{ "NEWS_VIEWER.LOADING" | translate }}</ion-title>
-    } @else if(error()) {
-    <ion-title>{{ "NEWS_VIEWER.ERROR" | translate }}</ion-title>
-    } @else {
-    <ion-title>{{ news?.title }}</ion-title>
+    @if (loading()) {
+      <ion-title>{{ "NEWS_VIEWER.LOADING" | translate }}</ion-title>
+    } @else if (error()) {
+      <ion-title>{{ "NEWS_VIEWER.ERROR" | translate }}</ion-title>
     }
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  @if(news) { @if(news.featuredImageUrl) {
-  <div class="news-featured-image-container">
-    <img
-      class="news-featured-image"
-      [src]="news.featuredImageUrl"
-      alt="Featured Image"
-    />
-  </div>
-  }
-  <div class="news-viewer-content" [innerHTML]="news.safeContent"></div>
+  @if (news) {
+    @if (news.featuredImageUrl) {
+      <h2 class="news-viewer-title">{{ news.title }}</h2>
+      <div class="news-featured-image-container">
+        <img
+          class="news-featured-image"
+          [src]="news.featuredImageUrl"
+          alt="Featured Image"
+        />
+      </div>
+    }
+    <div class="news-viewer-content" [innerHTML]="news.safeContent"></div>
   }
 </ion-content>
