@@ -25,9 +25,9 @@ interface _0pageelement {
   id: number;
   opens_external_url: boolean | null;
   order: null | number;
-  primary_image: PrimaryImage[] | null;
+  primary_image: Image[] | null;
   primary_image_width: null | number;
-  secondary_image: PrimaryImage[] | null;
+  secondary_image: Image[] | null;
   secondary_image_width: null | number;
   subtitle: null | string;
   subtitle_size: null | number;
@@ -39,7 +39,7 @@ interface _0pageelement {
   code: string | null;
 }
 
-interface PrimaryImage {
+interface Image {
   changed: number;
   hash: string;
   id: string;

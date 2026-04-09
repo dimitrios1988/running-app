@@ -1,0 +1,81 @@
+:host {
+  /* defaults (can be overridden via HostBinding) */
+  --bg-color: blue;
+  --text-color: #ece4e4;
+  --filter-color: invert(100%) sepia(38%) saturate(1590%) hue-rotate(292deg) brightness(109%) contrast(86%);
+  --title-size: 1.3rem;
+  display: block;
+}
+
+.link-element {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 4rem;
+  color: var(--text-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-color)
+}
+
+.title {
+  font-size: var(--title-size);
+  font-weight: 500;
+  color: var(--text-color);
+  letter-spacing: 0.02rem;
+}
+
+.subtitle {
+  font-size: var(--subtitle-size);
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.title-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  z-index: 1;
+  padding-top: 0.7rem;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    padding-bottom: 0.7rem;
+}
+
+.title-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.arrow-column {
+  flex: 0 0 auto;
+  display: flex;
+  align-self: end;
+  justify-content: center;
+}
+
+.right-arrow {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.icon-column {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-column img {
+  filter: var(--filter-color);
+  display: block;
+}

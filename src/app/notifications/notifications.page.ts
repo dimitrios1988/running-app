@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, effect, inject, OnDestroy, ViewChild } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
@@ -69,9 +69,23 @@ export class NotificationsPage implements OnDestroy {
 
   constructor() {
     addIcons({ chevronDownCircleOutline, chevronForwardOutline });
+    effect(() => {
+      const language = this.translateService.getCurrentLang();
+      const eventId = this.myRaceService.runner$()?.event.id;
+      if (language) {
+        this.notificationSub$?.unsubscribe();
+        this.notificationSub$ = this.notificationsService
+          .getNotifications(language, eventId)
+          .subscribe((data: INotification[]) => {
+            this.notifications = data;
+            this.checkViewportSize();
+          });
+      }
+    });
   }
 
   ionViewWillEnter(): void {
+    this.notificationSub$?.unsubscribe();
     this.notificationSub$ = this.loadNotifications().subscribe();
   }
 

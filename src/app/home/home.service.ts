@@ -79,6 +79,9 @@ export class HomeService {
               (element) =>
                 element['2(element_type)']?.code === 'countdown_timer',
             );
+            const linkElementsResponse = response.filter(
+              (element) => element['2(element_type)']?.code === 'link',
+            );
             return {
               headerElementModel: headerElementResponse
                 ? {
@@ -269,6 +272,39 @@ export class HomeService {
                           : null,
                         altText: response['0(page_element)'].title,
                         linkUrl: response['0(page_element)'].url,
+                      };
+                    })
+                  : null,
+              linkElementModels:
+                linkElementsResponse.length > 0
+                  ? linkElementsResponse.map((response) => {
+                      return {
+                        id: response['0(page_element)'].id,
+                        order: response['0(page_element)'].order,
+                        type: 'link',
+                        title: response['0(page_element)'].title,
+                        title_size: response['0(page_element)'].title_size,
+                        backgroundColor: response['0(page_element)']
+                          .background_color
+                          ? `#${response['0(page_element)'].background_color}`
+                          : null,
+                        textColor: response['0(page_element)'].text_color
+                          ? `#${response['0(page_element)'].text_color}`
+                          : null,
+                        url: response['0(page_element)'].url,
+                        secondaryImage: response?.['0(page_element)']
+                          .secondary_image
+                          ? new URL(
+                              `/data/download/${
+                                response['0(page_element)'].secondary_image[0]
+                                  .name
+                              }?attribute_id=45d68dae-2bf7-475a-9b92-35f7a9899912&file_id=${
+                                response['0(page_element)'].secondary_image[0]
+                                  .id
+                              }&version=0&token=${this.authService.getToken()}`,
+                              AUTH_CREDENTIALS.app_url,
+                            ).toString()
+                          : null,
                       };
                     })
                   : null,

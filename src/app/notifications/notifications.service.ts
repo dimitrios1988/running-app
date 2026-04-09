@@ -17,6 +17,7 @@ import { Preferences } from '@capacitor/preferences';
 import { SettingsService } from '../settings/settings.service';
 import { ToastService } from '../shared/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
+import { MyRaceService } from '../myrace/myrace.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,13 +34,18 @@ export class NotificationsService {
     AUTH_CREDENTIALS.app_url,
   ).toString();
   private readonly http = inject(HttpClient);
+  private readonly myRaceService = inject(MyRaceService);
   public readonly notifications$ = this._notifications.asReadonly();
   constructor(private settingsService: SettingsService) {
     effect(() => {
       const language = this.settingsService.selectedLanguage$();
+      const eventId = this.myRaceService.runner$()?.event.id;
       if (language) {
         this.notificationSub$.unsubscribe();
-        this.notificationSub$ = this.getNotifications(language).subscribe();
+        this.notificationSub$ = this.getNotifications(
+          language,
+          eventId,
+        ).subscribe();
       }
     });
   }
@@ -87,7 +93,7 @@ export class NotificationsService {
       }),
       catchError((error) => {
         const errorMessage = this.translateService.instant(
-          'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS',
+          'NOTIFICATIONS.ERRORS.FAILED_TO_LOAD_NOTIFICATIONS',
         );
         this.toastService.showError(errorMessage);
         return throwError(() => error);

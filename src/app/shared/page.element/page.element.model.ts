@@ -6,7 +6,8 @@ export type PageElementModel =
   | NewsElementModel
   | InfoParentElementModel
   | CountdownTimerElementModel
-  | ContentImageElementModel;
+  | ContentImageElementModel
+  | LinkElementModel;
 
 export interface BasePageElement {
   order: number | null;
@@ -19,6 +20,7 @@ export interface HomeElementModel {
   infoParentElementModel: InfoParentElementModel | null;
   countdownTimerElementModels: CountdownTimerElementModel[] | null;
   contentImageElementModels: ContentImageElementModel[] | null;
+  linkElementModels: LinkElementModel[] | null;
 }
 
 export interface HeaderElementModel {
@@ -90,4 +92,15 @@ export interface ContentImageElementModel extends BasePageElement {
   imageUrl: string | null;
   altText: string | null;
   linkUrl: string | null;
+}
+
+export interface LinkElementModel extends BasePageElement {
+  id: number;
+  type: 'link';
+  backgroundColor: string | null;
+  textColor: string | null;
+  title: string | null;
+  title_size: number | null;
+  url: string | null;
+  secondaryImage: string | null;
 }

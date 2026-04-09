@@ -5,6 +5,7 @@ import { InfoComponent } from '../../home/info/info.component';
 import { PageElementModel } from './page.element.model';
 import { CountdowntimerComponent } from '../../home/countdowntimer/countdowntimer.component';
 import { ContentImageComponent } from '../../home/content-image/content-image.component';
+import { LinkComponent } from '../../home/link/link.component';
 
 @Component({
   selector: 'app-page-element',
@@ -16,6 +17,7 @@ import { ContentImageComponent } from '../../home/content-image/content-image.co
     InfoComponent,
     CountdowntimerComponent,
     ContentImageComponent,
+    LinkComponent,
   ],
 })
 export class PageElementComponent {

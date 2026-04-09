@@ -24,6 +24,8 @@ export class MyRaceService {
       const payload = this.authService.userPayload();
       if (!payload) {
         this._runner.set(null);
+      } else {
+        this.getRunnerInfo(payload.uuid).subscribe();
       }
     });
   }

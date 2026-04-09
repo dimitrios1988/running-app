@@ -1,0 +1,27 @@
+<button
+  type="button"
+  class="link-element"
+  (click)="navigateToLink(linkElementModel.url)"
+  [attr.aria-label]="linkElementModel.title"
+>
+  <div class="title-row">
+    <div class="icon-column" aria-hidden="true">
+      @if (linkElementModel.secondaryImage) {
+        <img
+          [src]="linkElementModel.secondaryImage"
+          width="32"
+          height="32"
+          [alt]="linkElementModel.title"
+        />
+      }
+    </div>
+
+    <div class="title-column">
+      <span class="title">{{ linkElementModel.title }}</span>
+    </div>
+
+    <div class="arrow-column" aria-hidden="true">
+      <ion-icon name="chevron-forward-outline" class="right-arrow"></ion-icon>
+    </div>
+  </div>
+</button>

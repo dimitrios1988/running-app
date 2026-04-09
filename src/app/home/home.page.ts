@@ -23,6 +23,7 @@ import { HomeService } from './home.service';
 import { Router } from '@angular/router';
 import {
   HeaderElementModel,
+  HomeElementModel,
   PageElementModel,
 } from '../shared/page.element/page.element.model';
 import { Subscription } from 'rxjs';
@@ -57,16 +58,20 @@ export class HomePage implements OnDestroy {
   homepageToolbarElement!: ElementRef;
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;
+  homeElementModel: HomeElementModel | null = null;
 
   constructor() {
     addIcons({ settingsOutline, chevronDownCircleOutline });
     effect(() => {
-      this.homeElementsSub.unsubscribe();
-      this.populateHomeElements();
+      this.homeElementModel = this.homeService.homeElements();
+      if (this.homeElementModel) {
+        this.populateHomeElements();
+      }
     });
   }
 
   ionViewWillEnter(): void {
+    this.homeElementsSub.unsubscribe();
     this.homeElementsSub = this.homeService
       .getHomeElements(this.settingsService.selectedLanguage$()!)
       .subscribe();
@@ -86,22 +91,22 @@ export class HomePage implements OnDestroy {
   }
 
   populateHomeElements(): void {
-    const homeElements = this.homeService.homeElements();
-    if (homeElements) {
-      this.headerElementModel = homeElements.headerElementModel
-        ? homeElements.headerElementModel
+    if (this.homeElementModel) {
+      this.headerElementModel = this.homeElementModel.headerElementModel
+        ? this.homeElementModel.headerElementModel
         : undefined;
       this.pageElementModels = [
-        ...(homeElements.newsElementModel
-          ? [homeElements.newsElementModel]
+        ...(this.homeElementModel.newsElementModel
+          ? [this.homeElementModel.newsElementModel]
           : []),
-        ...(homeElements.countdownTimerElementModels ?? []),
-        ...(homeElements.contentImageElementModels ?? []),
-        ...(homeElements.trackingElementModel
-          ? [homeElements.trackingElementModel]
+        ...(this.homeElementModel.countdownTimerElementModels ?? []),
+        ...(this.homeElementModel.contentImageElementModels ?? []),
+        ...(this.homeElementModel.linkElementModels ?? []),
+        ...(this.homeElementModel.trackingElementModel
+          ? [this.homeElementModel.trackingElementModel]
           : []),
-        ...(homeElements.infoParentElementModel
-          ? [homeElements.infoParentElementModel]
+        ...(this.homeElementModel.infoParentElementModel
+          ? [this.homeElementModel.infoParentElementModel]
           : []),
       ].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
