@@ -14,7 +14,7 @@ export class HttpRetryInterceptor implements HttpInterceptor {
   private readonly maxRetries = 3;
   intercept(
     req: HttpRequest<any>,
-    next: HttpHandler
+    next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       retry({
@@ -26,7 +26,7 @@ export class HttpRetryInterceptor implements HttpInterceptor {
           const backoffMs = Math.pow(2, retryIndex - 1) * 500;
           return timer(backoffMs);
         },
-      })
+      }),
     );
   }
 }
