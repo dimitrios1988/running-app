@@ -74,6 +74,10 @@
   "AUTH": {
     "ERRORS": {
       "INVALID_CREDENTIALS": "Invalid email or bib number. Please try again."
-    }
+    },
+    "SIGN_IN": "Sign In",
+    "EMAIL": "Email",
+    "BIB_NUMBER": "Bib Number",
+    "LOGIN": "Login"
   }
 }

@@ -74,6 +74,10 @@
   "AUTH": {
     "ERRORS": {
       "INVALID_CREDENTIALS": "Μη έγκυρο email ή αριθμός συμμετοχής (bib). Παρακαλώ δοκιμάστε ξανά."
-    }
+    },
+    "SIGN_IN": "Σύνδεση",
+    "EMAIL": "Email",
+    "BIB_NUMBER": "Αριθμός Συμμετοχής (Bib)",
+    "LOGIN": "Είσοδος"
   }
 }

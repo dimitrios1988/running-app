@@ -5,11 +5,11 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../shared/services/toast.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
-  imports: [IonicModule, ReactiveFormsModule],
+  imports: [IonicModule, ReactiveFormsModule, TranslatePipe],
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],

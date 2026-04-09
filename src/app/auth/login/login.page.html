@@ -1,13 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Login</ion-title>
+    <ion-title>{{ 'AUTH.LOGIN' | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Login</ion-title>
+      <ion-title size="large">{{ 'AUTH.LOGIN' | translate }}</ion-title>
     </ion-toolbar>
   </ion-header>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -16,7 +16,7 @@
         <ion-input
           formControlName="email"
           type="email"
-          label="Email"
+          label="{{ 'AUTH.EMAIL' | translate }}"
           labelPlacement="stacked"
         ></ion-input>
       </ion-item>
@@ -25,13 +25,13 @@
         <ion-input
           formControlName="bib"
           type="number"
-          label="Bib Number"
+          label="{{ 'AUTH.BIB_NUMBER' | translate }}"
           labelPlacement="stacked"
         ></ion-input>
       </ion-item>
 
       <ion-button expand="block" type="submit" [disabled]="form.invalid"
-        >Sign In</ion-button
+        >{{ 'AUTH.SIGN_IN' | translate }}</ion-button
       >
     </ion-list>
   </form>
