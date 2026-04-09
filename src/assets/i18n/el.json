@@ -44,7 +44,10 @@
     "REFRESHING_TEXT": "Ενημέρωση ειδοποιήσεων...",
     "NEW_NOTIFICATION": "Νέα Ειδοποίηση",
     "NO_NOTIFICATIONS": "Δεν υπάρχουν ειδοποιήσεις",
-    "NOTIFICATIONS": "Ειδοποιήσεις"
+    "NOTIFICATIONS": "Ειδοποιήσεις",
+    "ERRORS": {
+      "FAILED_TO_LOAD_NOTIFICATIONS": "Αποτυχία φόρτωσης ειδοποιήσεων. Παρακαλώ ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά αργότερα."
+    }
   },
   "NOTIFICATIONS_VIEWER": {
     "NOTIFICATION": "Ειδοποίηση",

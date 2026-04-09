@@ -44,7 +44,10 @@
     "REFRESHING_TEXT": "Updating notifications...",
     "NEW_NOTIFICATION": "New Notification",
     "NO_NOTIFICATIONS": "No notifications",
-    "NOTIFICATIONS": "Notifications"
+    "NOTIFICATIONS": "Notifications",
+    "ERRORS": {
+      "FAILED_TO_LOAD_NOTIFICATIONS": "Failed to load notifications. Please check your internet connection and try again later."
+    }
   },
   "NOTIFICATIONS_VIEWER": {
     "NOTIFICATION": "Notification",
