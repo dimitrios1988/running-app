@@ -64,11 +64,6 @@ export class OneSignalService {
                 (accepted: boolean) => {
                   console.log('User accepted notifications: ' + accepted);
                   OneSignal.User.pushSubscription.optIn();
-                  const selectedLanguage =
-                    this.settingsService.selectedLanguage$();
-                  if (selectedLanguage) {
-                    this.setSubscriberLanguage(selectedLanguage);
-                  }
                 },
                 (error: any) => {
                   console.error('OneSignal requestPermission error:', error);
@@ -84,18 +79,22 @@ export class OneSignalService {
           console.error('OneSignal optOut error:', error);
         }
       }
+      const selectedLanguage = this.settingsService.selectedLanguage$();
+      if (selectedLanguage) {
+        this.setSubscriberLanguage(selectedLanguage);
+      }
     });
 
     effect(() => {
       const userPayload = this.authService.userPayload();
       if (userPayload) {
         this.setSubscriberUUID(userPayload.uuid);
-        const selectedLanguage = this.settingsService.selectedLanguage$();
-        if (selectedLanguage) {
-          this.setSubscriberLanguage(selectedLanguage);
-        }
       } else {
         this.logoutSubscriber();
+      }
+      const selectedLanguage = this.settingsService.selectedLanguage$();
+      if (selectedLanguage) {
+        this.setSubscriberLanguage(selectedLanguage);
       }
     });
   }
