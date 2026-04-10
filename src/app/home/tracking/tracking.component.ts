@@ -1,9 +1,7 @@
 import {
   Component,
-  EventEmitter,
   Input,
   OnChanges,
-  Output,
   SimpleChanges,
   HostBinding,
 } from '@angular/core';
@@ -23,7 +21,6 @@ import { Router } from '@angular/router';
 })
 export class TrackingComponent implements OnChanges {
   @Input() trackingElementModel?: TrackingElementModel;
-  @Output() open = new EventEmitter<void>();
 
   // bind CSS custom properties to the host so we don't manipulate DOM directly
   @HostBinding('style.--bg-color') hostBgColor?: string;
