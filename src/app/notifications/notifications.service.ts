@@ -106,11 +106,11 @@ export class NotificationsService {
     return pipedRequest$;
   }
 
-  getNotificationById(id: number, language: string): Observable<INotification> {
+  getNotificationById(id: number): Observable<INotification> {
     try {
       return this.http
-        .get<NotificationsResp[]>(`${this.notificationsApi}/${id}`, {
-          params: { language },
+        .get<NotificationsResp[]>(`${this.notificationsApi}`, {
+          params: { id },
         })
         .pipe(
           map((resp) => {
@@ -126,7 +126,7 @@ export class NotificationsService {
           }),
           catchError((error) => {
             const errorMessage = this.translateService.instant(
-              'HOME.ERRORS.FAILED_TO_LOAD_HOME_ELEMENTS',
+              'NOTIFICATIONS_VIEWER.ERRORS.FAILED_TO_LOAD_NOTIFICATION',
             );
             this.toastService.showError(errorMessage);
             return throwError(() => error);

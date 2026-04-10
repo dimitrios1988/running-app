@@ -15,7 +15,6 @@ import { INotification } from '../notification.interface';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
-import { SettingsService } from '../../settings/settings.service';
 
 @Component({
   selector: 'app-notifications-viewer',
@@ -42,7 +41,6 @@ export class NotificationsViewerComponent implements OnInit, OnDestroy {
   private notificationSub: Subscription = Subscription.EMPTY;
   private route = inject(ActivatedRoute);
   private notificationsService = inject(NotificationsService);
-  private settingsService = inject(SettingsService);
   constructor() {}
 
   ngOnInit() {
@@ -52,10 +50,7 @@ export class NotificationsViewerComponent implements OnInit, OnDestroy {
     this.error.set(null);
     this.notificationSub.unsubscribe();
     this.notificationSub = this.notificationsService
-      .getNotificationById(
-        Number(id),
-        this.settingsService.selectedLanguage$() || 'en'
-      )
+      .getNotificationById(Number(id))
       .subscribe({
         next: (notification: INotification) => {
           if (notification) {
