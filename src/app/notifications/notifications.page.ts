@@ -27,7 +27,7 @@ import {
   chevronDownCircleOutline,
   chevronForwardOutline,
 } from 'ionicons/icons';
-import { Observable, Subscription, tap } from 'rxjs';
+import { finalize, Observable, Subscription, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MyRaceService } from '../myrace/myrace.service';
@@ -77,7 +77,7 @@ export class NotificationsPage implements OnDestroy {
         this.notificationSub$ = this.notificationsService
           .getNotifications(language, eventId)
           .subscribe((data: INotification[]) => {
-            this.notifications = data;
+            this.notifications = new Array(...data);
             this.checkViewportSize();
           });
       }
@@ -105,7 +105,9 @@ export class NotificationsPage implements OnDestroy {
       )
       .pipe(
         tap((data: INotification[]) => {
-          this.notifications = data;
+          this.notifications = new Array(...data);
+        }),
+        finalize(() => {
           this.checkViewportSize();
         }),
       );

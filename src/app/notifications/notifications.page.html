@@ -22,14 +22,14 @@
   </ion-refresher>
   <cdk-virtual-scroll-viewport
     class="scroll-viewport"
-    itemSize="115"
+    [itemSize]="115"
     orientation="vertical"
     (scrolledIndexChange)="onScroll()"
   >
-    @if(notifications != null && notifications.length > 0) {
-    <ion-list lines="full"
-      ><ion-item
-        *cdkVirtualFor="let notification of notifications; let i = index"
+    @if(notifications != null && notifications!.length > 0) {
+    <ion-list lines="full">
+      @for (notification of notifications; track notification) {
+      <ion-item
         [button]="true"
         class="notifications-item"
         (click)="openNotification(notification)"
@@ -54,8 +54,16 @@
             name="chevron-forward-outline"
             class="right-arrow"
           ></ion-icon>
-        </div> </ion-item
-    ></ion-list>
+        </div>
+      </ion-item>
+      }
+    </ion-list>
+    } @else {
+    <div class="no-notifications-wrapper">
+      <ion-text color="medium"
+        >{{ 'NOTIFICATIONS.NO_NOTIFICATIONS' | translate }}</ion-text
+      >
+    </div>
     }
   </cdk-virtual-scroll-viewport>
 </ion-content>
