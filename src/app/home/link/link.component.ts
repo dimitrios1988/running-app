@@ -16,6 +16,7 @@ import { hexToCssFilter, hexToRgb } from '../../shared/color.utils';
   selector: 'app-link',
   templateUrl: './link.component.html',
   styleUrls: ['./link.component.scss'],
+  standalone: true,
   imports: [IonIcon],
 })
 export class LinkComponent implements OnChanges {
