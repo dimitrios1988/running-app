@@ -10,7 +10,7 @@ import { Browser } from '@capacitor/browser';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
-import { hexToCssFilter, hexToRgb } from '../../shared/color.utils';
+import { hexToRgb } from '../../shared/color.utils';
 
 @Component({
   selector: 'app-link',
@@ -22,7 +22,6 @@ import { hexToCssFilter, hexToRgb } from '../../shared/color.utils';
 export class LinkComponent implements OnChanges {
   @Input() linkElementModel!: LinkElementModel;
   @HostBinding('style.--bg-color') hostBgColor?: string;
-  @HostBinding('style.--filter-color') hostFilterColor?: string;
   @HostBinding('style.--title-size') hostTitleSize?: string;
   @HostBinding('style.--text-color') hostTextColor?: string;
 
@@ -57,7 +56,6 @@ export class LinkComponent implements OnChanges {
     }
 
     if (m?.textColor) {
-      this.hostFilterColor = hexToCssFilter(m.textColor);
       this.hostTextColor = `${m.textColor}`;
     }
     if (m?.title_size) {
