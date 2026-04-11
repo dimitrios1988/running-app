@@ -9,7 +9,10 @@ import {
   tap,
   throwError,
 } from 'rxjs';
-import { HomeElementModel } from '../shared/page.element/page.element.model';
+import {
+  HomeElementModel,
+  LinkElementModel,
+} from '../shared/page.element/page.element.model';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
 import { AuthService } from '../auth/auth.service';
@@ -162,7 +165,19 @@ export class HomeService {
                           AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
-                    icon: 'https://unpkg.com/ionicons/dist/svg/analytics-outline.svg',
+                    icon: trackingElementResponse?.['0(page_element)']
+                      .secondary_image
+                      ? new URL(
+                          `/data/download/${
+                            trackingElementResponse['0(page_element)']
+                              .secondary_image[0].name
+                          }?attribute_id=cc6d340b-2728-4bdb-95c3-90feb97dbcb2&file_id=${
+                            trackingElementResponse['0(page_element)']
+                              .secondary_image[0].id
+                          }&version=0&token=${this.authService.getToken()}`,
+                          AUTH_CREDENTIALS.app_url,
+                        ).toString()
+                      : null,
                     link: trackingElementResponse?.['0(page_element)'].url,
                     opens_in_external_url:
                       trackingElementResponse?.['0(page_element)']
@@ -172,6 +187,7 @@ export class HomeService {
                 : null,
               newsElementModel: newsElementsResponse
                 ? {
+                    id: newsElementsResponse['0(page_element)'].id,
                     type: 'news',
                     order: newsElementsResponse['0(page_element)'].order,
                     title: newsElementsResponse['0(page_element)'].title,
@@ -201,7 +217,19 @@ export class HomeService {
                           AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
-                    icon: 'https://unpkg.com/ionicons/dist/svg/analytics-outline.svg',
+                    icon: newsElementsResponse['0(page_element)']
+                      .secondary_image
+                      ? new URL(
+                          `/data/download/${
+                            newsElementsResponse['0(page_element)']
+                              .secondary_image[0].name
+                          }?attribute_id=cc6d340b-2728-4bdb-95c3-90feb97dbcb2&file_id=${
+                            newsElementsResponse['0(page_element)']
+                              .secondary_image[0].id
+                          }&version=0&token=${this.authService.getToken()}`,
+                          AUTH_CREDENTIALS.app_url,
+                        ).toString()
+                      : null,
                   }
                 : null,
               infoParentElementModel:
@@ -277,7 +305,7 @@ export class HomeService {
                   : null,
               linkElementModels:
                 linkElementsResponse.length > 0
-                  ? linkElementsResponse.map((response) => {
+                  ? (linkElementsResponse.map((response) => {
                       return {
                         id: response['0(page_element)'].id,
                         order: response['0(page_element)'].order,
@@ -292,8 +320,7 @@ export class HomeService {
                           ? `#${response['0(page_element)'].text_color}`
                           : null,
                         url: response['0(page_element)'].url,
-                        secondaryImage: response?.['0(page_element)']
-                          .secondary_image
+                        icon: response?.['0(page_element)'].secondary_image
                           ? new URL(
                               `/data/download/${
                                 response['0(page_element)'].secondary_image[0]
@@ -306,7 +333,7 @@ export class HomeService {
                             ).toString()
                           : null,
                       };
-                    })
+                    }) as LinkElementModel[])
                   : null,
             } as HomeElementModel;
           }),

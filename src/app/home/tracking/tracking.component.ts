@@ -6,7 +6,7 @@ import {
   HostBinding,
 } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { hexToCssFilter, hexToRgb } from '../../shared/color.utils';
+import { hexToRgb } from '../../shared/color.utils';
 import { TrackingElementModel } from '../../shared/page.element/page.element.model';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
@@ -24,7 +24,7 @@ export class TrackingComponent implements OnChanges {
 
   // bind CSS custom properties to the host so we don't manipulate DOM directly
   @HostBinding('style.--bg-color') hostBgColor?: string;
-  @HostBinding('style.--filter-color') hostFilterColor?: string;
+  //@HostBinding('style.--filter-color') hostFilterColor?: string;
   @HostBinding('style.--title-size') hostTitleSize?: string;
   @HostBinding('style.--subtitle-size') hostSubtitleSize?: string;
   @HostBinding('style.--text-color') hostTextColor?: string;
@@ -70,7 +70,7 @@ export class TrackingComponent implements OnChanges {
     }
 
     if (m?.textColor) {
-      this.hostFilterColor = hexToCssFilter(m.textColor);
+      //this.hostFilterColor = hexToCssFilter(m.textColor);
       this.hostTextColor = `${m.textColor}`;
     }
     if (m?.title_size) {

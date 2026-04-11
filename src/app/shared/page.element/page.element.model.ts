@@ -48,6 +48,7 @@ export interface TrackingElementModel extends BasePageElement {
 }
 
 export interface NewsElementModel extends BasePageElement {
+  id: number;
   type: 'news';
   title: string | null;
   title_size: number | null;
@@ -102,5 +103,5 @@ export interface LinkElementModel extends BasePageElement {
   title: string | null;
   title_size: number | null;
   url: string | null;
-  secondaryImage: string | null;
+  icon: string | null;
 }
