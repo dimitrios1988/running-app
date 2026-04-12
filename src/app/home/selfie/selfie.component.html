@@ -1,0 +1,27 @@
+<button
+  type="button"
+  (click)="onSelfieElementClick()"
+  class="selfie-element"
+  [attr.aria-label]="selfieElementModel.title"
+>
+  <div class="title-row">
+    <div class="icon-column" aria-hidden="true">
+      @if (selfieElementModel.icon) {
+        <img
+          [src]="selfieElementModel.icon"
+          width="32"
+          height="32"
+          [alt]="selfieElementModel.title"
+        />
+      }
+    </div>
+
+    <div class="title-column">
+      <span class="title">{{ selfieElementModel.title }}</span>
+    </div>
+
+    <div class="arrow-column" aria-hidden="true">
+      <ion-icon name="chevron-forward-outline" class="right-arrow"></ion-icon>
+    </div>
+  </div>
+</button>

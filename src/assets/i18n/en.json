@@ -39,6 +39,9 @@
     }
   },
   "NEWS_VIEWER": { "LOADING": "Loading...", "ERROR": "Error" },
+  "CAMERA": {
+    "TAKE_SELFIE": "Take Selfie"
+  },
   "NOTIFICATIONS": {
     "PULLING_TEXT": "Pull down to refresh notifications",
     "REFRESHING_TEXT": "Updating notifications...",

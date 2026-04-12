@@ -7,7 +7,8 @@ export type PageElementModel =
   | InfoParentElementModel
   | CountdownTimerElementModel
   | ContentImageElementModel
-  | LinkElementModel;
+  | LinkElementModel
+  | SelfieElementModel;
 
 export interface BasePageElement {
   order: number | null;
@@ -21,6 +22,7 @@ export interface HomeElementModel {
   countdownTimerElementModels: CountdownTimerElementModel[] | null;
   contentImageElementModels: ContentImageElementModel[] | null;
   linkElementModels: LinkElementModel[] | null;
+  selfieElementModel: SelfieElementModel | null;
 }
 
 export interface HeaderElementModel {
@@ -103,5 +105,15 @@ export interface LinkElementModel extends BasePageElement {
   title: string | null;
   title_size: number | null;
   url: string | null;
+  icon: string | null;
+}
+
+export interface SelfieElementModel extends BasePageElement {
+  id: number;
+  type: 'selfie';
+  backgroundColor: string | null;
+  textColor: string | null;
+  title: string | null;
+  title_size: number | null;
   icon: string | null;
 }

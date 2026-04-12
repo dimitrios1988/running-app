@@ -105,6 +105,9 @@ export class HomePage implements OnDestroy {
         ...(this.homeElementModel.trackingElementModel
           ? [this.homeElementModel.trackingElementModel]
           : []),
+        ...(this.homeElementModel.selfieElementModel
+          ? [this.homeElementModel.selfieElementModel]
+          : []),
         ...(this.homeElementModel.infoParentElementModel
           ? [this.homeElementModel.infoParentElementModel]
           : []),

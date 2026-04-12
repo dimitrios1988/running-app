@@ -24,7 +24,6 @@ export class TrackingComponent implements OnChanges {
 
   // bind CSS custom properties to the host so we don't manipulate DOM directly
   @HostBinding('style.--bg-color') hostBgColor?: string;
-  //@HostBinding('style.--filter-color') hostFilterColor?: string;
   @HostBinding('style.--title-size') hostTitleSize?: string;
   @HostBinding('style.--subtitle-size') hostSubtitleSize?: string;
   @HostBinding('style.--text-color') hostTextColor?: string;

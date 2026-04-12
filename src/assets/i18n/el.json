@@ -59,6 +59,9 @@
       "ERROR_LOADING": "Η ειδοποίηση δεν βρέθηκε."
     }
   },
+  "CAMERA": {
+    "TAKE_SELFIE": "Τραβήξτε Selfie"
+  },
   "MY_RACE": {
     "MY_RACE": "Ο Αγώνας Μου",
     "REGISTRATION_INFO": "Πληροφορίες Εγγραφής",

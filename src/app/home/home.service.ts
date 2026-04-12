@@ -85,6 +85,9 @@ export class HomeService {
             const linkElementsResponse = response.filter(
               (element) => element['2(element_type)']?.code === 'link',
             );
+            const selfieElementResponse = response.find(
+              (element) => element['2(element_type)']?.code === 'selfie',
+            );
             return {
               headerElementModel: headerElementResponse
                 ? {
@@ -335,6 +338,37 @@ export class HomeService {
                       };
                     }) as LinkElementModel[])
                   : null,
+              selfieElementModel: selfieElementResponse
+                ? {
+                    id: selfieElementResponse['0(page_element)'].id,
+                    order: selfieElementResponse['0(page_element)'].order,
+                    type: 'selfie',
+                    title: selfieElementResponse['0(page_element)'].title,
+                    title_size:
+                      selfieElementResponse['0(page_element)'].title_size,
+                    backgroundColor: selfieElementResponse['0(page_element)']
+                      .background_color
+                      ? `#${selfieElementResponse['0(page_element)'].background_color}`
+                      : null,
+                    textColor: selfieElementResponse['0(page_element)']
+                      .text_color
+                      ? `#${selfieElementResponse['0(page_element)'].text_color}`
+                      : null,
+                    icon: selfieElementResponse?.['0(page_element)']
+                      .secondary_image
+                      ? new URL(
+                          `/data/download/${
+                            selfieElementResponse['0(page_element)']
+                              .secondary_image[0].name
+                          }?attribute_id=45d68dae-2bf7-475a-9b92-35f7a9899912&file_id=${
+                            selfieElementResponse['0(page_element)']
+                              .secondary_image[0].id
+                          }&version=0&token=${this.authService.getToken()}`,
+                          AUTH_CREDENTIALS.app_url,
+                        ).toString()
+                      : null,
+                  }
+                : null,
             } as HomeElementModel;
           }),
           tap((homeElements: HomeElementModel) => {

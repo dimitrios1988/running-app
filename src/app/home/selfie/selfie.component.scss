@@ -1,0 +1,69 @@
+:host {
+  /* defaults (can be overridden via HostBinding) */
+  --bg-color: blue;
+  --text-color: #ece4e4;
+  --title-size: 1.3rem;
+  display: block;
+}
+
+.selfie-element {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  color: var(--text-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-color)
+}
+
+.title {
+  font-size: var(--title-size);
+  font-weight: 500;
+  color: var(--text-color);
+  letter-spacing: 0.02rem;
+}
+
+.title-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  z-index: 1;
+  background-image: linear-gradient(0deg, var(--bg-color) 0%, rgba(255, 255, 255, 0) 100%);
+  padding-top: 0.8rem;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    padding-bottom: 0.8rem;
+}
+
+.title-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.arrow-column {
+  flex: 0 0 auto;
+  display: flex;
+  align-self: end;
+  justify-content: center;
+}
+
+.right-arrow {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.icon-column {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

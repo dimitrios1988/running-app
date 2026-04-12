@@ -6,6 +6,7 @@ import { PageElementModel } from './page.element.model';
 import { CountdowntimerComponent } from '../../home/countdowntimer/countdowntimer.component';
 import { ContentImageComponent } from '../../home/content-image/content-image.component';
 import { LinkComponent } from '../../home/link/link.component';
+import { SelfieComponent } from '../../home/selfie/selfie.component';
 
 @Component({
   selector: 'app-page-element',
@@ -18,6 +19,7 @@ import { LinkComponent } from '../../home/link/link.component';
     CountdowntimerComponent,
     ContentImageComponent,
     LinkComponent,
+    SelfieComponent,
   ],
 })
 export class PageElementComponent {
