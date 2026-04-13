@@ -69,7 +69,7 @@ export class SelfieComponent implements OnChanges {
       const photo = await Camera.takePhoto({
         quality: 90,
         editable: 'no',
-        saveToGallery: false,
+        saveToGallery: true,
         cameraDirection: CameraDirection.Front,
       });
 
