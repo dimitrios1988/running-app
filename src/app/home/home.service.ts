@@ -367,6 +367,8 @@ export class HomeService {
                           AUTH_CREDENTIALS.app_url,
                         ).toString()
                       : null,
+                    shareText:
+                      selfieElementResponse['0(page_element)'].subtitle,
                   }
                 : null,
             } as HomeElementModel;

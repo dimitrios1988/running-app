@@ -116,4 +116,5 @@ export interface SelfieElementModel extends BasePageElement {
   title: string | null;
   title_size: number | null;
   icon: string | null;
+  shareText: string | null;
 }

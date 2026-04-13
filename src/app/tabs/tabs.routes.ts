@@ -48,13 +48,6 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'home/selfie/camera',
-        loadComponent: () =>
-          import('../home/selfie/camera/camera.component').then(
-            (m) => m.CameraComponent,
-          ),
-      },
-      {
         path: 'notifications',
         loadComponent: () =>
           import('../notifications/notifications.page').then(

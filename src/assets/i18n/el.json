@@ -62,6 +62,9 @@
   "CAMERA": {
     "TAKE_SELFIE": "Τραβήξτε Selfie"
   },
+  "SELFIE": {
+    "SHARE_PHOTO": "Κοινοποιήστε τη Φωτογραφία"
+  },
   "MY_RACE": {
     "MY_RACE": "Ο Αγώνας Μου",
     "REGISTRATION_INFO": "Πληροφορίες Εγγραφής",

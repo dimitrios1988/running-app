@@ -42,6 +42,9 @@
   "CAMERA": {
     "TAKE_SELFIE": "Take Selfie"
   },
+  "SELFIE": {
+    "SHARE_PHOTO": "Share Photo"
+  },
   "NOTIFICATIONS": {
     "PULLING_TEXT": "Pull down to refresh notifications",
     "REFRESHING_TEXT": "Updating notifications...",

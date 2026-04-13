@@ -1,6 +1,7 @@
 import {
   Component,
   HostBinding,
+  inject,
   Input,
   OnChanges,
   SimpleChanges,
@@ -10,7 +11,9 @@ import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { hexToRgb } from '../../shared/color.utils';
 import { SelfieElementModel } from '../../shared/page.element/page.element.model';
-import { Router } from '@angular/router';
+import { Camera, CameraDirection } from '@capacitor/camera';
+import { Share } from '@capacitor/share';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-selfie',
@@ -24,8 +27,9 @@ export class SelfieComponent implements OnChanges {
   @HostBinding('style.--bg-color') hostBgColor?: string;
   @HostBinding('style.--title-size') hostTitleSize?: string;
   @HostBinding('style.--text-color') hostTextColor?: string;
+  private readonly translateService = inject(TranslateService);
 
-  constructor(private router: Router) {
+  constructor() {
     addIcons({ chevronForwardOutline });
   }
 
@@ -36,7 +40,9 @@ export class SelfieComponent implements OnChanges {
   }
 
   onSelfieElementClick() {
-    this.router.navigate(['/tabs/home/selfie/camera']);
+    this.takePhotoAndShare().then(() => {
+      console.log('Picture taken successfully');
+    });
   }
 
   private updateCssVars() {
@@ -55,6 +61,29 @@ export class SelfieComponent implements OnChanges {
     }
     if (m?.title_size) {
       this.hostTitleSize = `${m.title_size}rem`;
+    }
+  }
+
+  private async takePhotoAndShare() {
+    try {
+      const photo = await Camera.takePhoto({
+        quality: 90,
+        editable: 'no',
+        saveToGallery: false,
+        cameraDirection: CameraDirection.Front,
+      });
+
+      if (!photo.uri) {
+        throw new Error('No file path returned');
+      }
+      await Share.share({
+        title: 'My Photo',
+        text: this.selfieElementModel.shareText ?? '',
+        url: `file://${photo.uri}`,
+        dialogTitle: this.translateService.instant('SELFIE.SHARE_PHOTO'),
+      });
+    } catch (err) {
+      console.error(err);
     }
   }
 }
