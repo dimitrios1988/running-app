@@ -20,28 +20,34 @@
       refreshingText="{{ 'NEWS_LIST.REFRESHING_TEXT' | translate }}"
     />
   </ion-refresher>
-  <cdk-virtual-scroll-viewport
-    class="scroll-viewport"
-    itemSize="300"
-    (scrolledIndexChange)="onScroll()"
-  >
-    <ion-card
-      *cdkVirtualFor="let item of newsListItems"
-      class="news-list-item"
-      (click)="openNewsItem(item)"
+  @if (newsListItems && newsListItems.length > 0) {
+    <cdk-virtual-scroll-viewport
+      class="scroll-viewport"
+      itemSize="300"
+      (scrolledIndexChange)="onScroll()"
     >
-      <div
-        class="featured-image-container"
-        [style.background-image]="'url(' + item.featuredImageUrl + ')'"
-      ></div>
+      <ion-card
+        *cdkVirtualFor="let item of newsListItems"
+        class="news-list-item"
+        (click)="openNewsItem(item)"
+      >
+        <div
+          class="featured-image-container"
+          [style.background-image]="'url(' + item.featuredImageUrl + ')'"
+        ></div>
 
-      <ion-card-header>
-        <ion-card-title>{{ item.title }}</ion-card-title>
-        <ion-card-subtitle>{{ item.excerpt }}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        {{ item.publishedDate | date: "medium" }}
-      </ion-card-content>
-    </ion-card>
-  </cdk-virtual-scroll-viewport>
+        <ion-card-header>
+          <ion-card-title>{{ item.title }}</ion-card-title>
+          <ion-card-subtitle>{{ item.excerpt }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          {{ item.publishedDate | date: "medium" }}
+        </ion-card-content>
+      </ion-card>
+    </cdk-virtual-scroll-viewport>
+  } @else {
+    <div class="no-news-wrapper">
+      <ion-text color="medium">{{ "NEWS_LIST.NO_NEWS" | translate }}</ion-text>
+    </div>
+  }
 </ion-content>

@@ -34,6 +34,7 @@
     "TITLE": "News",
     "PULLING_TEXT": "Pull down to refresh news",
     "REFRESHING_TEXT": "Updating news...",
+    "NO_NEWS": "No news available",
     "ERRORS": {
       "FAILED_TO_LOAD_NEWS": "Failed to load news. Please check your internet connection and try again later."
     }

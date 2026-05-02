@@ -13,6 +13,7 @@ import {
   IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
+  IonText,
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
@@ -36,6 +37,7 @@ import { SettingsService } from '../../../settings/settings.service';
   styleUrls: ['./news.list.component.scss'],
   standalone: true,
   imports: [
+    IonText,
     IonHeader,
     IonContent,
     IonToolbar,
