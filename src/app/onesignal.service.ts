@@ -1,5 +1,5 @@
 import { effect, inject, Injectable } from '@angular/core';
-import OneSignal, { NotificationClickEvent } from 'onesignal-cordova-plugin';
+import OneSignal, { NotificationClickEvent } from '@onesignal/capacitor-plugin';
 import { ONESIGNAL } from './secrets';
 import { SettingsService } from './settings/settings.service';
 import { Router } from '@angular/router';
