@@ -1,4 +1,4 @@
-import { provideZoneChangeDetection } from "@angular/core";
+import { provideAppInitializer, provideZoneChangeDetection } from "@angular/core";
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
   RouteReuseStrategy,
@@ -18,89 +18,39 @@ import {
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
-import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
-import { SettingsService } from './app/settings/settings.service';
-import { AppConfigurationService } from './app/app.configuration.service';
 import { AuthInterceptor } from './app/auth/auth.interceptor';
 import { HttpRetryInterceptor } from './app/httpretry.interceptor';
+import { initializeLanguage } from './app/i18n/initialize-language';
 
-/**
- * Preloads a translation file before bootstrapping Angular.
- */
-async function preloadTranslations(
-  lang: string
-): Promise<Record<string, string>> {
-  const response = await fetch(`/assets/i18n/${lang}.json`);
-  if (!response.ok) {
-    console.error(`Failed to preload translations for ${lang}`);
-    return {};
-  }
-  return await response.json();
-}
-
-(async () => {
-  const appRef = await bootstrapApplication(AppComponent, {
-    providers: [
-      provideZoneChangeDetection(),{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-      provideIonicAngular(),
-      provideRouter(routes, withPreloading(PreloadAllModules)),
-      provideHttpClient(withInterceptorsFromDi()),
-      provideTranslateService({
-        loader: provideTranslateHttpLoader({
-          prefix: '/assets/i18n/',
-          suffix: '.json',
-        }),
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideZoneChangeDetection(),{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    provideIonicAngular(),
+    provideRouter(routes, withPreloading(PreloadAllModules)),
+    provideHttpClient(withInterceptorsFromDi()),
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: '/assets/i18n/',
+        suffix: '.json',
+        // Load the bundled catalogs straight off HttpBackend. They are local
+        // assets, so they need neither the auth header nor the retry backoff,
+        // and going through the interceptors breaks them inside the Capacitor
+        // WebView.
+        useHttpBackend: true,
       }),
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: AuthInterceptor,
-        multi: true,
-      },
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: HttpRetryInterceptor,
-        multi: true,
-      },
-    ],
-  });
-
-  const appConfigurationService = appRef.injector.get(AppConfigurationService);
-  const defaultLanguage =
-    appConfigurationService.appConfiguration.defaultLanguage;
-  const suppportedLanguages =
-    appConfigurationService.appConfiguration.supportedLanguages;
-  const translateService = appRef.injector.get(TranslateService);
-  translateService.setFallbackLang(defaultLanguage.code);
-  suppportedLanguages
-    .filter((lang) => lang.code != defaultLanguage.code)
-    .forEach(async (lang) => {
-      let translations = await preloadTranslations(lang.code);
-      translateService.setTranslation(lang.code, translations, false);
-    });
-  const settingsService = appRef.injector.get(SettingsService);
-  settingsService.getSelectedLanguage().then((selectedLang) => {
-    if (
-      selectedLang &&
-      suppportedLanguages.some((lang) => lang.code === selectedLang)
-    ) {
-      translateService.use(selectedLang).subscribe();
-      if (suppportedLanguages.some((lang) => lang.code === selectedLang)) {
-        translateService.use(selectedLang).subscribe();
-      } else if (
-        suppportedLanguages.some(
-          (lang) => lang.code === translateService.getBrowserLang()
-        )
-      ) {
-        translateService.use(translateService.getBrowserLang()!).subscribe();
-        settingsService.setSelectedLanguage(translateService.getBrowserLang()!);
-      } else {
-        settingsService.setSelectedLanguage(defaultLanguage.code);
-        translateService.use(defaultLanguage.code).subscribe();
-      }
-    } else {
-      settingsService.setSelectedLanguage(defaultLanguage.code);
-      translateService.use(defaultLanguage.code).subscribe();
-    }
-  });
-})();
+    }),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpRetryInterceptor,
+      multi: true,
+    },
+    provideAppInitializer(initializeLanguage),
+  ],
+});
