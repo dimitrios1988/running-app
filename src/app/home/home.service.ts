@@ -109,7 +109,7 @@ export class HomeService {
                     mainImageWidth: `${
                       headerElementResponse['0(page_element)']
                         .primary_image_width ?? '0'
-                    }%`,
+                    }rem`,
                     secondaryImage: headerElementResponse['0(page_element)']
                       .secondary_image
                       ? new URL(
@@ -126,7 +126,7 @@ export class HomeService {
                     secondaryImageWidth: `${
                       headerElementResponse['0(page_element)']
                         .secondary_image_width ?? '0'
-                    }%`,
+                    }rem`,
                     backgroundColor: headerElementResponse['0(page_element)']
                       .background_color
                       ? `#${headerElementResponse['0(page_element)'].background_color}`
