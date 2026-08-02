@@ -5,13 +5,6 @@
 </ion-header>
 
 <ion-content [scrollY]="false" class="virtual-wrapper">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large"
-        >{{ "NOTIFICATIONS.NOTIFICATIONS" | translate }}</ion-title
-      >
-    </ion-toolbar>
-  </ion-header>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content
       pullingIcon="chevron-down-circle-outline"
@@ -26,17 +19,28 @@
     orientation="vertical"
     (scrolledIndexChange)="onScroll()"
   >
-    @if(notifications != null && notifications!.length > 0) {
+    @if (notifications === undefined) {
+    <!-- first load: skeletons rather than a flash of the empty state -->
+    <div class="notifications-skeleton-wrapper" aria-hidden="true">
+      @for (i of [1, 2, 3, 4, 5]; track i) {
+      <div class="app-skeleton notifications-skeleton-row"></div>
+      }
+    </div>
+    } @else if (notifications && notifications.length > 0) {
     <ion-list lines="full">
       @for (notification of notifications; track notification) {
       <ion-item
         [button]="true"
         class="notifications-item"
+        [class.is-unread]="!notification.isRead"
         (click)="openNotification(notification)"
       >
         @if (!notification.isRead) {
         <div class="unread-indicator-wrapper" slot="start">
-          <div class="unread-indicator"></div>
+          <div class="unread-indicator" aria-hidden="true"></div>
+          <span class="app-visually-hidden"
+            >{{ 'NOTIFICATIONS.UNREAD' | translate }}</span
+          >
         </div>
         }
         <ion-label>
@@ -50,19 +54,23 @@
             >{{notification.publishedAt | date : "short"}}</ion-note
           >
           <ion-icon
-            slot="end"
             name="chevron-forward-outline"
             class="right-arrow"
+            aria-hidden="true"
           ></ion-icon>
         </div>
       </ion-item>
       }
     </ion-list>
     } @else {
-    <div class="no-notifications-wrapper">
-      <ion-text color="medium"
-        >{{ 'NOTIFICATIONS.NO_NOTIFICATIONS' | translate }}</ion-text
-      >
+    <div class="app-empty">
+      <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+      <p class="app-empty-title">
+        {{ 'NOTIFICATIONS.NO_NOTIFICATIONS' | translate }}
+      </p>
+      <p class="app-empty-text">
+        {{ 'NOTIFICATIONS.NO_NOTIFICATIONS_HINT' | translate }}
+      </p>
     </div>
     }
   </cdk-virtual-scroll-viewport>

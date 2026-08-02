@@ -13,15 +13,9 @@ export class SettingsService {
   notificationsEnabled$ = computed(() => this.notificationsEnabled());
 
   constructor() {
-    this.initLanguage();
+    // The selected language is resolved and applied by initializeLanguage(),
+    // which runs as an app initializer and calls setSelectedLanguage().
     this.initNotifications();
-  }
-
-  private async initLanguage() {
-    const lang = await Preferences.get({ key: 'selectedLanguage' });
-    if (lang.value) {
-      this.selectedLanguage.set(lang.value);
-    }
   }
 
   private async initNotifications() {

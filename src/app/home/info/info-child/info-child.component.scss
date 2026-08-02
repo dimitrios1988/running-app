@@ -1,69 +1,79 @@
 :host {
-  --bg-color: blue;
-  --text-color: #ece4e4;
+  --bg-color: var(--ion-color-secondary);
+  --text-color: #ffffff;
   --title-size: 1.3rem;
   --subtitle-size: 0.9rem;
-  --filter-color: invert(100%) sepia(38%) saturate(1590%)
-    hue-rotate(292deg) brightness(109%) contrast(86%);
+  /* flex item of .info-row: never shrink, and stretch to the tallest card */
+  display: flex;
+  flex: 0 0 auto;
 }
 
+/* shell (radius / shadow / overflow) comes from .app-card in global.scss */
 .info-child-element {
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    width: 11rem;
-    height: 8rem;
-    color: var(--text-color);
-    border-radius: 0.5rem;
-    box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    min-height: 0;
-    position: relative;
-    background-color: var(--bg-color);
-    text-align: left;
-}
-
-.title {
-    font-size: var(--title-size);
-    font-weight: 500;
-    letter-spacing: 0.02rem;
-    color: var(--text-color);
-}
-
-.subtitle {
-    font-size: var(--subtitle-size);
-    color: var(--text-color);
-    font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  width: 12rem;
+  /* min, not fixed: a wrapped subtitle must not be clipped by the card */
+  min-height: 9rem;
+  padding: 0;
+  border: 0;
+  scroll-snap-align: start;
+  text-align: start;
+  color: var(--text-color);
+  background-color: var(--bg-color);
 }
 
 .title-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    z-index: 1;
-    padding: 0.7rem;
-    height: 100%;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--app-space-2);
+  padding: var(--app-space-3);
 }
 
-.title-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 100%;
+/*
+ * Stretched by the column flex container, so its width is exactly the
+ * .title-row content box — the row width minus its padding.
+ */
+.subtitle {
+  font-size: var(--subtitle-size);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-color);
+  opacity: 0.88;
+  overflow-wrap: anywhere;
+}
+
+.title-line {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: var(--app-space-2);
+}
+
+/* no clamp: the title wraps to as many lines as it needs and the card grows */
+.title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--title-size);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0.01rem;
+  color: var(--text-color);
+  overflow-wrap: anywhere;
 }
 
 .arrow-column {
-    flex: 0 0 auto;
-    display: flex;
-    align-self: end;
-    justify-content: center;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
 }
 
 .right-arrow {
-    font-size: 2rem;
-    font-weight: 800;
+  font-size: 1.5rem;
+  opacity: 0.8;
 }

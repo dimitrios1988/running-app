@@ -6,7 +6,7 @@ import {
   OnInit,
   EffectRef,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -17,16 +17,19 @@ import {
   IonButtons,
   IonButton,
   IonIcon,
-  IonCardHeader,
-  IonCard,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
   IonRefresher,
   IonRefresherContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonNote,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { exitOutline } from 'ionicons/icons';
+import {
+  chevronDownCircleOutline,
+  exitOutline,
+  personCircleOutline,
+} from 'ionicons/icons';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -43,11 +46,10 @@ import { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
   imports: [
     IonRefresherContent,
     IonRefresher,
-    IonCardContent,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCard,
-    IonCardHeader,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonNote,
     IonIcon,
     IonButtons,
     IonContent,
@@ -70,7 +72,7 @@ export class MyracePage implements OnInit, OnDestroy {
   runnerInfo!: IRunner;
 
   constructor() {
-    addIcons({ exitOutline });
+    addIcons({ exitOutline, personCircleOutline, chevronDownCircleOutline });
     this.stopEffect = effect(() => {
       const runnerInfo = this.myRaceService.runner$();
       if (runnerInfo) {
@@ -85,10 +87,7 @@ export class MyracePage implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter(): void {
-    const uuid = this.authService.getRunnerUUID();
-    if (uuid) {
-      this.runnerSub = this.myRaceService.getRunnerInfo(uuid).subscribe();
-    }
+    this.loadRunnerInfo();
   }
 
   ionViewWillLeave(): void {
@@ -116,11 +115,23 @@ export class MyracePage implements OnInit, OnDestroy {
   }
 
   doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
+    this.loadRunnerInfo(() => event.target.complete());
+  }
+
+  // onSettled runs on success, failure and cancellation, so the refresher is
+  // never left spinning.
+  private loadRunnerInfo(onSettled?: () => void): void {
+    const uuid = this.authService.getRunnerUUID();
+    if (!uuid) {
+      onSettled?.();
+      return;
+    }
+
     this.runnerSub.unsubscribe();
     this.runnerSub = this.myRaceService
-      .getRunnerInfo(this.runnerInfo.runner.uuid)
-      .subscribe(() => {
-        (event.target as HTMLIonRefresherElement)?.complete();
-      });
+      .getRunnerInfo(uuid)
+      .pipe(finalize(() => onSettled?.()))
+      // MyRaceService already logs out and redirects on failure.
+      .subscribe({ error: () => undefined });
   }
 }

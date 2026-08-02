@@ -1,6 +1,6 @@
 <button
   type="button"
-  class="link-element"
+  class="link-element app-card app-pressable"
   (click)="navigateToLink(linkElementModel.url)"
   [attr.aria-label]="linkElementModel.title"
 >
@@ -17,7 +17,7 @@
     </div>
 
     <div class="title-column">
-      <span class="title">{{ linkElementModel.title }}</span>
+      <span class="title app-clamp-2">{{ linkElementModel.title }}</span>
     </div>
 
     <div class="arrow-column" aria-hidden="true">

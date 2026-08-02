@@ -1,6 +1,15 @@
-.news-viewer-content{
-  margin: 0.7rem;
+.news-featured-image-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
 }
-.news-viewer-title{
-  margin: 0.7rem;
+
+.news-viewer-title {
+  margin: var(--app-space-4) var(--app-space-4) var(--app-space-3);
+  font-size: var(--app-text-xl);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.news-viewer-content {
+  margin: 0 var(--app-space-4) var(--app-space-6);
 }

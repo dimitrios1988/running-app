@@ -6,6 +6,8 @@ import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../shared/services/toast.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { addIcons } from 'ionicons';
+import { ribbonOutline } from 'ionicons/icons';
 
 @Component({
   standalone: true,
@@ -26,7 +28,9 @@ export class LoginPage {
     private router: Router,
     private toastController: ToastService,
     private translateService: TranslateService,
-  ) {}
+  ) {
+    addIcons({ ribbonOutline });
+  }
 
   onSubmit() {
     if (this.form.invalid) return;

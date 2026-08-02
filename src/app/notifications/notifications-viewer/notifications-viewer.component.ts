@@ -7,7 +7,13 @@ import {
   IonBackButton,
   IonContent,
   IonSpinner,
+  IonIcon,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  alertCircleOutline,
+  notificationsOffOutline,
+} from 'ionicons/icons';
 import { ActivatedRoute } from '@angular/router';
 import { NotificationsService } from '../notifications.service';
 import { signal } from '@angular/core';
@@ -23,6 +29,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   standalone: true,
   imports: [
     IonSpinner,
+    IonIcon,
     IonContent,
     IonBackButton,
     IonHeader,
@@ -41,7 +48,9 @@ export class NotificationsViewerComponent implements OnInit, OnDestroy {
   private notificationSub: Subscription = Subscription.EMPTY;
   private route = inject(ActivatedRoute);
   private notificationsService = inject(NotificationsService);
-  constructor() {}
+  constructor() {
+    addIcons({ alertCircleOutline, notificationsOffOutline });
+  }
 
   ngOnInit() {
     // Extract ID from route parameters

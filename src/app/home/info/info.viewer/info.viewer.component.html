@@ -9,17 +9,17 @@
 
 <ion-content [fullscreen]="true">
   @if (info$ | async; as data) { @if (data.image?.trim()) {
-  <div class="image-container">
-    <img [src]="data.image" alt="Info Image" />
+  <div class="image-container app-media">
+    <img [src]="data.image" alt="" loading="lazy" />
   </div>
   } @if (data.link?.trim()) {
   <div class="link-container">
-    <ion-button expand="full" (click)="navigateToLink(data.link)">
+    <ion-button expand="block" (click)="navigateToLink(data.link)">
       {{ "INFO_VIEWER.MORE_INFO" | translate }}
     </ion-button>
   </div>
   }
 
-  <div class="info-description" [innerHTML]="data.safeContent"></div>
+  <div class="info-description app-prose" [innerHTML]="data.safeContent"></div>
   }
 </ion-content>

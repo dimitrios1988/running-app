@@ -1,22 +1,25 @@
-<div class="countdown-timer-element">
+<div class="countdown-timer-element app-card">
   <h4>{{ title }}</h4>
-  <p>{{ targetDate | date: "mediumDate" }}</p>
+  <p class="target-date">{{ targetDate | date: "mediumDate" }}</p>
 
-  <div class="wrapper">
-    <div class="description" aria-hidden="true">
-      <p>{{ "HOME.DATE.DAYS" | translate }}</p>
-      <p>{{ "HOME.DATE.HOURS" | translate }}</p>
-      <p>{{ "HOME.DATE.MINUTES" | translate }}</p>
-      <p>{{ "HOME.DATE.SECONDS" | translate }}</p>
-    </div>
-
-    @if (time$ | async; as t) {
-      <div class="times" role="timer" aria-live="polite">
-        <p>{{ formatTwo(t.days) }}</p>
-        <p>{{ formatTwo(t.hours) }}</p>
-        <p>{{ formatTwo(t.minutes) }}</p>
-        <p>{{ formatTwo(t.seconds) }}</p>
+  @if (time$ | async; as t) {
+    <div class="wrapper" role="timer" aria-live="off">
+      <div class="unit">
+        <span class="num">{{ formatTwo(t.days) }}</span>
+        <span class="label">{{ "HOME.DATE.DAYS" | translate }}</span>
       </div>
-    }
-  </div>
+      <div class="unit">
+        <span class="num">{{ formatTwo(t.hours) }}</span>
+        <span class="label">{{ "HOME.DATE.HOURS" | translate }}</span>
+      </div>
+      <div class="unit">
+        <span class="num">{{ formatTwo(t.minutes) }}</span>
+        <span class="label">{{ "HOME.DATE.MINUTES" | translate }}</span>
+      </div>
+      <div class="unit">
+        <span class="num">{{ formatTwo(t.seconds) }}</span>
+        <span class="label">{{ "HOME.DATE.SECONDS" | translate }}</span>
+      </div>
+    </div>
+  }
 </div>

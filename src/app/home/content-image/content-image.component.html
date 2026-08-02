@@ -1,13 +1,13 @@
 @if (contentImageElementModel !== null || contentImageElementModel !==
 undefined) {
 <div
-  class="content-image-element-container"
+  class="content-image-element-container app-card app-media"
   (click)="navigateToLink(contentImageElementModel.linkUrl)"
 >
   <img
-    src="{{ contentImageElementModel.imageUrl }}"
+    [src]="contentImageElementModel.imageUrl"
     alt="{{ contentImageElementModel.altText }}"
-    title="{{ contentImageElementModel.altText }}"
+    loading="lazy"
   />
 </div>
 }

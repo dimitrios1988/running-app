@@ -1,17 +1,23 @@
 <ion-tabs>
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="home">
-      <ion-icon name="home"></ion-icon>
+      <ion-icon class="tab-icon-inactive" name="home-outline"></ion-icon>
+      <ion-icon class="tab-icon-active" name="home"></ion-icon>
       <ion-label>{{'TABS.HOME' | translate}}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="myrace">
-      <ion-icon name="person"></ion-icon>
+      <ion-icon class="tab-icon-inactive" name="person-outline"></ion-icon>
+      <ion-icon class="tab-icon-active" name="person"></ion-icon>
       <ion-label>{{'TABS.MY_RACE' | translate}}</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="notifications">
-      <ion-icon name="notifications"></ion-icon>
+      <ion-icon
+        class="tab-icon-inactive"
+        name="notifications-outline"
+      ></ion-icon>
+      <ion-icon class="tab-icon-active" name="notifications"></ion-icon>
       <ion-label>{{'TABS.NOTIFICATIONS' | translate}}</ion-label>
     </ion-tab-button>
   </ion-tab-bar>

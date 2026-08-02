@@ -2,7 +2,10 @@
   <ion-toolbar>
     <ion-title>{{ "MY_RACE.MY_RACE" | translate }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="logoutRunner()">
+      <ion-button
+        (click)="logoutRunner()"
+        [attr.aria-label]="'COMMON.LOGOUT' | translate"
+      >
         <ion-icon name="exit-outline" aria-hidden="true"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -18,71 +21,80 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content
       pullingIcon="chevron-down-circle-outline"
-      pullingText="{{ 'HOME.PULLING_TEXT' | translate }}"
+      pullingText="{{ 'MY_RACE.PULLING_TEXT' | translate }}"
       refreshingSpinner="circles"
-      refreshingText="{{ 'HOME.REFRESHING_TEXT' | translate }}"
+      refreshingText="{{ 'MY_RACE.REFRESHING_TEXT' | translate }}"
     ></ion-refresher-content>
   </ion-refresher>
-  <ng-container>
-    @if(runnerInfo){
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>
-          {{'MY_RACE.REGISTRATION_INFO' | translate}}
-        </ion-card-title>
-        <ion-card-subtitle>
-          {{ getEventName() }} - {{ getPlaceName() }}
-        </ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="runner-info-container">
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.FIRST_NAME' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.firstName }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.LAST_NAME' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.lastName }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.GENDER' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.gender }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.FATHERS_NAME' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.fathersName }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.EMAIL' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.email }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.DATE_OF_BIRTH' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.birthdate | date }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.AGE_GROUP' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.ageGroup }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.NATIONALITY' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.nationality }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.BLOCK' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.block }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.BIB_NUMBER' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.bib }}</span>
-          </div>
-          <div class="runner-info">
-            <span class="title">{{'MY_RACE.CLUB' | translate}}:</span>
-            <span class="value">{{ runnerInfo.runner.club }}</span>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
-    }
-  </ng-container>
+
+  @if (runnerInfo) {
+  <div class="myrace-wrapper">
+    <!-- the bib number is the runner's identity: lead with it -->
+    <section class="bib-hero">
+      <span class="bib-label">{{ "MY_RACE.BIB_NUMBER" | translate }}</span>
+      <span class="bib-number">{{ runnerInfo.runner.bib }}</span>
+      <span class="runner-name"
+        >{{ runnerInfo.runner.firstName }} {{ runnerInfo.runner.lastName
+        }}</span
+      >
+      <span class="race-name">{{ getEventName() }} · {{ getPlaceName() }}</span>
+    </section>
+
+    <ion-list class="details-list" lines="full" [inset]="true">
+      <!-- <ion-list-header>
+          <ion-label>{{ "MY_RACE.REGISTRATION_INFO" | translate }}</ion-label>
+        </ion-list-header> -->
+
+      @if (runnerInfo.runner.gender) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.GENDER" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.gender }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.fathersName) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.FATHERS_NAME" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.fathersName }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.email) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.EMAIL" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.email }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.birthdate) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.DATE_OF_BIRTH" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.birthdate | date }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.ageGroup) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.AGE_GROUP" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.ageGroup }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.nationality) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.NATIONALITY" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.nationality }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.block) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.BLOCK" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.block }}</ion-note>
+      </ion-item>
+      } @if (runnerInfo.runner.club) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.CLUB" | translate }}</ion-label>
+        <ion-note slot="end">{{ runnerInfo.runner.club }}</ion-note>
+      </ion-item>
+      }
+    </ion-list>
+  </div>
+  } @else {
+  <div class="app-empty">
+    <ion-icon name="person-circle-outline" aria-hidden="true"></ion-icon>
+    <p class="app-empty-title">{{ "MY_RACE.NOT_REGISTERED" | translate }}</p>
+    <p class="app-empty-text">
+      {{ "MY_RACE.NOT_REGISTERED_HINT" | translate }}
+    </p>
+  </div>
+  }
 </ion-content>

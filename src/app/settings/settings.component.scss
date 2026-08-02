@@ -1,20 +1,18 @@
-// filepath: c:\Users\Dimitris\running-app\src\app\settings\settings.component.scss
-.picker-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+.settings-list {
   width: 100%;
   max-width: 480px;
-  margin: 0 auto;
+  margin: var(--app-space-3) auto 0;
 }
 
-/* title that visually sits above the picker */
-.picker-title {
-  text-align: center;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--ion-color-primary);
-  background: var(--ion-background-color);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+ion-list-header ion-label {
+  font-size: var(--app-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ion-color-medium);
+}
+
+ion-item ion-icon[slot="start"] {
+  margin-inline-end: var(--app-space-3);
+  color: var(--ion-color-medium);
 }

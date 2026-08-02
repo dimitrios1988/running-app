@@ -1,3 +1,19 @@
-.notification-container{
-  margin: 0.7rem;
+.notification-container {
+  margin: var(--app-space-4) var(--app-space-4) var(--app-space-6);
+}
+
+.notification-container h2 {
+  margin: 0 0 var(--app-space-1);
+  font-size: var(--app-text-xl);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.notification-date {
+  margin: 0 0 var(--app-space-4);
+  font-size: var(--app-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ion-color-medium);
 }

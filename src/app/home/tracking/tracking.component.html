@@ -1,31 +1,35 @@
 <button
   type="button"
-  class="tracking-element"
+  class="tracking-element app-card app-pressable"
   (click)="onClick()"
   [attr.aria-label]="trackingElementModel?.title"
 >
   @if(trackingElementModel?.backgroundImage){
   <img
     [src]="trackingElementModel?.backgroundImage"
-    alt="Tracking background"
+    alt=""
     class="background-image"
-    role="presentation"
   />
+  <span class="app-scrim" aria-hidden="true"></span>
   }
 
   <div class="title-row">
     <div class="icon-column" aria-hidden="true">
+      @if(trackingElementModel?.icon){
       <img
         [src]="trackingElementModel?.icon"
         width="32"
         height="32"
         [alt]="trackingElementModel?.title"
       />
+      }
     </div>
 
     <div class="title-column">
-      <span class="title">{{ trackingElementModel?.title }}</span>
-      <span class="subtitle">{{ trackingElementModel?.subtitle }}</span>
+      <span class="title app-clamp-2">{{ trackingElementModel?.title }}</span>
+      <span class="subtitle app-clamp-1">{{
+        trackingElementModel?.subtitle
+      }}</span>
     </div>
 
     <div class="arrow-column" aria-hidden="true">

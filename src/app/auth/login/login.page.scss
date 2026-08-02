@@ -1,3 +1,42 @@
-ion-item {
-  margin-bottom: 12px;
+.login-wrapper {
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--app-space-1);
+  padding: var(--app-space-5) var(--app-space-2) var(--app-space-4);
+
+  ion-icon {
+    font-size: 3rem;
+    color: var(--ion-color-primary);
+  }
+
+  h1 {
+    margin: var(--app-space-2) 0 0;
+    font-size: var(--app-text-xl);
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    max-width: 28ch;
+    font-size: var(--app-text-sm);
+    line-height: 1.5;
+    color: var(--ion-color-medium);
+  }
+}
+
+.login-actions {
+  padding: var(--app-space-4) var(--app-space-4) 0;
+}
+
+.login-actions ion-button {
+  --border-radius: var(--app-radius-md);
+  font-weight: 600;
 }

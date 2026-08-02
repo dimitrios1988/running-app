@@ -35,3 +35,297 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/*
+ * Shared app layer
+ * ----------------------------------------------------------------------------
+ * These classes are intentionally global rather than per-component: the
+ * production build enforces a 4kb *error* budget on any single component
+ * stylesheet (see angular.json > budgets > anyComponentStyle), while global
+ * styles fall under the far more generous "initial" budget. Global styles are
+ * also not view-encapsulated, so they apply inside every component template.
+ * Component-scoped rules still win, because Angular injects them after this
+ * sheet.
+ */
+
+/* ---------- card shell ---------- */
+.app-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--app-radius-md);
+  box-shadow: var(--app-elev-2);
+}
+
+/* ---------- press + focus affordance for native <button> cards ---------- */
+.app-pressable {
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+
+  &:active {
+    transform: scale(0.985);
+    box-shadow: var(--app-elev-1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- legibility scrim over photographic backgrounds ---------- */
+.app-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.62) 26%,
+    rgba(0, 0, 0, 0.28) 52%,
+    rgba(0, 0, 0, 0) 78%
+  );
+}
+
+/* ---------- images ---------- */
+img {
+  max-width: 100%;
+}
+
+.app-media {
+  background-color: var(--app-surface-muted);
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: app-fade-in 0.28s ease both;
+  }
+}
+
+/* ---------- skeleton loading ---------- */
+.app-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--app-radius-md);
+  background-color: var(--app-surface-muted);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--app-shimmer-highlight) 50%,
+      transparent 100%
+    );
+    animation: app-shimmer 1.4s infinite;
+  }
+}
+
+.app-skeleton-card {
+  height: 12rem;
+}
+
+/* ---------- designed empty / error states ---------- */
+.app-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-2);
+  padding: var(--app-space-6) var(--app-space-5);
+  text-align: center;
+
+  ion-icon {
+    font-size: 3rem;
+    color: var(--ion-color-medium);
+    opacity: 0.7;
+  }
+
+  .app-empty-title {
+    margin: 0;
+    font-size: var(--app-text-lg);
+    font-weight: 600;
+    color: var(--ion-text-color);
+  }
+
+  .app-empty-text {
+    margin: 0;
+    max-width: 28ch;
+    font-size: var(--app-text-sm);
+    line-height: 1.5;
+    color: var(--ion-color-medium);
+  }
+}
+
+/* ---------- centred spinner block ---------- */
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--app-space-6);
+}
+
+/* ---------- line clamping for CMS-authored text ---------- */
+.app-clamp-1,
+.app-clamp-2,
+.app-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.app-clamp-1 {
+  -webkit-line-clamp: 1;
+}
+.app-clamp-2 {
+  -webkit-line-clamp: 2;
+}
+.app-clamp-3 {
+  -webkit-line-clamp: 3;
+}
+
+/* ---------- screen-reader-only text ---------- */
+.app-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * ---------- CMS rich text ----------
+ * The news viewer, info viewer and notification viewer all render server
+ * authored HTML through [innerHTML]. Without this it renders as unstyled
+ * browser-default markup.
+ */
+.app-prose {
+  color: var(--ion-text-color);
+  font-size: var(--app-text-md);
+  line-height: 1.65;
+  overflow-wrap: break-word;
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: var(--app-space-5) 0 var(--app-space-2);
+    line-height: 1.25;
+    font-weight: 650;
+  }
+  h1 {
+    font-size: var(--app-text-xl);
+  }
+  h2 {
+    font-size: var(--app-text-lg);
+  }
+  h3,
+  h4 {
+    font-size: var(--app-text-md);
+  }
+
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  p {
+    margin: 0 0 var(--app-space-4);
+  }
+
+  ul,
+  ol {
+    margin: 0 0 var(--app-space-4);
+    padding-inline-start: 1.35rem;
+  }
+
+  li {
+    margin-bottom: var(--app-space-1);
+  }
+
+  a {
+    color: var(--ion-color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  img,
+  video,
+  iframe {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: var(--app-space-4) 0;
+    border-radius: var(--app-radius-md);
+    background-color: var(--app-surface-muted);
+  }
+
+  blockquote {
+    margin: var(--app-space-4) 0;
+    padding: var(--app-space-2) var(--app-space-4);
+    border-inline-start: 3px solid var(--ion-color-primary);
+    color: var(--ion-color-medium);
+    font-style: italic;
+  }
+
+  hr {
+    height: 1px;
+    margin: var(--app-space-5) 0;
+    border: 0;
+    background-color: var(--ion-border-color);
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: var(--app-text-sm);
+  }
+
+  th,
+  td {
+    padding: var(--app-space-2);
+    border: 1px solid var(--ion-border-color);
+    text-align: start;
+  }
+}
+
+/* ---------- motion ---------- */
+@keyframes app-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes app-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-pressable {
+    transition: none;
+  }
+  .app-pressable:active {
+    transform: none;
+  }
+  .app-skeleton::after {
+    animation: none;
+  }
+  .app-media img {
+    animation: none;
+  }
+}

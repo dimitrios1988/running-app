@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar
-    style="--main-image-width: {{ headerElementModel?.mainImageWidth?? '0px'}}; --secondary-image-width: {{ headerElementModel?.secondaryImageWidth ?? '0px' }};"
+    [style.--main-image-width]="headerElementModel?.mainImageWidth ?? '0px'"
+    [style.--secondary-image-width]="
+      headerElementModel?.secondaryImageWidth ?? '0px'
+    "
     class="homepage-toolbar"
     #homepageToolbar
   >
@@ -11,7 +14,7 @@
     <div class="center-header-image">
       <img
         [src]="headerElementModel?.mainImage"
-        alt="Logo"
+        alt=""
         class="main-image"
         loading="lazy"
       />
@@ -19,7 +22,7 @@
     } @else { @if (headerElementModel?.mainImage?.trim()) {
     <img
       [src]="headerElementModel?.mainImage"
-      alt="Logo"
+      alt=""
       class="main-image"
       [slot]="
             headerElementModel?.mainImagePosition === 'left'
@@ -33,7 +36,7 @@
     } @if (headerElementModel?.secondaryImage?.trim()) {
     <img
       [src]="headerElementModel?.secondaryImage"
-      alt="Secondary Logo"
+      alt=""
       class="secondary-image"
       slot="secondary"
       loading="lazy"
@@ -41,7 +44,10 @@
     } }
 
     <ion-buttons slot="end">
-      <ion-button (click)="navigateToSettings()">
+      <ion-button
+        (click)="navigateToSettings()"
+        [attr.aria-label]="'COMMON.SETTINGS' | translate"
+      >
         <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -58,8 +64,14 @@
     ></ion-refresher-content>
   </ion-refresher>
   <div class="element-container">
-    @for (el of (pageElementModels ? pageElementModels : []); track el) {
-    <app-page-element [element]="el"></app-page-element>
+    @if (pageElementModels && pageElementModels.length > 0) {
+      @for (el of pageElementModels; track el) {
+        <app-page-element [element]="el"></app-page-element>
+      }
+    } @else if (isLoading) {
+      <div class="app-skeleton app-skeleton-card" aria-hidden="true"></div>
+      <div class="app-skeleton app-skeleton-card" aria-hidden="true"></div>
+      <div class="app-skeleton app-skeleton-card" aria-hidden="true"></div>
     }
   </div>
 </ion-content>

@@ -1,12 +1,14 @@
 :host {
-  --bg-color: none;
+  display: block;
 }
 
+/* shell (radius / shadow / overflow) comes from .app-card in global.scss */
 div.content-image-element-container {
-  width: 100%;;
+  width: 100%;
+  cursor: pointer;
 }
 
- .content-image-element-container img {
+.content-image-element-container img {
   width: 100%;
   height: auto;
 }

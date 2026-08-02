@@ -12,8 +12,8 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardSubtitle,
-  IonCardContent,
-  IonText,
+  IonNote,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
@@ -26,9 +26,12 @@ import {
 } from '@angular/cdk/scrolling';
 
 import { addIcons } from 'ionicons';
-import { chevronDownCircleOutline } from 'ionicons/icons';
+import {
+  chevronDownCircleOutline,
+  newspaperOutline,
+} from 'ionicons/icons';
 import { DatePipe } from '@angular/common';
-import { Subscription, tap } from 'rxjs';
+import { finalize, Subscription, tap } from 'rxjs';
 import { SettingsService } from '../../../settings/settings.service';
 
 @Component({
@@ -37,7 +40,6 @@ import { SettingsService } from '../../../settings/settings.service';
   styleUrls: ['./news.list.component.scss'],
   standalone: true,
   imports: [
-    IonText,
     IonHeader,
     IonContent,
     IonToolbar,
@@ -50,7 +52,8 @@ import { SettingsService } from '../../../settings/settings.service';
     IonCardHeader,
     IonCardTitle,
     IonCardSubtitle,
-    IonCardContent,
+    IonNote,
+    IonIcon,
     TranslatePipe,
     ScrollingModule,
     DatePipe,
@@ -59,6 +62,12 @@ import { SettingsService } from '../../../settings/settings.service';
 export class NewsListComponent implements OnDestroy {
   @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;
   newsListItems?: INewsListItem[];
+  /*
+   * Presentation-only flag: the service seeds its signal with [], so an empty
+   * array cannot distinguish "still loading" from "genuinely no news". Without
+   * this the empty state flashes on every cold open.
+   */
+  isLoading = true;
 
   private router = inject(Router);
   private newsService = inject(NewsService);
@@ -67,7 +76,7 @@ export class NewsListComponent implements OnDestroy {
   private settingsService = inject(SettingsService);
 
   constructor() {
-    addIcons({ chevronDownCircleOutline });
+    addIcons({ chevronDownCircleOutline, newspaperOutline });
     effect(() => {
       this.newsListItems = this.newsService.newsList$();
       this.checkViewportSize();
@@ -79,8 +88,10 @@ export class NewsListComponent implements OnDestroy {
   }
 
   ionViewWillEnter(): void {
+    this.isLoading = !this.newsListItems?.length;
     this.newsListItemsSub = this.newsService
       .getNewsItems(this.settingsService.selectedLanguage$()!)
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe();
     this.checkViewportSize();
   }

@@ -7,7 +7,14 @@ import {
   IonLabel,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { home, notifications, person } from 'ionicons/icons';
+import {
+  home,
+  homeOutline,
+  notifications,
+  notificationsOutline,
+  person,
+  personOutline,
+} from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-tabs',
@@ -19,6 +26,13 @@ export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
 
   constructor() {
-    addIcons({ home, person, notifications });
+    addIcons({
+      home,
+      homeOutline,
+      person,
+      personOutline,
+      notifications,
+      notificationsOutline,
+    });
   }
 }

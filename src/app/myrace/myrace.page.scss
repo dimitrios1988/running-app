@@ -1,18 +1,54 @@
-.runner-info-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.myrace-wrapper {
+  padding: var(--app-space-2) 0 var(--app-space-6);
 }
 
-.runner-info .title {
-    font-weight: bold;
+/* the bib number is the runner's identity, so it leads the page */
+.bib-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-space-1);
+  margin: 0 var(--app-space-4) var(--app-space-5);
+  padding: var(--app-space-5) var(--app-space-4);
+  border-radius: var(--app-radius-lg);
+  border-top: 4px solid var(--app-accent-vivid);
+  box-shadow: var(--app-elev-2);
+  text-align: center;
+  color: var(--ion-color-secondary-contrast);
+  background: var(--ion-color-secondary);
 }
 
-.runner-info .value {
-    margin-left: 0.5rem;
+.bib-label {
+  font-size: var(--app-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 
-ion-card-subtitle {
-    font-size: 1rem;
-    color: var(--ion-color-medium);
+.bib-number {
+  font-family: var(--app-font-numeric);
+  font-size: clamp(2.5rem, 16vw, 4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.runner-name {
+  margin-top: var(--app-space-2);
+  font-size: var(--app-text-lg);
+  font-weight: 600;
+}
+
+.race-name {
+  font-size: var(--app-text-sm);
+  opacity: 0.75;
+}
+
+.details-list ion-note[slot="end"] {
+  font-size: var(--app-text-sm);
+  text-align: end;
+  max-width: 60%;
+  overflow-wrap: anywhere;
 }
