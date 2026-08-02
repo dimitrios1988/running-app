@@ -29,6 +29,9 @@ import {
   chevronDownCircleOutline,
   exitOutline,
   personCircleOutline,
+  qrCodeOutline,
+  alertCircle,
+  checkmarkCircle,
 } from 'ionicons/icons';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
@@ -72,7 +75,14 @@ export class MyracePage implements OnInit, OnDestroy {
   runnerInfo!: IRunner;
 
   constructor() {
-    addIcons({ exitOutline, personCircleOutline, chevronDownCircleOutline });
+    addIcons({
+      exitOutline,
+      personCircleOutline,
+      chevronDownCircleOutline,
+      qrCodeOutline,
+      alertCircle,
+      checkmarkCircle,
+    });
     this.stopEffect = effect(() => {
       const runnerInfo = this.myRaceService.runner$();
       if (runnerInfo) {

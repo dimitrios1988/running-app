@@ -52,3 +52,31 @@
   max-width: 60%;
   overflow-wrap: anywhere;
 }
+
+.runner-alert-icon{
+  font-size: var(--app-text-2xl);
+  color: var(--ion-color-danger);
+}
+
+.runner-qr-icon {  
+  font-size: var(--app-text-2xl);
+  color: var(--ion-color-secondary-contrast);
+}
+
+.print-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-2);
+  font-size: var(--app-text-sm);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+
+  ion-icon {
+    font-size: 1.25em;
+    flex-shrink: 0;
+  }
+}
+
+.print-status-success {
+    color: var(--ion-color-success-tint);
+}

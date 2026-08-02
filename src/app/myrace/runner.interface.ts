@@ -2,6 +2,7 @@ export interface IRunner {
   runner: _0runner;
   event: _1event;
   place: _place;
+  lp_runner: _3runner | null;
 }
 
 interface _1event {
@@ -28,4 +29,11 @@ interface _0runner {
 interface _place {
   nameGr: string | null;
   nameEn: string | null;
+}
+
+interface _3runner {
+  runnerQrData: string;
+  isPrinted: boolean;
+  isPrintable: boolean;
+  receivesAsAGroup: boolean;
 }

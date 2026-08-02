@@ -73,6 +73,15 @@ export class MyRaceService {
               nameGr: response[0]['2(category)'].name_gr,
               nameEn: response[0]['2(category)'].name_en,
             },
+            lp_runner: response[0]['3(runner)']
+              ? {
+                  isPrintable: response[0]['3(runner)'].is_printable,
+                  isPrinted: response[0]['3(runner)'].is_printed,
+                  runnerQrData: response[0]['3(runner)'].runner_qr_data,
+                  receivesAsAGroup:
+                    response[0]['3(runner)'].receives_as_a_group,
+                }
+              : null,
           } as IRunner;
         }),
         tap((runner: IRunner) => {

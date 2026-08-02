@@ -31,6 +31,12 @@
   <div class="myrace-wrapper">
     <!-- the bib number is the runner's identity: lead with it -->
     <section class="bib-hero">
+      @if (runnerInfo.lp_runner?.isPrinted) {
+      <span class="print-status print-status-success">
+        <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
+        {{ "MY_RACE.PRINTED" | translate }}
+      </span>
+      }
       <span class="bib-label">{{ "MY_RACE.BIB_NUMBER" | translate }}</span>
       <span class="bib-number">{{ runnerInfo.runner.bib }}</span>
       <span class="runner-name"
@@ -38,6 +44,20 @@
         }}</span
       >
       <span class="race-name">{{ getEventName() }} · {{ getPlaceName() }}</span>
+      @if(runnerInfo.lp_runner?.isPrintable &&
+      !runnerInfo.lp_runner?.receivesAsAGroup) {
+      <ion-icon
+        name="qr-code-outline"
+        aria-hidden="true"
+        class="runner-qr-icon"
+      ></ion-icon>
+      } @else if(runnerInfo.lp_runner?.receivesAsAGroup) {
+      <ion-icon
+        name="alert-circle"
+        aria-hidden="true"
+        class="runner-alert-icon"
+      ></ion-icon>
+      }
     </section>
 
     <ion-list class="details-list" lines="full" [inset]="true">

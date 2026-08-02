@@ -103,7 +103,8 @@
     "BLOCK": "Block",
     "BIB_NUMBER": "Bib Number",
     "CLUB": "Club",
-    "AGE_GROUP": "Age Group"
+    "AGE_GROUP": "Age Group",
+    "PRINTED": "Printed"
   },
   "AUTH": {
     "ERRORS": {
