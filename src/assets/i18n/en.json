@@ -7,7 +7,7 @@
   "TABS": {
     "HOME": "Home",
     "NOTIFICATIONS": "Notifications",
-    "MY_RACE": "My Race"
+    "MY_RACE": "My Registration"
   },
   "HOME": {
     "ERRORS": {
@@ -87,7 +87,7 @@
     }
   },
   "MY_RACE": {
-    "MY_RACE": "My Race",
+    "MY_RACE": "My Registration",
     "REGISTRATION_INFO": "Registration Info",
     "NOT_REGISTERED": "No registration found",
     "NOT_REGISTERED_HINT": "Sign in with the email and bib number from your race confirmation.",
@@ -104,11 +104,21 @@
     "BIB_NUMBER": "Bib Number",
     "CLUB": "Club",
     "AGE_GROUP": "Age Group",
-    "PRINTED": "Printed"
+    "PRINTED": "Printed",
+    "SHOW_QR": "Show QR code",
+    "SHOW_BIB": "Show bib number",
+    "QR_HINT": "Show this code at bib pickup.",
+    "QR_ALT": "QR code for bib number {{bib}}",
+    "QR_LOADING": "Loading QR code...",
+    "QR_ERROR": "Couldn't load the QR code.",
+    "GROUP_RECEIVES": "Your bib will be collected by your team representative.",
+    "NOT_PRINTABLE": "This bib is not printable. Please contact the race organizers"
   },
   "AUTH": {
     "ERRORS": {
-      "INVALID_CREDENTIALS": "Invalid email or bib number. Please try again."
+      "INVALID_CREDENTIALS": "Invalid email or bib number. Please try again.",
+      "BIB_REQUIRED": "Enter your bib number.",
+      "BIB_INVALID": "Bib number must be a whole number greater than 0."
     },
     "SIGN_IN": "Sign In",
     "EMAIL": "Email",

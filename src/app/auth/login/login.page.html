@@ -30,9 +30,12 @@
             formControlName="bib"
             type="number"
             inputmode="numeric"
+            min="1"
+            step="1"
             label="{{ 'AUTH.BIB_NUMBER' | translate }}"
             labelPlacement="stacked"
             helperText="{{ 'AUTH.BIB_HELPER' | translate }}"
+            [errorText]="bibErrorKey | translate"
           ></ion-input>
         </ion-item>
       </ion-list>

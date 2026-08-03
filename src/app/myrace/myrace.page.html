@@ -27,94 +27,172 @@
     ></ion-refresher-content>
   </ion-refresher>
 
-  @if (runnerInfo) {
+  @if (runnerInfo(); as info) {
   <div class="myrace-wrapper">
-    <!-- the bib number is the runner's identity: lead with it -->
-    <section class="bib-hero">
-      @if (runnerInfo.lp_runner?.isPrinted) {
-      <span class="print-status print-status-success">
-        <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
-        {{ "MY_RACE.PRINTED" | translate }}
-      </span>
-      }
-      <span class="bib-label">{{ "MY_RACE.BIB_NUMBER" | translate }}</span>
-      <span class="bib-number">{{ runnerInfo.runner.bib }}</span>
-      <span class="runner-name"
-        >{{ runnerInfo.runner.firstName }} {{ runnerInfo.runner.lastName
-        }}</span
-      >
-      <span class="race-name">{{ getEventName() }} · {{ getPlaceName() }}</span>
-      @if(runnerInfo.lp_runner?.isPrintable &&
-      !runnerInfo.lp_runner?.receivesAsAGroup) {
-      <ion-icon
-        name="qr-code-outline"
-        aria-hidden="true"
-        class="runner-qr-icon"
-      ></ion-icon>
-      } @else if(runnerInfo.lp_runner?.receivesAsAGroup) {
-      <ion-icon
-        name="alert-circle"
-        aria-hidden="true"
-        class="runner-alert-icon"
-      ></ion-icon>
-      }
-    </section>
+    <!-- the bib number is the runner's identity: lead with it. When the runner
+         collects their own printed bib the card flips to reveal the QR code.
+         The 3D classes are gated on canFlip so a non-flippable card renders
+         exactly as before, with no compositing layer. -->
+    <div
+      #flipRoot
+      class="bib-flip"
+      [class.app-flip]="canFlip()"
+      [class.is-flipped]="qrFlipped"
+    >
+      <div [class.app-flip-inner]="canFlip()">
+        <section
+          class="bib-hero"
+          [class.app-flip-face]="canFlip()"
+          [class.app-flip-front]="canFlip()"
+          [attr.inert]="qrFlipped ? '' : null"
+          [attr.aria-hidden]="qrFlipped ? 'true' : null"
+          (click)="onCardTap()"
+        >
+          @if (info.lp_runner?.isPrinted) {
+          <span class="print-status print-status-success">
+            <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
+            {{ "MY_RACE.PRINTED" | translate }}
+          </span>
+          }
+          <span class="bib-label">{{ "MY_RACE.BIB_NUMBER" | translate }}</span>
+          <span class="bib-number">{{ info.runner.bib }}</span>
+          <span class="runner-name"
+            >{{ info.runner.firstName }} {{ info.runner.lastName }}</span
+          >
+          <span class="race-name">{{ eventName() }} · {{ placeName() }}</span>
+          @if (canFlip()) {
+          <button #frontCta type="button" class="bib-flip-cta app-pressable">
+            <ion-icon name="qr-code-outline" aria-hidden="true"></ion-icon>
+            {{ "MY_RACE.SHOW_QR" | translate }}
+          </button>
+          } @else if (info.lp_runner?.receivesAsAGroup ||
+          info.lp_runner?.isPrintable) {
+          <span class="runner-alert-text">
+            <ion-icon
+              name="alert-circle"
+              aria-hidden="true"
+              class="runner-alert-icon"
+            ></ion-icon>
+            @if (!info.lp_runner?.isPrintable) { {{ "MY_RACE.NOT_PRINTABLE" |
+            translate }} } @else if (info.lp_runner?.receivesAsAGroup){ {{
+            "MY_RACE.GROUP_RECEIVES" | translate }} }
+          </span>
+          }
+        </section>
+
+        @if (canFlip()) {
+        <div
+          class="bib-hero app-flip-face app-flip-back"
+          [attr.inert]="qrFlipped ? null : ''"
+          [attr.aria-hidden]="qrFlipped ? null : 'true'"
+          (click)="onCardTap()"
+        >
+          <!-- stopPropagation so tapping the code itself does not flip it away
+               mid-scan; it also covers the retry button inside -->
+          <div
+            class="bib-qr-slot"
+            aria-live="polite"
+            (click)="$event.stopPropagation()"
+          >
+            @if (!qrError) {
+            <!-- the img must stay in the DOM whenever it could load, with the
+                 spinner overlaid: hiding it behind the spinner would mean
+                 (load) never fires and the spinner never clears -->
+            <img
+              class="bib-qr-img"
+              [src]="qrUrl()"
+              [alt]="'MY_RACE.QR_ALT' | translate: { bib: info.runner.bib }"
+              width="319"
+              height="319"
+              (load)="onQrLoad()"
+              (error)="onQrLoadError()"
+            />
+            } @if (qrLoading && !qrError) {
+            <ion-spinner
+              name="crescent"
+              role="status"
+              [attr.aria-label]="'MY_RACE.QR_LOADING' | translate"
+            ></ion-spinner>
+            } @if (qrError) {
+            <div class="bib-qr-error">
+              <ion-icon name="alert-circle" aria-hidden="true"></ion-icon>
+              <span>{{ "MY_RACE.QR_ERROR" | translate }}</span>
+              @if (qrUrl()) {
+              <ion-button
+                size="small"
+                fill="outline"
+                color="secondary"
+                (click)="retryQr($event)"
+              >
+                {{ "COMMON.RETRY" | translate }}
+              </ion-button>
+              }
+            </div>
+            }
+          </div>
+
+          <span class="bib-label">
+            {{ "MY_RACE.BIB_NUMBER" | translate }} · {{ info.runner.bib }}
+          </span>
+          <span class="bib-qr-hint">{{ "MY_RACE.QR_HINT" | translate }}</span>
+
+          <button #backCta type="button" class="bib-flip-cta app-pressable">
+            {{ "MY_RACE.SHOW_BIB" | translate }}
+          </button>
+        </div>
+        }
+      </div>
+    </div>
 
     <ion-list class="details-list" lines="full" [inset]="true">
       <!-- <ion-list-header>
           <ion-label>{{ "MY_RACE.REGISTRATION_INFO" | translate }}</ion-label>
         </ion-list-header> -->
 
-      @if (runnerInfo.runner.gender) {
+      @if (info.runner.gender) {
       <ion-item>
         <ion-label>{{ "MY_RACE.GENDER" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.gender }}</ion-note>
+        <ion-note slot="end">{{ info.runner.gender }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.fathersName) {
+      } @if (info.runner.fathersName) {
       <ion-item>
         <ion-label>{{ "MY_RACE.FATHERS_NAME" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.fathersName }}</ion-note>
+        <ion-note slot="end">{{ info.runner.fathersName }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.email) {
+      } @if (info.runner.email) {
       <ion-item>
         <ion-label>{{ "MY_RACE.EMAIL" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.email }}</ion-note>
+        <ion-note slot="end">{{ info.runner.email }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.birthdate) {
+      } @if (info.runner.birthdate) {
       <ion-item>
         <ion-label>{{ "MY_RACE.DATE_OF_BIRTH" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.birthdate | date }}</ion-note>
+        <ion-note slot="end">{{ info.runner.birthdate | date }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.ageGroup) {
+      } @if (info.runner.ageGroup) {
       <ion-item>
         <ion-label>{{ "MY_RACE.AGE_GROUP" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.ageGroup }}</ion-note>
+        <ion-note slot="end">{{ info.runner.ageGroup }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.nationality) {
+      } @if (info.runner.nationality) {
       <ion-item>
         <ion-label>{{ "MY_RACE.NATIONALITY" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.nationality }}</ion-note>
+        <ion-note slot="end">{{ info.runner.nationality }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.block) {
+      } @if (info.runner.block) {
       <ion-item>
         <ion-label>{{ "MY_RACE.BLOCK" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.block }}</ion-note>
+        <ion-note slot="end">{{ info.runner.block }}</ion-note>
       </ion-item>
-      } @if (runnerInfo.runner.club) {
+      } @if (info.runner.club) {
       <ion-item>
         <ion-label>{{ "MY_RACE.CLUB" | translate }}</ion-label>
-        <ion-note slot="end">{{ runnerInfo.runner.club }}</ion-note>
+        <ion-note slot="end">{{ info.runner.club }}</ion-note>
       </ion-item>
       }
     </ion-list>
   </div>
   } @else {
-  <div class="app-empty">
-    <ion-icon name="person-circle-outline" aria-hidden="true"></ion-icon>
-    <p class="app-empty-title">{{ "MY_RACE.NOT_REGISTERED" | translate }}</p>
-    <p class="app-empty-text">
-      {{ "MY_RACE.NOT_REGISTERED_HINT" | translate }}
-    </p>
-  </div>
+  <div class="app-skeleton app-skeleton-card" aria-hidden="true"></div>
   }
 </ion-content>

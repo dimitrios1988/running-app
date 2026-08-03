@@ -1,7 +1,23 @@
 import { Component } from '@angular/core';
 
-import { IonicModule } from '@ionic/angular';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import {
+  IonButton,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonList,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../shared/services/toast.service';
@@ -9,9 +25,30 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { ribbonOutline } from 'ionicons/icons';
 
+function wholeNumber(
+  control: AbstractControl<number | null>,
+): ValidationErrors | null {
+  const value = control.value;
+  return value === null || Number.isInteger(value)
+    ? null
+    : { wholeNumber: true };
+}
+
 @Component({
   standalone: true,
-  imports: [IonicModule, ReactiveFormsModule, TranslatePipe],
+  imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonIcon,
+    IonList,
+    IonItem,
+    IonInput,
+    IonButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+  ],
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
@@ -19,8 +56,20 @@ import { ribbonOutline } from 'ionicons/icons';
 export class LoginPage {
   public form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    bib: ['', [Validators.required]],
+    bib: this.fb.control<number | null>(null, [
+      Validators.required,
+      Validators.min(1),
+      wholeNumber,
+    ]),
   });
+
+  get bibErrorKey(): string {
+    const errors = this.form.controls.bib.errors;
+    if (!errors) return '';
+    return errors['required']
+      ? 'AUTH.ERRORS.BIB_REQUIRED'
+      : 'AUTH.ERRORS.BIB_INVALID';
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -34,7 +83,8 @@ export class LoginPage {
 
   onSubmit() {
     if (this.form.invalid) return;
-    const { email, bib } = this.form.value as { email: string; bib: string };
+    const { email, bib } = this.form.getRawValue();
+    if (email === null || bib === null) return;
     this.auth.loginRunner(bib, email).subscribe({
       next: () => {
         if (this.auth.getRunnerUUID() !== '')

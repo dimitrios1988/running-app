@@ -57,6 +57,38 @@
   box-shadow: var(--app-elev-2);
 }
 
+/* ---------- 3D flip card ----------
+ * Both faces share one grid cell, so the container is always as tall as the
+ * taller face: nothing is absolutely positioned and nothing collapses.
+ * Radius + shadow belong on the *untransformed* wrapper - a box-shadow on a
+ * rotated, backface-hidden element rasterises badly in WebKit (the shadow
+ * rotates with the card, and corners go jagged on iOS).
+ * Never add overflow / opacity / filter / clip-path to .app-flip-inner:
+ * every one of them flattens the 3D rendering context.
+ */
+.app-flip {
+  perspective: 1200px;
+}
+
+.app-flip-inner {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.app-flip-face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+}
+
+.app-flip-back {
+  transform: rotateY(180deg);
+}
+
+.app-flip.is-flipped .app-flip-inner {
+  transform: rotateY(180deg);
+}
+
 /* ---------- press + focus affordance for native <button> cards ---------- */
 .app-pressable {
   transition: transform 0.16s ease, box-shadow 0.16s ease;
@@ -327,5 +359,28 @@ img {
   }
   .app-media img {
     animation: none;
+  }
+
+  /* flip card: crossfade the faces instead of rotating them.
+     The `transform: none` on .app-flip-back is mandatory - without it the back
+     keeps its rotateY(180deg) and renders mirrored, which will not scan. */
+  .app-flip-inner,
+  .app-flip.is-flipped .app-flip-inner {
+    transform: none;
+    transition: none;
+  }
+  .app-flip-face {
+    backface-visibility: visible;
+    transition: opacity 0.15s linear;
+  }
+  .app-flip-back {
+    transform: none;
+    opacity: 0;
+  }
+  .app-flip.is-flipped .app-flip-front {
+    opacity: 0;
+  }
+  .app-flip.is-flipped .app-flip-back {
+    opacity: 1;
   }
 }
