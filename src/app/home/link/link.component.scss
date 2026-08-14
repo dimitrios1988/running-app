@@ -1,43 +1,40 @@
 :host {
   /* defaults (can be overridden via HostBinding) */
-  --bg-color: blue;
-  --text-color: #ece4e4;
+  --bg-color: var(--ion-color-secondary);
+  --text-color: #ffffff;
   --title-size: 1.3rem;
   display: block;
 }
 
+/* shell (radius / shadow / overflow) comes from .app-card in global.scss */
 .link-element {
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;
+  padding: 0;
+  border: 0;
   color: var(--text-color);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  position: relative;
-  background-color: var(--bg-color)
+  background-color: var(--bg-color);
 }
 
 .title {
   font-size: var(--title-size);
-  font-weight: 500;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0.01rem;
   color: var(--text-color);
-  letter-spacing: 0.02rem;
 }
 
 .title-row {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  z-index: 1;
-  background-image: linear-gradient(0deg, var(--bg-color) 0%, rgba(255, 255, 255, 0) 100%);
-  padding-top: 0.9rem;
-    padding-left: 0.7rem;
-    padding-right: 0.7rem;
-    padding-bottom: 0.9rem;
+  gap: var(--app-space-2);
+  padding: var(--app-space-3);
+  min-height: 3.25rem;
 }
 
 .title-column {
@@ -46,24 +43,20 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  text-align: start;
+  min-width: 0;
 }
 
-.arrow-column {
-  flex: 0 0 auto;
-  display: flex;
-  align-self: end;
-  justify-content: center;
-}
-
-.right-arrow {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--text-color);
-}
-
+.arrow-column,
 .icon-column {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.right-arrow {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  opacity: 0.8;
 }

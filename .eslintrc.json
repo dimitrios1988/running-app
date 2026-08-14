@@ -34,7 +34,24 @@
             "prefix": "app",
             "style": "camelCase"
           }
+        ],
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@ionic/angular",
+                "message": "Import Ionic components from '@ionic/angular/standalone'. The app bootstraps with provideIonicAngular(), so IonicModule's lazy custom-element loader never runs and any tag registered only via IonicModule silently fails to upgrade in optimized production builds."
+              }
+            ]
+          }
         ]
+      }
+    },
+    {
+      "files": ["*.spec.ts"],
+      "rules": {
+        "no-restricted-imports": "off"
       }
     },
     {

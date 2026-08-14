@@ -1,15 +1,16 @@
 <button
   type="button"
   #newsElement
-  class="news-element"
+  class="news-element app-card app-pressable"
   (click)="navigateToNews()"
 >
   @if(newsElementModel.backgroundImage){
   <img
     [src]="newsElementModel.backgroundImage"
-    alt="News Header Image"
+    alt=""
     class="background-image"
   />
+  <span class="app-scrim" aria-hidden="true"></span>
   }
 
   <div class="title-row">
@@ -19,15 +20,16 @@
         #newsIcon
         [src]="newsElementModel.icon"
         width="32"
+        height="32"
         [alt]="newsElementModel.title"
       />
       }
     </div>
     <div class="title-column">
-      <span class="title">{{ newsElementModel.title }}</span>
-      <span class="subtitle">{{ newsElementModel.subtitle }}</span>
+      <span class="title app-clamp-2">{{ newsElementModel.title }}</span>
+      <span class="subtitle app-clamp-1">{{ newsElementModel.subtitle }}</span>
     </div>
-    <div class="arrow-column">
+    <div class="arrow-column" aria-hidden="true">
       <ion-icon name="chevron-forward-outline" class="right-arrow"></ion-icon>
     </div>
   </div>

@@ -5,21 +5,43 @@
       <ion-title>{{ "NEWS_VIEWER.LOADING" | translate }}</ion-title>
     } @else if (error()) {
       <ion-title>{{ "NEWS_VIEWER.ERROR" | translate }}</ion-title>
+    } @else {
+      <ion-title>{{ news?.title }}</ion-title>
     }
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  @if (news) {
+  @if (loading()) {
+    <div class="app-loading">
+      <ion-spinner
+        name="crescent"
+        role="status"
+        [attr.aria-label]="'NEWS_VIEWER.LOADING' | translate"
+      ></ion-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="app-empty">
+      <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+      <p class="app-empty-title">{{ "NEWS_VIEWER.ERROR" | translate }}</p>
+      <p class="app-empty-text">
+        {{ "NEWS_VIEWER.ERROR_LOADING" | translate }}
+      </p>
+    </div>
+  } @else if (news) {
     @if (news.featuredImageUrl) {
-      <h2 class="news-viewer-title">{{ news.title }}</h2>
-      <div class="news-featured-image-container">
+      <div class="news-featured-image-container app-media">
         <img
           class="news-featured-image"
           [src]="news.featuredImageUrl"
-          alt="Featured Image"
+          alt=""
+          loading="lazy"
         />
       </div>
     }
-    <div class="news-viewer-content" [innerHTML]="news.safeContent"></div>
+    <h2 class="news-viewer-title">{{ news.title }}</h2>
+    <div
+      class="news-viewer-content app-prose"
+      [innerHTML]="news.safeContent"
+    ></div>
   }
 </ion-content>

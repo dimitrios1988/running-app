@@ -25,6 +25,7 @@
     <app-selfie [selfieElementModel]="element"></app-selfie>
   }
   @default {
-    <p>Unsupported element type</p>
+    <!-- Unknown element type from the CMS: render nothing rather than
+         leaking an untranslated developer string to users. -->
   }
 }

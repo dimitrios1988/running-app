@@ -14,7 +14,7 @@ import {
   IonList,
   IonNote,
 } from '@ionic/angular/standalone';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   CdkVirtualScrollViewport,
   ScrollingModule,
@@ -26,11 +26,13 @@ import { addIcons } from 'ionicons';
 import {
   chevronDownCircleOutline,
   chevronForwardOutline,
+  notificationsOutline,
 } from 'ionicons/icons';
 import { finalize, Observable, Subscription, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MyRaceService } from '../myrace/myrace.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Component({
   selector: 'app-notifications',
@@ -60,7 +62,7 @@ export class NotificationsPage implements OnDestroy {
 
   notifications?: INotification[];
   private atTop = true;
-  private translateService = inject(TranslateService);
+  private settingsService = inject(SettingsService);
   private myRaceService = inject(MyRaceService);
   private notificationsService: NotificationsService =
     inject(NotificationsService);
@@ -68,9 +70,13 @@ export class NotificationsPage implements OnDestroy {
   private router: Router = inject(Router);
 
   constructor() {
-    addIcons({ chevronDownCircleOutline, chevronForwardOutline });
+    addIcons({
+      chevronDownCircleOutline,
+      chevronForwardOutline,
+      notificationsOutline,
+    });
     effect(() => {
-      const language = this.translateService.getCurrentLang();
+      const language = this.settingsService.selectedLanguage$();
       const eventId = this.myRaceService.runner$()?.event.id;
       if (language) {
         this.notificationSub$?.unsubscribe();
@@ -100,7 +106,7 @@ export class NotificationsPage implements OnDestroy {
   private loadNotifications(): Observable<INotification[]> {
     return this.notificationsService
       .getNotifications(
-        this.translateService.getCurrentLang(),
+        this.settingsService.selectedLanguage$()!,
         this.myRaceService.runner$()?.event?.id,
       )
       .pipe(

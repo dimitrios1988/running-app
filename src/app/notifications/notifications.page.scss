@@ -6,32 +6,36 @@ ion-content.virtual-wrapper {
   box-sizing: border-box;
 }
 
-/* CDK viewport must fill the available space */
+/*
+ * The viewport fills the content area. ion-content already accounts for the
+ * header, the tab bar and the safe areas, so no magic pixel arithmetic here.
+ */
 .scroll-viewport {
-  height: calc(100dvh - 112px - var(--ion-safe-area-top) - var(--ion-safe-area-bottom));
+  height: 100%;
   width: 100%;
   overflow: auto;
   box-sizing: border-box;
-   display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
-  padding: 0;
-  gap: 12px;
 }
 
 .notifications-item {
+  --padding-top: var(--app-space-3);
+  --padding-bottom: var(--app-space-3);
+  --inner-padding-end: var(--app-space-2);
   width: 100%;
-  margin: 0;
-  box-shadow: var(--ion-box-shadow);
   cursor: pointer;
-  display: flex ;
-  flex-direction: column;
-  border-bottom: 2px;
 }
 
-ion-list{
+.notifications-item.is-unread {
+  --background: rgba(var(--ion-color-primary-rgb), 0.06);
+}
+
+.notifications-item.is-unread ion-label strong {
+  font-weight: 700;
+}
+
+ion-list {
   padding-bottom: 0;
+  background: transparent;
 }
 
 ion-label strong {
@@ -39,30 +43,59 @@ ion-label strong {
   max-width: calc(100% - 60px);
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+ion-label ion-text {
+  font-size: var(--app-text-sm);
+  line-height: 1.4;
 }
 
 ion-label ion-note {
   font-size: 0.9rem;
 }
 
-.metadata-end-wrapper{
+.metadata-end-wrapper {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 5px;
+  align-items: center;
+  gap: var(--app-space-2);
+  align-self: flex-start;
+  padding-top: 0.15rem;
+}
+
+.metadata-end-wrapper ion-note {
+  font-size: var(--app-text-xs);
+  white-space: nowrap;
+}
+
+.right-arrow {
+  font-size: 1.125rem;
+  color: var(--ion-color-medium);
+}
+
+.unread-indicator-wrapper {
+  display: flex;
+  align-items: center;
+  margin-inline-end: var(--app-space-2);
 }
 
 .unread-indicator {
   background: var(--ion-color-primary);
-  width: 10px;
-  height: 10px;
-  border-radius: 100%;
-  position: absolute;
-  inset-inline-start: 12px;
-  top: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--app-radius-pill);
 }
 
+.notifications-skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
 
-.no-notifications-wrapper {
-  margin: 0.7rem;
+.notifications-skeleton-row {
+  height: 86px;
+  border-radius: 0;
 }

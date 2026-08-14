@@ -7,8 +7,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.2.1'
+        classpath 'com.android.tools.build:gradle:9.3.1'
         classpath 'com.google.gms:google-services:4.4.4'
+        // Needed by the onesignal-capacitor-plugin workaround below.
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -21,6 +23,27 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// @onesignal/capacitor-plugin 1.1.7 applies 'kotlin-android' only when AGP < 9,
+// assuming AGP 9 hosts have built-in Kotlin support enabled. We cannot enable it
+// (android.builtInKotlin=true fails on :capacitor-camera and :capacitor-inappbrowser,
+// which apply 'kotlin-android' themselves: "Cannot add extension with name 'kotlin'").
+// So on AGP 9 nothing compiles the plugin's Kotlin sources - the module builds, but
+// its classes.jar holds only R.class and the app dies at startup with
+//   PluginLoadException: Could not find class by class path:
+//   com.onesignal.capacitor.OneSignalCapacitorPlugin
+// Apply Kotlin for that one module here. Drop this once the plugin ships a fix.
+subprojects { sub ->
+    if (sub.name == 'onesignal-capacitor-plugin') {
+        sub.plugins.withId('com.android.library') {
+            sub.apply plugin: 'kotlin-android'
+            sub.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                // Match the sourceCompatibility/targetCompatibility the plugin sets.
+                compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            }
+        }
     }
 }
 

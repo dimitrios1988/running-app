@@ -1,61 +1,76 @@
 :host {
-  --bg-color: blue;
-  --text-color: #ece4e4;
+  --bg-color: var(--ion-color-secondary);
+  --text-color: #ffffff;
   --title-size: inherit;
   display: block;
 }
 
+/* shell (radius / shadow / overflow) comes from .app-card in global.scss */
 .countdown-timer-element {
-  box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.2);
-  text-align: center;
-  background-color: var(--bg-color);
   width: 100%;
-  color: var(--text-color);  
-  border-radius: 6px;
-  padding: 0.7rem;
-}
-
-.countdown-timer-element > p {
-  margin: 5px 0 15px 0;
+  padding: var(--app-space-4);
+  text-align: center;
+  color: var(--text-color);
+  background-color: var(--bg-color);
 }
 
 .countdown-timer-element > h4 {
+  margin: 0;
   font-size: var(--title-size);
-  letter-spacing: 0.02rem;
+  font-weight: 650;
+  letter-spacing: 0.01rem;
+}
+
+.target-date {
+  margin: var(--app-space-1) 0 var(--app-space-4);
+  font-size: var(--app-text-sm);
+  opacity: 0.75;
 }
 
 .wrapper {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-}
-
-.description,
-.times {
-  display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  align-items: center;
+  gap: var(--app-space-2);
 }
 
-.description > p {
-  margin: 0;
-  font: normal 14px sans-serif;
-}
-
-.times > p {
-  margin: 0;
-  font: normal 40px "Courier New", Courier, monospace;
-  line-height: 1;
-  letter-spacing: -2px;
+.unit {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: var(--app-space-1);
+  padding: var(--app-space-2) var(--app-space-1);
+  border-radius: var(--app-radius-md);
 }
 
-/* responsive reductions */
-@media (max-width: 420px) {
-  .times > p {
-    font-size: 30px;
-  }
+/* tinted chip derived from the text colour, so it works on light and dark cards */
+.unit::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: currentColor;
+  opacity: 0.1;
+}
+
+.num,
+.label {
+  position: relative;
+}
+
+.num {
+  font-family: var(--app-font-numeric);
+  font-size: clamp(1.75rem, 10vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.label {
+  font-size: var(--app-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
 }

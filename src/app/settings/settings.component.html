@@ -8,14 +8,22 @@
 </ion-header>
 <ion-content [fullscreen]="true">
   <div class="settings-list">
-    <ion-list>
+    <ion-list [inset]="true">
+      <ion-list-header>
+        <ion-label>{{ "SETTINGS.SECTION_GENERAL" | translate }}</ion-label>
+      </ion-list-header>
       <ion-item>
+        <ion-icon
+          name="language-outline"
+          slot="start"
+          aria-hidden="true"
+        ></ion-icon>
         <ion-select
           label="{{ 'SETTINGS.LANGUAGE' | translate }}"
           placeholder="{{ 'SETTINGS.SELECT_LANGUAGE' | translate }}"
           interface="popover"
           (ionChange)="selectedLanguageChanged($event.detail.value)"
-          [value]="currentLang"
+          [value]="currentLang()"
         >
           @for (language of appConfiguration.supportedLanguages; track $index) {
             <ion-select-option [value]="language.code">{{
@@ -25,12 +33,17 @@
         </ion-select>
       </ion-item>
       <ion-item>
+        <ion-icon
+          name="notifications-outline"
+          slot="start"
+          aria-hidden="true"
+        ></ion-icon>
         <ion-select
           label="{{ 'SETTINGS.NOTIFICATIONS' | translate }}"
           placeholder="{{ 'SETTINGS.SELECT_NOTIFICATIONS' | translate }}"
           interface="popover"
           (ionChange)="notificationsOptionChanged($event.detail.value)"
-          [value]="notificationsEnabled"
+          [value]="notificationsEnabled()"
         >
           <ion-select-option [value]="true">{{
             "SETTINGS.ENABLED" | translate
@@ -39,7 +52,7 @@
             "SETTINGS.DISABLED" | translate
           }}</ion-select-option>
         </ion-select>
-      </ion-item></ion-list
-    >
+      </ion-item>
+    </ion-list>
   </div>
 </ion-content>

@@ -58,7 +58,7 @@ export class AuthService {
     return this.token;
   }
 
-  loginRunner(bib: string, email: string): Observable<LoginRunnerResponse[]> {
+  loginRunner(bib: number, email: string): Observable<LoginRunnerResponse[]> {
     const url = new URL(
       `/api/mobile_app_manager/login_runner/v1`,
       AUTH_CREDENTIALS.app_url,

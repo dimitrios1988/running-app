@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   IonItem,
   IonList,
@@ -10,11 +10,17 @@ import {
   IonButtons,
   IonBackButton,
   IonContent,
+  IonListHeader,
+  IonLabel,
+  IonIcon,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { languageOutline, notificationsOutline } from 'ionicons/icons';
 import { Location } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SettingsService } from './settings.service';
 import { AppConfigurationService } from '../app.configuration.service';
+import { ToastService } from '../shared/services/toast.service';
 
 @Component({
   selector: 'app-settings',
@@ -29,46 +35,58 @@ import { AppConfigurationService } from '../app.configuration.service';
     IonTitle,
     IonHeader,
     IonList,
+    IonListHeader,
+    IonLabel,
+    IonIcon,
     IonItem,
     IonSelect,
     IonSelectOption,
     TranslatePipe,
   ],
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent {
   private location = inject(Location);
   private settingsService = inject(SettingsService);
+  private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
   public appConfiguration = inject(AppConfigurationService).appConfiguration;
-  currentLang: string | null;
-  notificationsEnabled: boolean = false;
+  currentLang = this.settingsService.selectedLanguage$;
+  notificationsEnabled = this.settingsService.notificationsEnabled$;
 
-  constructor(private translate: TranslateService) {
-    this.currentLang = this.settingsService.selectedLanguage$();
-    this.notificationsEnabled = this.settingsService.notificationsEnabled$();
+  constructor() {
+    addIcons({ languageOutline, notificationsOutline });
   }
 
   goBack() {
     this.location.back();
   }
 
-  ngOnInit() {}
-
   selectedLanguageChanged(lang: string) {
+    // The select is bound to currentLang(), so writing to the signal echoes
+    // back through (ionChange). Ignore the echo.
+    if (!lang || lang === this.currentLang()) {
+      return;
+    }
     this.settingsService.setSelectedLanguage(lang).then(() => {
-      // Language preference saved
       this.switchLanguage(lang);
     });
   }
 
-  notificationsOptionChanged(event: boolean) {
-    const enabled = event;
+  notificationsOptionChanged(enabled: boolean) {
+    if (enabled === this.notificationsEnabled()) {
+      return;
+    }
     this.settingsService.setNotificationsEnabled(enabled);
   }
 
   switchLanguage(lang: string) {
-    this.translate.use(lang).subscribe(() => {
-      //this.currentLang = lang;
-      // Optionally persist to storage and update Ionic RTL if needed
+    this.translate.use(lang).subscribe({
+      error: (error) => {
+        console.error(`[i18n] Failed to load translations for "${lang}"`, error);
+        this.toastService.showError(
+          this.translate.instant('SETTINGS.ERRORS.FAILED_TO_LOAD_LANGUAGE'),
+        );
+      },
     });
   }
 }

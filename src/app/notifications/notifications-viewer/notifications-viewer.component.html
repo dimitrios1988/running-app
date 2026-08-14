@@ -14,12 +14,22 @@
 </ion-header>
 <ion-content [fullscreen]="true">
   @if(loading()) {
-  <div class="loading-container">
-    <ion-spinner name="crescent"></ion-spinner>
+  <div class="app-loading">
+    <ion-spinner
+      name="crescent"
+      role="status"
+      [attr.aria-label]="'NOTIFICATIONS_VIEWER.LOADING' | translate"
+    ></ion-spinner>
   </div>
   } @else if(error()) {
-  <div class="error-container">
-    <p>{{ "NOTIFICATIONS_VIEWER.ERRORS.ERROR_LOADING" | translate }}</p>
+  <div class="app-empty">
+    <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+    <p class="app-empty-title">
+      {{ "NOTIFICATIONS_VIEWER.ERRORS.ERROR" | translate }}
+    </p>
+    <p class="app-empty-text">
+      {{ "NOTIFICATIONS_VIEWER.ERRORS.ERROR_LOADING" | translate }}
+    </p>
   </div>
   } @else if(notification()) {
   <div class="notification-container">
@@ -28,13 +38,16 @@
       {{ notification()?.publishedAt | date : "medium" }}
     </p>
     <div
-      class="notification-content"
+      class="notification-content app-prose"
       [innerHTML]="notification()?.message"
     ></div>
   </div>
   } @else {
-  <div class="error-container">
-    <p>{{ "NOTIFICATIONS_VIEWER.NOT_FOUND" | translate }}</p>
+  <div class="app-empty">
+    <ion-icon name="notifications-off-outline" aria-hidden="true"></ion-icon>
+    <p class="app-empty-title">
+      {{ "NOTIFICATIONS_VIEWER.NOT_FOUND" | translate }}
+    </p>
   </div>
   }
 </ion-content>

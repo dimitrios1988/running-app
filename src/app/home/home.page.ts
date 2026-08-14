@@ -26,7 +26,7 @@ import {
   HomeElementModel,
   PageElementModel,
 } from '../shared/page.element/page.element.model';
-import { Subscription } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { SettingsService } from '../settings/settings.service';
 import { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -59,6 +59,11 @@ export class HomePage implements OnDestroy {
   pageElementModels: PageElementModel[] = [];
   headerElementModel?: HeaderElementModel;
   homeElementModel: HomeElementModel | null = null;
+  /*
+   * Presentation-only flag: pageElementModels starts as [], so an empty array
+   * cannot distinguish "still loading" from "no elements". Drives the skeleton.
+   */
+  isLoading = true;
 
   constructor() {
     addIcons({ settingsOutline, chevronDownCircleOutline });
@@ -72,8 +77,10 @@ export class HomePage implements OnDestroy {
 
   ionViewWillEnter(): void {
     this.homeElementsSub.unsubscribe();
+    this.isLoading = this.pageElementModels.length === 0;
     this.homeElementsSub = this.homeService
       .getHomeElements(this.settingsService.selectedLanguage$()!)
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe();
     this.populateHomeElements();
   }

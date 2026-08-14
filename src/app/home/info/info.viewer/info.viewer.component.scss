@@ -1,4 +1,17 @@
+.image-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
 
-.info-description{
-  margin: 0.7rem;
+.link-container {
+  padding: var(--app-space-4) var(--app-space-4) 0;
+}
+
+.link-container ion-button {
+  --border-radius: var(--app-radius-md);
+  font-weight: 600;
+}
+
+.info-description {
+  margin: var(--app-space-4) var(--app-space-4) var(--app-space-6);
 }

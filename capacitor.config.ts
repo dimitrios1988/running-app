@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'gr.weallrun.runningapp',
   appName: 'Running App',
   webDir: 'www',
   ios: {

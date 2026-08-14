@@ -1,18 +1,170 @@
-.runner-info-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.myrace-wrapper {
+  padding: var(--app-space-2) 0 var(--app-space-6);
 }
 
-.runner-info .title {
-    font-weight: bold;
+/* perspective wrapper: keeps margin, radius and shadow off the rotating layer */
+.bib-flip {
+  margin: 0 var(--app-space-4) var(--app-space-5);
+  border-radius: var(--app-radius-lg);
+  box-shadow: var(--app-elev-2);
 }
 
-.runner-info .value {
-    margin-left: 0.5rem;
+/* the bib number is the runner's identity, so it leads the page */
+.bib-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* the QR face is the taller of the two, so centre the front's content
+     rather than letting it hug the top of the shared grid cell */
+  justify-content: center;
+  gap: var(--app-space-1);
+  padding: var(--app-space-5) var(--app-space-4);
+  border-radius: var(--app-radius-lg);
+  border-top: 4px solid var(--app-accent-vivid);
+  text-align: center;
+  color: var(--ion-color-secondary-contrast);
+  background: var(--ion-color-secondary);
 }
 
-ion-card-subtitle {
-    font-size: 1rem;
-    color: var(--ion-color-medium);
+.app-flip .bib-hero {
+  cursor: pointer;
+  /* unprefixed user-select is Safari 17+, and we support iOS 16.1 */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.bib-label {
+  font-size: var(--app-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.bib-number {
+  font-family: var(--app-font-numeric);
+  font-size: clamp(2.5rem, 16vw, 4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.runner-name {
+  margin-top: var(--app-space-2);
+  font-size: var(--app-text-lg);
+  font-weight: 600;
+}
+
+.race-name {
+  font-size: var(--app-text-sm);
+  opacity: 0.75;
+}
+
+.details-list ion-note[slot="end"] {
+  font-size: var(--app-text-sm);
+  text-align: end;
+  max-width: 60%;
+  overflow-wrap: anywhere;
+}
+
+.runner-alert-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-2);
+  font-size: var(--app-text-sm);
+  font-weight: 600;
+  color: var(--ion-color-danger);
+  flex-direction: column;
+}
+
+.runner-alert-icon {
+  font-size: var(--app-text-lg);
+}
+
+
+/* loading, loaded and error all occupy this identical square: no layout shift.
+   The qzone=4 quiet zone is baked into the returned SVG, so no inner padding,
+   and the panel stays exactly #fff so there is no seam with the image. */
+.bib-qr-slot {
+  display: grid;
+  place-items: center;
+  width: min(55%, 176px);
+  aspect-ratio: 1;
+  margin: var(--app-space-2) 0 var(--app-space-1);
+  overflow: hidden;
+  border-radius: var(--app-radius-sm);
+  background: #fff;
+  /* the panel is white in both themes, so the foreground must be set here -
+     the card's own currentColor is white and would be invisible */
+  color: var(--ion-color-secondary);
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.bib-qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bib-qr-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-space-1);
+  padding: var(--app-space-2);
+  font-size: var(--app-text-xs);
+  line-height: 1.35;
+
+  ion-icon {
+    font-size: var(--app-text-xl);
+    color: var(--ion-color-danger);
+  }
+}
+
+.bib-qr-hint {
+  max-width: 26ch;
+  font-size: var(--app-text-xs);
+  opacity: 0.75;
+}
+
+.bib-flip-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-2);
+  margin-top: var(--app-space-2);
+  padding: var(--app-space-1) var(--app-space-3);
+  border: 0;
+  border-radius: var(--app-radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--app-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: var(--app-text-lg);
+  }
+}
+
+.print-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-2);
+  font-size: var(--app-text-sm);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+
+  ion-icon {
+    font-size: 1.25em;
+    flex-shrink: 0;
+  }
+}
+
+.print-status-success {
+    color: var(--ion-color-success-tint);
 }

@@ -6,8 +6,11 @@
 .element-container {
   display: flex;
   flex-direction: column;
-  margin: 0.7rem;
-  gap: 0.8rem;
+  gap: var(--app-space-4);
+  /* padding: var(--app-space-3) var(--app-space-4)
+    calc(var(--app-space-6) + var(--ion-safe-area-bottom, 0px)); */
+    padding: var(--app-space-3) var(--app-space-4)
+    
 }
 
 .main-image {
@@ -30,10 +33,4 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-
-
-ion-toolbar.homepage-toolbar {
-  background: var(--ion-toolbar-background);
 }

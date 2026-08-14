@@ -1,7 +1,7 @@
 <button
   type="button"
   (click)="onSelfieElementClick()"
-  class="selfie-element"
+  class="selfie-element app-card app-pressable"
   [attr.aria-label]="selfieElementModel.title"
 >
   <div class="title-row">
@@ -17,7 +17,7 @@
     </div>
 
     <div class="title-column">
-      <span class="title">{{ selfieElementModel.title }}</span>
+      <span class="title app-clamp-2">{{ selfieElementModel.title }}</span>
     </div>
 
     <div class="arrow-column" aria-hidden="true">

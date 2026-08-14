@@ -14,7 +14,11 @@ import {
   IonToolbar,
   IonBackButton,
   IonTitle,
+  IonSpinner,
+  IonIcon,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { alertCircleOutline } from 'ionicons/icons';
 import { NewsService } from '../news.service';
 import { INews } from './news.item';
 import { Subscription } from 'rxjs';
@@ -34,6 +38,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     IonButtons,
     IonHeader,
     IonContent,
+    IonSpinner,
+    IonIcon,
     TranslatePipe,
   ],
 })
@@ -48,6 +54,7 @@ export class NewsViewerComponent implements OnInit, OnDestroy {
   news: (INews & { safeContent: SafeHtml }) | null = null;
 
   constructor() {
+    addIcons({ alertCircleOutline });
     effect(() => {
       const news = this.newsService.news$();
       if (news) {

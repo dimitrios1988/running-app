@@ -1,16 +1,18 @@
 <button
   type="button"
   #infoChildElement
-  class="info-child-element"
+  class="info-child-element app-card app-pressable"
   (click)="navigateToInfo()"
+  [attr.aria-label]="infoChildElementModel?.title"
 >
   <div class="title-row">
-    <div class="title-column">
-      <span class="subtitle">{{ infoChildElementModel?.subtitle }}</span>
+    <!-- spans the full inner width: the chevron shares the title's line only -->
+    <span class="subtitle">{{ infoChildElementModel?.subtitle }}</span>
+    <div class="title-line">
       <span class="title">{{ infoChildElementModel?.title }}</span>
-    </div>
-    <div class="arrow-column">
-      <ion-icon name="chevron-forward-outline" class="right-arrow"></ion-icon>
+      <div class="arrow-column" aria-hidden="true">
+        <ion-icon name="chevron-forward-outline" class="right-arrow"></ion-icon>
+      </div>
     </div>
   </div>
 </button>

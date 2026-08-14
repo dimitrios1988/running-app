@@ -1,1 +1,37 @@
+ion-tab-bar {
+  /* Ionic hard-codes 56px (md) / 50px (ios) and exposes no height variable.
+     The host is box-sizing: content-box, so this is pure content height —
+     the border and the bottom safe-area inset are added outside it. */
+  height: 60px;
+  --background: var(--ion-tab-bar-background);
+  --border: 1px solid var(--ion-border-color);
+  --color: var(--ion-color-medium);
+  --color-selected: var(--ion-color-primary);
+}
 
+/* NOTE: do not set --padding-top / --padding-bottom on ion-tab-button.
+   Ionic's .button-native is height:100% + border-box, so that padding is
+   subtracted from the bar's fixed height and clips the label. */
+
+ion-tab-button ion-label {
+  font-size: var(--app-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+ion-tab-button ion-icon {
+  font-size: 1.5rem;
+}
+
+/* outline icon by default, filled once the tab is active */
+.tab-icon-active {
+  display: none;
+}
+
+ion-tab-button.tab-selected .tab-icon-inactive {
+  display: none;
+}
+
+ion-tab-button.tab-selected .tab-icon-active {
+  display: block;
+}

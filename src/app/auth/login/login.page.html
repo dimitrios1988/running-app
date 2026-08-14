@@ -5,34 +5,46 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">{{ 'AUTH.LOGIN' | translate }}</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <ion-list>
-      <ion-item>
-        <ion-input
-          formControlName="email"
-          type="email"
-          label="{{ 'AUTH.EMAIL' | translate }}"
-          labelPlacement="stacked"
-        ></ion-input>
-      </ion-item>
+  <div class="login-wrapper">
+    <div class="login-hero">
+      <ion-icon name="ribbon-outline" aria-hidden="true"></ion-icon>
+      <h1>{{ 'AUTH.WELCOME' | translate }}</h1>
+      <p>{{ 'AUTH.SUBTITLE' | translate }}</p>
+    </div>
 
-      <ion-item>
-        <ion-input
-          formControlName="bib"
-          type="number"
-          label="{{ 'AUTH.BIB_NUMBER' | translate }}"
-          labelPlacement="stacked"
-        ></ion-input>
-      </ion-item>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <ion-list [inset]="true">
+        <ion-item>
+          <ion-input
+            formControlName="email"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            label="{{ 'AUTH.EMAIL' | translate }}"
+            labelPlacement="stacked"
+          ></ion-input>
+        </ion-item>
 
-      <ion-button expand="block" type="submit" [disabled]="form.invalid"
-        >{{ 'AUTH.SIGN_IN' | translate }}</ion-button
-      >
-    </ion-list>
-  </form>
+        <ion-item>
+          <ion-input
+            formControlName="bib"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            step="1"
+            label="{{ 'AUTH.BIB_NUMBER' | translate }}"
+            labelPlacement="stacked"
+            helperText="{{ 'AUTH.BIB_HELPER' | translate }}"
+            [errorText]="bibErrorKey | translate"
+          ></ion-input>
+        </ion-item>
+      </ion-list>
+
+      <div class="login-actions">
+        <ion-button expand="block" type="submit" [disabled]="form.invalid"
+          >{{ 'AUTH.SIGN_IN' | translate }}</ion-button
+        >
+      </div>
+    </form>
+  </div>
 </ion-content>
