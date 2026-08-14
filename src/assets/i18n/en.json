@@ -76,6 +76,12 @@
       "FAILED_TO_LOAD_NOTIFICATIONS": "Failed to load notifications. Please check your internet connection and try again later."
     }
   },
+  "NOTIFICATIONS_PROMPT": {
+    "TITLE": "Stay in the loop",
+    "MESSAGE": "Get notified about race updates, start times and your results.",
+    "ENABLE": "Enable",
+    "NOT_NOW": "Not now"
+  },
   "NOTIFICATIONS_VIEWER": {
     "NOTIFICATION": "Notification",
     "NOT_FOUND": "The notification you are trying to view does not exist.",

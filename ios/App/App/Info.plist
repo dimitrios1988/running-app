@@ -24,13 +24,23 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Running App uses the camera so you can take a selfie to share your race moment.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Running App saves the selfies you take to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Running App needs access to your photo library to share the selfies you take.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
