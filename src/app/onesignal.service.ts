@@ -1,6 +1,8 @@
 import { effect, inject, Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import OneSignal, { NotificationClickEvent } from '@onesignal/capacitor-plugin';
+import { AlertController } from '@ionic/angular/standalone';
+import { TranslateService } from '@ngx-translate/core';
 import { ONESIGNAL } from './secrets';
 import { SettingsService } from './settings/settings.service';
 import { Router } from '@angular/router';
@@ -13,6 +15,8 @@ export class OneSignalService {
   private settingsService = inject(SettingsService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private alertController = inject(AlertController);
+  private translateService = inject(TranslateService);
 
   private readonly isNative = Capacitor.isNativePlatform();
 
@@ -28,12 +32,23 @@ export class OneSignalService {
     OneSignal.Notifications.addEventListener(
       'click',
       (event: NotificationClickEvent) => {
-        const additionalData = event.notification.additionalData as {
-          deeplink?: string;
-        };
-        const deeplink = additionalData.deeplink;
-        if (deeplink) {
-          this.router.navigate([`/tabs/notifications/viewer/${deeplink}`]);
+        const additionalData = event.notification.additionalData as
+          | { deeplink?: string }
+          | undefined;
+        const deeplink = additionalData?.deeplink;
+        if (!deeplink) {
+          return;
+        }
+        // The viewer resolves the segment with Number(id), so a non-numeric
+        // payload would silently fetch NaN. Fall back to the list instead.
+        const notificationId = Number(deeplink);
+        if (Number.isFinite(notificationId)) {
+          this.router.navigate([`/tabs/notifications/viewer/${notificationId}`]);
+        } else {
+          console.warn(
+            `OneSignal deeplink "${deeplink}" is not a notification id; opening the list.`,
+          );
+          this.router.navigate(['/tabs/notifications']);
         }
       },
     );
@@ -47,7 +62,11 @@ export class OneSignalService {
 
     effect(() => {
       const notificationsEnabled = this.settingsService.notificationsEnabled$();
-      this.syncPushSubscription(notificationsEnabled);
+      // null means the stored preference hasn't loaded yet. Syncing on it would
+      // opt the subscriber out on every cold start, then back in a tick later.
+      if (notificationsEnabled !== null) {
+        this.syncPushSubscription(notificationsEnabled);
+      }
 
       const selectedLanguage = this.settingsService.selectedLanguage$();
       if (selectedLanguage) {
@@ -67,6 +86,61 @@ export class OneSignalService {
         this.setSubscriberLanguage(selectedLanguage);
       }
     });
+  }
+
+  /**
+   * Shows a one-time in-app opt-in prompt on the very first launch.
+   *
+   * This is deliberately a "soft ask" rather than the OS dialog: iOS presents
+   * its permission prompt exactly once per install, and a denial there is
+   * unrecoverable short of sending the user into system settings. Asking in-app
+   * first means a user who isn't interested costs us nothing — they can still
+   * opt in later from Settings, with the OS prompt still available.
+   *
+   * Only the stored preference is written here; the effect above reacts to it
+   * and runs the actual permission request through syncPushSubscription().
+   */
+  async promptForNotificationsOnFirstLaunch(): Promise<void> {
+    if (!this.isNative) {
+      return;
+    }
+    try {
+      // Without this the prompt could resolve before the stored preference
+      // loads, and the late load would overwrite the user's fresh choice.
+      await this.settingsService.ready;
+
+      if (await this.settingsService.hasSeenNotificationsPrompt()) {
+        return;
+      }
+      // Recorded before presenting, so being force-quit mid-dialog doesn't
+      // re-prompt on every subsequent launch.
+      await this.settingsService.markNotificationsPromptSeen();
+
+      const alert = await this.alertController.create({
+        header: this.translateService.instant('NOTIFICATIONS_PROMPT.TITLE'),
+        message: this.translateService.instant('NOTIFICATIONS_PROMPT.MESSAGE'),
+        backdropDismiss: false,
+        buttons: [
+          {
+            text: this.translateService.instant('NOTIFICATIONS_PROMPT.NOT_NOW'),
+            role: 'cancel',
+          },
+          {
+            text: this.translateService.instant('NOTIFICATIONS_PROMPT.ENABLE'),
+            role: 'enable',
+          },
+        ],
+      });
+
+      await alert.present();
+      const { role } = await alert.onDidDismiss();
+      if (role === 'enable') {
+        // Declining needs no write: the preference already defaults to false.
+        await this.settingsService.setNotificationsEnabled(true);
+      }
+    } catch (error) {
+      console.error('OneSignal first-launch prompt failed:', error);
+    }
   }
 
   /**
