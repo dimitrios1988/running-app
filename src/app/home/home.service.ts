@@ -369,6 +369,9 @@ export class HomeService {
                       : null,
                     shareText:
                       selfieElementResponse['0(page_element)'].subtitle,
+                    // TODO: map the CMS overlay images here. Until then the
+                    // selfie camera falls back to DEFAULT_SELFIE_OVERLAYS.
+                    overlays: null,
                   }
                 : null,
             } as HomeElementModel;

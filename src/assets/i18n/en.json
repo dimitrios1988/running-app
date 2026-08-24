@@ -62,7 +62,23 @@
     "TAKE_SELFIE": "Take Selfie"
   },
   "SELFIE": {
-    "SHARE_PHOTO": "Share Photo"
+    "SHARE_PHOTO": "Share Photo",
+    "CHOOSE_OVERLAY": "Choose a frame",
+    "NO_OVERLAY": "None",
+    "SHUTTER": "Take photo",
+    "RETAKE": "Retake",
+    "SHARE": "Share",
+    "CLOSE": "Close camera",
+    "PHOTO_PREVIEW": "Your photo",
+    "ERRORS": {
+      "PERMISSION_DENIED": "Camera access is off. Allow it in your settings to take a selfie.",
+      "NO_CAMERA": "No camera was found on this device.",
+      "CAMERA_BUSY": "The camera is being used by another app. Close it and try again.",
+      "CAMERA_UNAVAILABLE": "We couldn't start the camera. Please try again.",
+      "OVERLAY_LOAD_FAILED": "Some frames couldn't be loaded.",
+      "CAPTURE_FAILED": "We couldn't take the photo. Please try again.",
+      "SHARE_FAILED": "We couldn't share the photo. Please try again."
+    }
   },
   "NOTIFICATIONS": {
     "PULLING_TEXT": "Pull down to refresh notifications",

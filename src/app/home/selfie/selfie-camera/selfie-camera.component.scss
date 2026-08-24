@@ -1,0 +1,150 @@
+/* Deliberately no `:host { display: block }`. Ionic puts `.ion-page` on this
+   host - `display: flex; flex-direction: column` - which is what makes
+   ion-content (`flex: 1`) occupy exactly the space left below the header. A
+   `:host` rule has the same specificity as `.ion-page` and is injected later, so
+   it wins and silently reverts the page to block layout: ion-content then takes
+   the FULL modal height and the whole stack is pushed down by the header's
+   height, straight under the navigation bar. */
+
+ion-toolbar {
+  --background: #000000;
+  --color: #ffffff;
+}
+
+ion-content {
+  --background: #000000;
+  /* .camera owns the bottom inset instead. Ionic's own fullscreen-modal padding
+     lands on .inner-scroll, which clips at its padding box - so it cannot lift
+     content out of the navigation-bar band - and it derives from a probe that
+     reports 0px on Android edge-to-edge. !important because Ionic sets it as an
+     inline style, which only an important declaration outranks. */
+  --internal-content-safe-area-padding-bottom: 0px !important;
+}
+
+/* A grid rather than a centred flex column, deliberately: the strip and shutter
+   sit in auto rows that take exactly their own height, so they can never be
+   pushed past the padding box. A centred flex column split any overflow in half
+   and pushed the shutter down through the safe-area inset, behind the
+   navigation bar. */
+.camera {
+  display: grid;
+  /* minmax(0, 1fr), not plain 1fr - the implicit `auto` minimum of 1fr would let
+     the preview refuse to shrink, which is the whole bug. */
+  grid-template-rows: minmax(0, 1fr);
+  grid-auto-rows: auto;
+  gap: var(--app-space-2);
+  height: 100%;
+  /* The WebView draws under the Android navigation bar; without this the
+     shutter sits behind it. */
+  padding-bottom: calc(var(--app-space-2) + var(--app-safe-bottom));
+}
+
+/* Absorbs whatever height is left over and centres the preview inside it. */
+.viewport {
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  /* Fits the leftover area on BOTH axes while staying exactly 3:4, so full-frame
+     overlays authored at 3:4 are never distorted. 75cqh is 75% of .viewport's
+     height - the width a 3:4 box needs to fill it - so min() picks whichever
+     axis binds and aspect-ratio derives the other. max-width + max-height cannot
+     do this on one element: clamping one axis leaves the other definite and
+     breaks the ratio. The capture measures this box rather than assuming the
+     ratio, so preview and photo match at any size. */
+  width: min(100%, 75cqh);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #000000;
+}
+
+.feed,
+.shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mirrored like a mirror for the front camera. Deliberately not applied to
+   .overlay or .shot - the overlay would render its text backwards, and the shot
+   already has the mirroring baked in. */
+.feed.is-mirrored {
+  transform: scaleX(-1);
+}
+
+.overlay {
+  position: absolute;
+  /* Applies only when the model leaves height null, keeping the artwork's own
+     aspect ratio; an explicit height is bound inline and stretches to fill,
+     matching drawImage(). */
+  height: auto;
+  pointer-events: none;
+}
+
+.stage-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-space-4);
+  padding: var(--app-space-2) var(--app-space-3);
+  min-height: 5.5rem;
+}
+
+.shutter {
+  box-sizing: border-box;
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 0;
+  border: 4px solid #ffffff;
+  border-radius: 50%;
+  background: none;
+}
+
+.shutter-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #ffffff;
+  transform: scale(0.86);
+  transition: transform 0.12s ease;
+}
+
+.shutter:active .shutter-inner {
+  transform: scale(0.72);
+}
+
+.shutter[disabled] {
+  opacity: 0.4;
+}
+
+.shutter:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shutter-inner {
+    transition: none;
+  }
+  .shutter:active .shutter-inner {
+    transform: scale(0.86);
+  }
+}

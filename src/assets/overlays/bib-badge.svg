@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="300" viewBox="0 0 420 300">
+  <!-- Race bib, intended for a bottom corner of the frame. -->
+  <rect x="8" y="8" width="404" height="284" rx="20" ry="20"
+        fill="#ffffff" stroke="#0b1b2b" stroke-width="8" />
+  <text x="210" y="86" text-anchor="middle"
+        font-family="Helvetica, Arial, sans-serif" font-size="42"
+        font-weight="bold" letter-spacing="6" fill="#c2410c">WE ALL RUN</text>
+  <line x1="44" y1="112" x2="376" y2="112" stroke="#0b1b2b" stroke-width="4" opacity="0.35" />
+  <text x="210" y="222" text-anchor="middle"
+        font-family="Helvetica, Arial, sans-serif" font-size="120"
+        font-weight="bold" fill="#0b1b2b">2026</text>
+  <circle cx="52" cy="266" r="9" fill="#0b1b2b" opacity="0.35" />
+  <circle cx="368" cy="266" r="9" fill="#0b1b2b" opacity="0.35" />
+</svg>

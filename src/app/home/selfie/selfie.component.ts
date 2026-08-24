@@ -6,14 +6,11 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { hexToRgb } from '../../shared/color.utils';
 import { SelfieElementModel } from '../../shared/page.element/page.element.model';
-import { Camera, CameraDirection } from '@capacitor/camera';
-import { Share } from '@capacitor/share';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-selfie',
@@ -27,7 +24,7 @@ export class SelfieComponent implements OnChanges {
   @HostBinding('style.--bg-color') hostBgColor?: string;
   @HostBinding('style.--title-size') hostTitleSize?: string;
   @HostBinding('style.--text-color') hostTextColor?: string;
-  private readonly translateService = inject(TranslateService);
+  private readonly modalController = inject(ModalController);
 
   constructor() {
     addIcons({ chevronForwardOutline });
@@ -39,10 +36,21 @@ export class SelfieComponent implements OnChanges {
     }
   }
 
-  onSelfieElementClick() {
-    this.takePhotoAndShare().then(() => {
-      console.log('Picture taken successfully');
+  async onSelfieElementClick(): Promise<void> {
+    // Loaded on demand: this card renders on every home visit, but the camera
+    // (and the canvas/filesystem code behind it) is opened rarely, so it has no
+    // business sitting in the home chunk.
+    const { SelfieCameraComponent } = await import(
+      './selfie-camera/selfie-camera.component'
+    );
+
+    const modal = await this.modalController.create({
+      component: SelfieCameraComponent,
+      componentProps: { selfieElementModel: this.selfieElementModel },
+      cssClass: 'app-modal-fullscreen',
+      backdropDismiss: false,
     });
+    await modal.present();
   }
 
   private updateCssVars() {
@@ -61,29 +69,6 @@ export class SelfieComponent implements OnChanges {
     }
     if (m?.title_size) {
       this.hostTitleSize = `${m.title_size}rem`;
-    }
-  }
-
-  private async takePhotoAndShare() {
-    try {
-      const photo = await Camera.takePhoto({
-        quality: 90,
-        editable: 'no',
-        saveToGallery: true,
-        cameraDirection: CameraDirection.Front,
-      });
-
-      if (!photo.uri) {
-        throw new Error('No file path returned');
-      }
-      await Share.share({
-        title: 'My Photo',
-        text: this.selfieElementModel.shareText ?? '',
-        url: `file://${photo.uri}`,
-        dialogTitle: this.translateService.instant('SELFIE.SHARE_PHOTO'),
-      });
-    } catch (err) {
-      console.error(err);
     }
   }
 }

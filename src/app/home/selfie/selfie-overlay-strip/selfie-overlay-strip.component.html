@@ -1,0 +1,36 @@
+<div
+  class="strip"
+  role="radiogroup"
+  [attr.aria-label]="'SELFIE.CHOOSE_OVERLAY' | translate"
+>
+  <button
+    type="button"
+    role="radio"
+    class="chip"
+    [class.is-selected]="selectedId() === null"
+    [attr.aria-checked]="selectedId() === null"
+    (click)="overlaySelect.emit(null)"
+  >
+    <span class="thumb is-empty" aria-hidden="true">
+      <ion-icon name="ban-outline"></ion-icon>
+    </span>
+    <span class="caption">{{ 'SELFIE.NO_OVERLAY' | translate }}</span>
+  </button>
+
+  @for (option of options(); track option.id) {
+    <button
+      type="button"
+      role="radio"
+      class="chip"
+      [class.is-selected]="selectedId() === option.id"
+      [attr.aria-checked]="selectedId() === option.id"
+      [attr.aria-label]="option.name"
+      (click)="overlaySelect.emit(option.id)"
+    >
+      <span class="thumb">
+        <img [src]="option.thumbnailUrl" alt="" aria-hidden="true" />
+      </span>
+      <span class="caption">{{ option.name }}</span>
+    </button>
+  }
+</div>

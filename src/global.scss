@@ -331,6 +331,17 @@ img {
   }
 }
 
+/* ---------- modals ---------- */
+/* Ionic applies `cssClass` to the host <ion-modal>, which sits outside every
+   component's encapsulated styles - so a full-screen modal has to be styled
+   from here. */
+.app-modal-fullscreen {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+  --background: #000000;
+}
+
 /* ---------- motion ---------- */
 @keyframes app-shimmer {
   100% {

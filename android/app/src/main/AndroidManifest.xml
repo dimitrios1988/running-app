@@ -38,4 +38,14 @@
          merge normally supplies this, but targetSdk is 36 so we declare it
          explicitly rather than depend on the merge. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- The selfie screen uses getUserMedia() in the WebView; Capacitor's
+         BridgeWebChromeClient turns that into a runtime CAMERA request, which
+         needs this declaration. It currently also arrives via a transitive dep
+         of @capacitor/inappbrowser - declaring it here means the camera does not
+         silently break if that dep is ever removed or bumped. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Declaring CAMERA implies uses-feature camera required=true, which would
+         filter camera-less devices on Play. The selfie is optional, so opt out. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>

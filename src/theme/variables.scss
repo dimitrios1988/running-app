@@ -112,6 +112,24 @@
   --app-space-5: 1.5rem;
   --app-space-6: 2rem;
 
+  /* ---------- safe areas ---------- */
+  /* The bottom system-bar inset, for anything anchored to the bottom of the
+     screen. Since targetSdk 36 and `viewport-fit=cover`, Capacitor leaves the
+     WebView full-screen (drawing under the Android navigation bar) and injects
+     the insets here on <html> instead - so consuming them is the web layer's
+     job.
+
+     Deliberately NOT --ion-safe-area-bottom: Ionic's modal overwrites that on
+     the ion-modal host from a getBoundingClientRect() probe its own source
+     flags as unreliable on Android edge-to-edge, where it can land on 0px.
+     Resolving the token here on :root - where Capacitor sets the value - means
+     the computed result inherits everywhere untouched. The env() fallback
+     covers iOS, where Capacitor injects nothing. */
+  --app-safe-bottom: var(
+    --safe-area-inset-bottom,
+    env(safe-area-inset-bottom, 0px)
+  );
+
   /* ---------- radius ---------- */
   --app-radius-sm: 0.5rem;
   --app-radius-md: 0.75rem;
@@ -189,8 +207,10 @@
     --ion-color-medium-shade: #828fa2;
     --ion-color-medium-tint: #9facbf;
 
-    --ion-color-light: #1e293b;
-    --ion-color-light-rgb: 30, 41, 59;
+    /* --ion-color-light: #1e293b; */
+     --ion-color-light: #e8edf5;
+    /* --ion-color-light-rgb: 30, 41, 59; */
+     --ion-color-light-rgb: 232, 237, 245;
     --ion-color-light-contrast: #ffffff;
     --ion-color-light-contrast-rgb: 255, 255, 255;
     --ion-color-light-shade: #1a2434;

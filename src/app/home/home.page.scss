@@ -7,10 +7,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--app-space-4);
-  /* padding: var(--app-space-3) var(--app-space-4)
-    calc(var(--app-space-6) + var(--ion-safe-area-bottom, 0px)); */
-    padding: var(--app-space-3) var(--app-space-4)
-    
+  /* The bottom inset keeps the last card clear of the Android navigation bar,
+     which the WebView draws underneath. */
+  padding: var(--app-space-3) var(--app-space-4)
+    calc(var(--app-space-6) + var(--app-safe-bottom));
 }
 
 .main-image {

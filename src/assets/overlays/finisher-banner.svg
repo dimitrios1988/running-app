@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="864" height="216" viewBox="0 0 864 216">
+  <!-- Ribbon banner, intended for the upper third of the frame. -->
+  <path d="M0 24 L864 24 L820 108 L864 192 L0 192 L44 108 Z" fill="#c2410c" />
+  <path d="M0 24 L864 24 L820 108 L864 192 L0 192 L44 108 Z"
+        fill="none" stroke="#ffffff" stroke-width="6" opacity="0.85" />
+  <text x="432" y="140" text-anchor="middle"
+        font-family="Helvetica, Arial, sans-serif" font-size="86"
+        font-weight="bold" letter-spacing="8" fill="#ffffff">FINISHER</text>
+</svg>

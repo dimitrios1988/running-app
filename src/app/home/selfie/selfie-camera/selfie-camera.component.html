@@ -1,0 +1,98 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>{{ "CAMERA.TAKE_SELFIE" | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="close()"
+        [attr.aria-label]="'SELFIE.CLOSE' | translate"
+      >
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="false">
+  <div class="camera">
+    <!-- .viewport takes the leftover height; .stage is the 3:4 box fitted inside
+         it, and stays the element the capture measures.
+         The <video> is never wrapped in @if: destroying it would detach the
+         MediaStream, so the captured shot is layered over it instead. -->
+    <div class="viewport">
+      <div class="stage" #stage>
+        <video
+          #video
+          class="feed"
+          [class.is-mirrored]="mirror()"
+          autoplay
+          muted
+          playsinline
+        ></video>
+
+        @if (activeOverlay(); as overlay) {
+          <img
+            class="overlay"
+            [src]="overlay.displayUrl"
+            alt=""
+            aria-hidden="true"
+            [style.left.%]="overlay.left"
+            [style.top.%]="overlay.top"
+            [style.width.%]="overlay.width"
+            [style.height.%]="overlay.height"
+            [style.opacity]="overlay.opacity"
+          />
+        }
+
+        @if (previewUrl(); as url) {
+          <img
+            class="shot"
+            [src]="url"
+            [alt]="'SELFIE.PHOTO_PREVIEW' | translate"
+          />
+        }
+
+        @if (starting()) {
+          <div class="stage-status">
+            <ion-spinner name="crescent" color="light"></ion-spinner>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (previewUrl()) {
+      <div class="controls">
+        <ion-button
+          fill="clear"
+          color="light"
+          [disabled]="busy()"
+          (click)="retake()"
+        >
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+          {{ "SELFIE.RETAKE" | translate }}
+        </ion-button>
+        <ion-button [disabled]="busy()" (click)="share()">
+          <ion-icon slot="start" name="share-social-outline"></ion-icon>
+          {{ "SELFIE.SHARE" | translate }}
+        </ion-button>
+      </div>
+    } @else {
+      <app-selfie-overlay-strip
+        [options]="options()"
+        [selectedId]="selectedId()"
+        (overlaySelect)="onOverlaySelect($event)"
+      ></app-selfie-overlay-strip>
+
+      <div class="controls">
+        <button
+          type="button"
+          class="shutter"
+          [disabled]="!ready() || busy()"
+          [attr.aria-label]="'SELFIE.SHUTTER' | translate"
+          (click)="capture()"
+        >
+          <span class="shutter-inner"></span>
+        </button>
+      </div>
+    }
+  </div>
+</ion-content>

@@ -117,4 +117,30 @@ export interface SelfieElementModel extends BasePageElement {
   title_size: number | null;
   icon: string | null;
   shareText: string | null;
+  overlays: SelfieOverlayModel[] | null;
+}
+
+/**
+ * A frame/sticker the user can composite onto their selfie.
+ *
+ * Position and size are normalised 0..1 fractions of the captured frame. That is
+ * the only representation where the CSS preview (`%` of the stage) and the canvas
+ * draw (`x * canvas.width`) are guaranteed to agree - pixel coordinates would need
+ * a reference resolution and would drift on every device.
+ */
+export interface SelfieOverlayModel {
+  id: number | string;
+  /** Caption under the option square, and its accessible label. */
+  name: string | null;
+  /** Full-resolution artwork, transparent where the photo should show through. */
+  imageUrl: string;
+  /** Optional smaller image for the option square; falls back to imageUrl. */
+  thumbnailUrl: string | null;
+  x: number;
+  y: number;
+  width: number;
+  /** null keeps the artwork's own aspect ratio instead of stretching it. */
+  height: number | null;
+  /** null renders fully opaque. */
+  opacity: number | null;
 }
