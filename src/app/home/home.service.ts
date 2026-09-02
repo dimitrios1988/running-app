@@ -12,6 +12,7 @@ import {
 import {
   HomeElementModel,
   LinkElementModel,
+  SelfieOverlayModel,
 } from '../shared/page.element/page.element.model';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_CREDENTIALS } from '../secrets';
@@ -88,6 +89,20 @@ export class HomeService {
             const selfieElementResponse = response.find(
               (element) => element['2(element_type)']?.code === 'selfie',
             );
+            if (selfieElementResponse) {
+              selfieElementResponse.overlays = response
+                .filter(
+                  (element) => element['2(element_type)']?.code === 'selfie',
+                )
+                .map((element) => element['4(selfie_overlay)']);
+              if (
+                selfieElementResponse.overlays[0] === undefined ||
+                (selfieElementResponse.overlays &&
+                  selfieElementResponse.overlays[0].id === null)
+              ) {
+                selfieElementResponse.overlays = null;
+              }
+            }
             return {
               headerElementModel: headerElementResponse
                 ? {
@@ -371,7 +386,27 @@ export class HomeService {
                       selfieElementResponse['0(page_element)'].subtitle,
                     // TODO: map the CMS overlay images here. Until then the
                     // selfie camera falls back to DEFAULT_SELFIE_OVERLAYS.
-                    overlays: null,
+                    overlays:
+                      selfieElementResponse.overlays?.map<SelfieOverlayModel>(
+                        (overlay) => ({
+                          id: overlay.id,
+                          name: overlay.name,
+                          imageUrl: new URL(
+                            `/data/download/${
+                              overlay.ovelay_image?.[0].name
+                            }?attribute_id=d3dbc218-bae1-48aa-8bcd-3790f2e9ee3f&file_id=${
+                              overlay.ovelay_image?.[0].id
+                            }&version=0&token=${this.authService.getToken()}`,
+                            AUTH_CREDENTIALS.app_url,
+                          ).toString(),
+                          thumbnailUrl: overlay.thumbnail_url,
+                          x: overlay.position_x,
+                          y: overlay.position_y,
+                          width: overlay.width,
+                          height: overlay.height,
+                          opacity: overlay.opacity,
+                        }),
+                      ),
                   }
                 : null,
             } as HomeElementModel;

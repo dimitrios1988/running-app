@@ -3,8 +3,21 @@ export interface HomeElementResponse {
   '1(language)': _1language;
   '2(element_type)': _2elementtype;
   '3(image_position)': _3imageposition;
+  '4(selfie_overlay)': _4selfieoverlay;
+  overlays?: _4selfieoverlay[] | null;
 }
 
+interface _4selfieoverlay {
+  id: number;
+  name: string | null;
+  ovelay_image: Image[] | null;
+  thumbnail_url: null | string;
+  position_x: number;
+  position_y: number;
+  width: number;
+  height: null | number;
+  opacity: null | number;
+}
 interface _3imageposition {
   code: null | 'left' | 'right' | 'center';
 }

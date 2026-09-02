@@ -42,7 +42,6 @@ import {
   LoadedOverlayImage,
   SelfieOverlayLoader,
 } from '../selfie-overlay-loader';
-import { DEFAULT_SELFIE_OVERLAYS } from '../selfie.overlays';
 import {
   SelfieOverlayId,
   SelfieOverlayOption,
@@ -381,37 +380,41 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
   }
 
   private async loadOverlays(): Promise<void> {
+    /* const models = this.selfieElementModel?.overlays?.length
+      ? this.selfieElementModel.overlays
+      : DEFAULT_SELFIE_OVERLAYS; */
     const models = this.selfieElementModel?.overlays?.length
       ? this.selfieElementModel.overlays
-      : DEFAULT_SELFIE_OVERLAYS;
+      : [];
+    if (models.length > 0) {
+      const results = await Promise.allSettled(
+        models.map(async (model): Promise<OverlayEntry> => {
+          const artwork = await this.overlayLoader.load(model.imageUrl);
+          const thumbnail = model.thumbnailUrl
+            ? await this.overlayLoader
+                .load(model.thumbnailUrl)
+                .catch(() => artwork)
+            : artwork;
+          return { model, artwork, thumbnail };
+        }),
+      );
 
-    const results = await Promise.allSettled(
-      models.map(async (model): Promise<OverlayEntry> => {
-        const artwork = await this.overlayLoader.load(model.imageUrl);
-        const thumbnail = model.thumbnailUrl
-          ? await this.overlayLoader
-              .load(model.thumbnailUrl)
-              .catch(() => artwork)
-          : artwork;
-        return { model, artwork, thumbnail };
-      }),
-    );
-
-    const loaded: OverlayEntry[] = [];
-    let failed = false;
-    for (const result of results) {
-      if (result.status === 'fulfilled') {
-        loaded.push(result.value);
-      } else {
-        failed = true;
-        console.error('Selfie overlay failed to load', result.reason);
+      const loaded: OverlayEntry[] = [];
+      let failed = false;
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          loaded.push(result.value);
+        } else {
+          failed = true;
+          console.error('Selfie overlay failed to load', result.reason);
+        }
       }
-    }
 
-    this.entries.set(loaded);
-    if (failed) {
-      // Whatever did load stays usable; only the broken options are dropped.
-      await this.toast('SELFIE.ERRORS.OVERLAY_LOAD_FAILED');
+      this.entries.set(loaded);
+      if (failed) {
+        // Whatever did load stays usable; only the broken options are dropped.
+        await this.toast('SELFIE.ERRORS.OVERLAY_LOAD_FAILED');
+      }
     }
   }
 
