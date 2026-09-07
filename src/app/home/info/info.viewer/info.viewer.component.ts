@@ -19,6 +19,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { IInfoViewer } from './info.viewer.interface';
 import { InfoViewerService } from './info.viewer.service';
+import { CachedSrcDirective } from '../../../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'app-info.viewer',
@@ -35,6 +36,7 @@ import { InfoViewerService } from './info.viewer.service';
     IonButton,
     TranslatePipe,
     AsyncPipe,
+    CachedSrcDirective,
   ],
 })
 export class InfoViewerComponent {

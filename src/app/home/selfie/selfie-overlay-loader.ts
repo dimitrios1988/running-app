@@ -1,6 +1,5 @@
-import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy, inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { ImageCacheService } from '../../shared/cache/image-cache.service';
 
 export interface LoadedOverlayImage {
   /** Decoded and ready for `drawImage` - no further await needed. */
@@ -28,12 +27,14 @@ const HTTP_URL = /^https?:/i;
  */
 @Injectable()
 export class SelfieOverlayLoader implements OnDestroy {
-  // Deliberately on HttpBackend rather than HttpClient: AuthInterceptor would
-  // attach an Authorization header, which turns these into non-simple
-  // cross-origin requests and demands a CORS preflight the image endpoint has no
-  // reason to answer. The CMS URLs already carry their own `?token=`.
-  private readonly http = new HttpClient(inject(HttpBackend));
+  // The shared image cache owns the fetch (including the HttpBackend trick that
+  // avoids a CORS preflight) and the disk tier, so reopening the camera does not
+  // re-download the artwork. What stays here is the part it must not do: force a
+  // `blob:` URL, which is the only source guaranteed not to taint the canvas.
+  private readonly imageCache = inject(ImageCacheService);
 
+  /** Decoded images for this modal - the shared cache stores bytes, not
+   * decoded HTMLImageElements. */
   private readonly cache = new Map<string, Promise<LoadedOverlayImage>>();
   private readonly objectUrls: string[] = [];
   private destroyed = false;
@@ -67,9 +68,7 @@ export class SelfieOverlayLoader implements OnDestroy {
     let displayUrl = url;
 
     if (HTTP_URL.test(url)) {
-      const blob = await firstValueFrom(
-        this.http.get(url, { responseType: 'blob' }),
-      );
+      const blob = await this.imageCache.loadBlob(url);
       displayUrl = URL.createObjectURL(blob);
 
       if (this.destroyed) {

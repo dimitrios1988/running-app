@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { AUTH_CREDENTIALS } from '../secrets';
 import { LoginResponse } from './responses/login.resp';
 import { LoginRunnerResponse } from './responses/login-runner.resp';
 import { UserPayload } from './responses/user-payload';
+import { CacheStorageService } from '../shared/cache/cache-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class AuthService {
   private token: string = '';
   private userPayload_ = signal<UserPayload | null>(null);
   public userPayload = this.userPayload_.asReadonly();
+  private readonly cache = inject(CacheStorageService);
 
   constructor(private http: HttpClient) {
     Preferences.get({ key: 'access_token' }).then((value) => {
@@ -72,6 +74,9 @@ export class AuthService {
       })
       .pipe(
         map((response) => {
+          // Whoever was signed in before, their runner-scoped responses must
+          // not be replayed to this one. Shared CMS content and images survive.
+          void this.dropRunnerScopedCache();
           // Store tokens
           const userPayload = {
             uuid: response[0]['0(runner)'].uuid,
@@ -99,5 +104,12 @@ export class AuthService {
       key: 'user_payload',
     });
     this.userPayload_.set(null);
+    await this.dropRunnerScopedCache();
+  }
+
+  /** Drops the runner's cached responses - their race card and notifications -
+   * while leaving shared CMS content and images in place. */
+  private dropRunnerScopedCache(): Promise<void> {
+    return this.cache.removeWhere((entry) => entry.scope === 'user');
   }
 }

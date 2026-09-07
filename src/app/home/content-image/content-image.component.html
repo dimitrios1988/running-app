@@ -5,7 +5,7 @@ undefined) {
   (click)="navigateToLink(contentImageElementModel.linkUrl)"
 >
   <img
-    [src]="contentImageElementModel.imageUrl"
+    [appCachedSrc]="contentImageElementModel.imageUrl"
     alt="{{ contentImageElementModel.altText }}"
     loading="lazy"
   />

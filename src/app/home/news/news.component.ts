@@ -5,12 +5,13 @@ import { chevronForwardOutline } from 'ionicons/icons';
 import { hexToRgb } from '../../shared/color.utils';
 import { Router } from '@angular/router';
 import { NewsElementModel } from '../../shared/page.element/page.element.model';
+import { CachedSrcDirective } from '../../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'app-news',
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss'],
-  imports: [IonIcon],
+  imports: [IonIcon, CachedSrcDirective],
 })
 export class NewsComponent implements OnInit {
   @ViewChild('newsElement', { static: true }) newsElement!: ElementRef;

@@ -12,12 +12,13 @@ import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { Browser } from '@capacitor/browser';
 import { Router } from '@angular/router';
+import { CachedSrcDirective } from '../../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'app-tracking',
   templateUrl: './tracking.component.html',
   styleUrls: ['./tracking.component.scss'],
-  imports: [IonIcon],
+  imports: [IonIcon, CachedSrcDirective],
 })
 export class TrackingComponent implements OnChanges {
   @Input() trackingElementModel?: TrackingElementModel;

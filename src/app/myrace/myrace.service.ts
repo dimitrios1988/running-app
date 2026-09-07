@@ -1,11 +1,12 @@
 import { effect, inject, Injectable, signal } from '@angular/core';
 import { IRunner } from './runner.interface';
 import { AUTH_CREDENTIALS } from '../secrets';
-import { catchError, finalize, map, Observable, shareReplay, tap } from 'rxjs';
+import { catchError, map, Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { RunnerInfoResponse } from './runner.info.resp';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
+import { withHttpCache } from '../shared/cache/http-cache.context';
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +17,6 @@ export class MyRaceService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly inFlightRequests: Map<string, Observable<IRunner>> =
-    new Map();
 
   constructor() {
     effect(() => {
@@ -30,19 +29,15 @@ export class MyRaceService {
     });
   }
 
-  getRunnerInfo(uuid: string): Observable<IRunner> {
-    const key = uuid;
-    if (this.inFlightRequests.has(key)) {
-      return this.inFlightRequests.get(key)!;
-    }
+  getRunnerInfo(uuid: string, forceRefresh = false): Observable<IRunner> {
     const runnerInfoApi = new URL(
       `/api/mobile_app_manager/get_runner_info/v1`,
       AUTH_CREDENTIALS.app_url,
     ).toString();
-    // Implementation of the HTTP request to fetch runner info goes here
     return this.http
       .get<RunnerInfoResponse[]>(runnerInfoApi, {
         params: { uuid },
+        context: withHttpCache({ scope: 'user', refresh: forceRefresh }),
       })
       .pipe(
         // You can add any necessary transformations here
@@ -93,10 +88,6 @@ export class MyRaceService {
           this.router.navigate(['/tabs/login']);
           throw error;
         }),
-        finalize(() => {
-          this.inFlightRequests.delete(key);
-        }),
-        shareReplay({ bufferSize: 1, refCount: true }),
       );
   }
 }

@@ -11,13 +11,14 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { hexToRgb } from '../../shared/color.utils';
+import { CachedSrcDirective } from '../../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'app-link',
   templateUrl: './link.component.html',
   styleUrls: ['./link.component.scss'],
   standalone: true,
-  imports: [IonIcon],
+  imports: [IonIcon, CachedSrcDirective],
 })
 export class LinkComponent implements OnChanges {
   @Input() linkElementModel!: LinkElementModel;

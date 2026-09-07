@@ -22,6 +22,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AuthInterceptor } from './app/auth/auth.interceptor';
 import { HttpRetryInterceptor } from './app/httpretry.interceptor';
+import { HttpCacheInterceptor } from './app/shared/cache/http-cache.interceptor';
 import { initializeLanguage } from './app/i18n/initialize-language';
 
 bootstrapApplication(AppComponent, {
@@ -41,6 +42,16 @@ bootstrapApplication(AppComponent, {
         useHttpBackend: true,
       }),
     }),
+    // First, so it is the outermost interceptor. A cache hit short-circuits
+    // before AuthInterceptor does any work, and - more importantly - a failed
+    // revalidation is swallowed here rather than being re-driven by
+    // HttpRetryInterceptor's retry, which would replay the cached value once
+    // per attempt.
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpCacheInterceptor,
+      multi: true,
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

@@ -4,8 +4,6 @@ import {
   Observable,
   Subscription,
   tap,
-  finalize,
-  shareReplay,
   catchError,
   throwError,
 } from 'rxjs';
@@ -18,6 +16,7 @@ import { SettingsService } from '../settings/settings.service';
 import { ToastService } from '../shared/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MyRaceService } from '../myrace/myrace.service';
+import { withHttpCache } from '../shared/cache/http-cache.context';
 
 @Injectable({
   providedIn: 'root',
@@ -25,8 +24,6 @@ import { MyRaceService } from '../myrace/myrace.service';
 export class NotificationsService {
   private readonly _notifications = signal<INotification[]>([]);
   private notificationSub$: Subscription = Subscription.EMPTY;
-  private inFlightRequests: Map<string, Observable<INotification[]>> =
-    new Map();
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
   private readonly notificationsApi = new URL(
@@ -53,23 +50,21 @@ export class NotificationsService {
   getNotifications(
     language: string,
     eventId?: number,
+    forceRefresh = false,
   ): Observable<INotification[]> {
-    const key = `${language}-${eventId}`;
-    const existing = this.inFlightRequests.get(key);
-    if (existing) {
-      return existing;
-    }
-    let request$: Observable<NotificationsResp[]>;
-    if (eventId) {
-      request$ = this.http.get<NotificationsResp[]>(this.notificationsApi, {
-        params: { language, event: eventId },
-      });
-    } else {
-      request$ = this.http.get<NotificationsResp[]>(this.notificationsApi, {
-        params: { language },
-      });
-    }
-    const pipedRequest$ = request$.pipe(
+    // `event` comes from the logged-in runner, so this list is runner-scoped
+    // even though the endpoint looks like shared content.
+    const context = withHttpCache({ scope: 'user', refresh: forceRefresh });
+    const request$ = eventId
+      ? this.http.get<NotificationsResp[]>(this.notificationsApi, {
+          params: { language, event: eventId },
+          context,
+        })
+      : this.http.get<NotificationsResp[]>(this.notificationsApi, {
+          params: { language },
+          context,
+        });
+    return request$.pipe(
       map((resp) => {
         return resp.map((item) => {
           return {
@@ -98,12 +93,7 @@ export class NotificationsService {
         this.toastService.showError(errorMessage);
         return throwError(() => error);
       }),
-      finalize(() => this.inFlightRequests.delete(key)),
-      shareReplay({ bufferSize: 1, refCount: true }),
     );
-
-    this.inFlightRequests.set(key, pipedRequest$);
-    return pipedRequest$;
   }
 
   getNotificationById(id: number): Observable<INotification> {

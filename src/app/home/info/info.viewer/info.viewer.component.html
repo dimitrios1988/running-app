@@ -10,7 +10,7 @@
 <ion-content [fullscreen]="true">
   @if (info$ | async; as data) { @if (data.image?.trim()) {
   <div class="image-container app-media">
-    <img [src]="data.image" alt="" loading="lazy" />
+    <img [appCachedSrc]="data.image" alt="" loading="lazy" />
   </div>
   } @if (data.link?.trim()) {
   <div class="link-container">

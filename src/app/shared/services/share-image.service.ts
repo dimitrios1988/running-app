@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
+import { blobToBase64 } from './blob.utils';
 
 export interface ShareImageOptions {
   title?: string;
@@ -86,21 +87,4 @@ export class ShareImageService {
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
     }
   }
-}
-
-/** `Filesystem.writeFile` wants bare base64, without the `data:` prefix. */
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(reader.error ?? new Error('Read failed'));
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== 'string') {
-        reject(new Error('Unexpected FileReader result'));
-        return;
-      }
-      resolve(result.slice(result.indexOf(',') + 1));
-    };
-    reader.readAsDataURL(blob);
-  });
 }

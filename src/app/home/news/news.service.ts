@@ -7,8 +7,6 @@ import {
   Subscription,
   catchError,
   throwError,
-  finalize,
-  shareReplay,
 } from 'rxjs';
 import { INews } from './news-viewer/news.item';
 import { HttpClient } from '@angular/common/http';
@@ -19,6 +17,7 @@ import { NewsItemResponse } from './responses/news.item.resp';
 import { SettingsService } from '../../settings/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../shared/services/toast.service';
+import { withHttpCache } from '../../shared/cache/http-cache.context';
 
 @Injectable({ providedIn: 'root' })
 export class NewsService {
@@ -31,8 +30,6 @@ export class NewsService {
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
-  private inFlightRequests: Map<string, Observable<INewsListItem[]>> =
-    new Map();
 
   constructor(private settingsService: SettingsService) {
     effect(() => {
@@ -44,19 +41,18 @@ export class NewsService {
     });
   }
 
-  getNewsItems(language: string): Observable<INewsListItem[]> {
-    const key = language;
-    const existing = this.inFlightRequests.get(key);
-    if (existing) {
-      return existing;
-    }
+  getNewsItems(
+    language: string,
+    forceRefresh = false,
+  ): Observable<INewsListItem[]> {
     const newsItemsApi = new URL(
       `/api/mobile_app_manager/news_items/v1`,
       AUTH_CREDENTIALS.app_url,
     ).toString();
-    const request$ = this.http
+    return this.http
       .get<NewsListResponse[]>(newsItemsApi, {
         params: { language },
+        context: withHttpCache({ scope: 'shared', refresh: forceRefresh }),
       })
       .pipe(
         map((response: NewsListResponse[]) => {
@@ -89,14 +85,14 @@ export class NewsService {
           this.toastService.showError(errorMessage);
           return throwError(() => error);
         }),
-        finalize(() => this.inFlightRequests.delete(key)),
-        shareReplay({ bufferSize: 1, refCount: true }),
       );
-    this.inFlightRequests.set(key, request$);
-    return request$;
   }
 
-  getNews(id: number, language: string): Observable<INews> {
+  getNews(
+    id: number,
+    language: string,
+    forceRefresh = false,
+  ): Observable<INews> {
     const newsItemApi = new URL(
       `/api/mobile_app_manager/news_item/v1/${id}`,
       AUTH_CREDENTIALS.app_url,
@@ -104,6 +100,7 @@ export class NewsService {
     return this.http
       .get<NewsItemResponse[]>(newsItemApi, {
         params: { language },
+        context: withHttpCache({ scope: 'shared', refresh: forceRefresh }),
       })
       .pipe(
         map((response: NewsItemResponse[]) => {

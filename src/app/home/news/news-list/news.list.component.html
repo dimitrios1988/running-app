@@ -35,16 +35,14 @@
       (scrolledIndexChange)="onScroll()"
     >
       <ion-card
-        *cdkVirtualFor="let item of newsListItems"
+        *cdkVirtualFor="let item of newsListItems; trackBy: trackById"
         class="news-list-item"
         [button]="true"
         (click)="openNewsItem(item)"
       >
         <div
           class="featured-image-container app-media"
-          [style.background-image]="
-            item.featuredImageUrl ? 'url(' + item.featuredImageUrl + ')' : null
-          "
+          [appCachedBackground]="item.featuredImageUrl"
         ></div>
 
         <ion-card-header>

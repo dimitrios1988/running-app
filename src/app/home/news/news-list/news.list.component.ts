@@ -26,13 +26,11 @@ import {
 } from '@angular/cdk/scrolling';
 
 import { addIcons } from 'ionicons';
-import {
-  chevronDownCircleOutline,
-  newspaperOutline,
-} from 'ionicons/icons';
+import { chevronDownCircleOutline, newspaperOutline } from 'ionicons/icons';
 import { DatePipe } from '@angular/common';
-import { finalize, Subscription, tap } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { SettingsService } from '../../../settings/settings.service';
+import { CachedBackgroundDirective } from '../../../shared/cache/cached-background.directive';
 
 @Component({
   selector: 'app-news.list',
@@ -57,6 +55,7 @@ import { SettingsService } from '../../../settings/settings.service';
     TranslatePipe,
     ScrollingModule,
     DatePipe,
+    CachedBackgroundDirective,
   ],
 })
 export class NewsListComponent implements OnDestroy {
@@ -91,9 +90,19 @@ export class NewsListComponent implements OnDestroy {
     this.isLoading = !this.newsListItems?.length;
     this.newsListItemsSub = this.newsService
       .getNewsItems(this.settingsService.selectedLanguage$()!)
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe();
+      // First emission, not completion: the cached copy arrives before the
+      // revalidation, and the skeletons should give way to it immediately.
+      .subscribe({
+        next: () => (this.isLoading = false),
+        error: () => (this.isLoading = false),
+      });
     this.checkViewportSize();
+  }
+
+  /** Keeps rows (and their images) alive across the second, revalidated
+   * emission, which rebuilds every item object. */
+  trackById(_index: number, item: INewsListItem): number {
+    return item.id;
   }
 
   ionViewWillLeave(): void {
@@ -117,10 +126,13 @@ export class NewsListComponent implements OnDestroy {
     const currentLang = this.settingsService.selectedLanguage$();
     if (!currentLang) return;
     this.newsListItemsSub?.unsubscribe();
+    const complete = () =>
+      (event.target as HTMLIonRefresherElement)?.complete();
     this.newsListItemsSub = this.newsService
-      .getNewsItems(currentLang)
-      .pipe(tap(() => (event.target as HTMLIonRefresherElement)?.complete()))
-      .subscribe();
+      // Bypass the cache: a pull-to-refresh must hit the network, and its
+      // failure must reach the toast rather than being swallowed.
+      .getNewsItems(currentLang, true)
+      .subscribe({ next: complete, error: complete });
   }
 
   openNewsItem(item: INewsListItem) {

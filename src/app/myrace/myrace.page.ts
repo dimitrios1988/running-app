@@ -173,7 +173,7 @@ export class MyracePage implements OnDestroy {
   }
 
   doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
-    this.loadRunnerInfo(() => event.target.complete());
+    this.loadRunnerInfo(() => event.target.complete(), true);
   }
 
   async onCardTap(): Promise<void> {
@@ -219,7 +219,7 @@ export class MyracePage implements OnDestroy {
 
   // onSettled runs on success, failure and cancellation, so the refresher is
   // never left spinning.
-  private loadRunnerInfo(onSettled?: () => void): void {
+  private loadRunnerInfo(onSettled?: () => void, forceRefresh = false): void {
     const uuid = this.authService.getRunnerUUID();
     if (!uuid) {
       onSettled?.();
@@ -228,7 +228,7 @@ export class MyracePage implements OnDestroy {
 
     this.runnerSub.unsubscribe();
     this.runnerSub = this.myRaceService
-      .getRunnerInfo(uuid)
+      .getRunnerInfo(uuid, forceRefresh)
       .pipe(finalize(() => onSettled?.()))
       // MyRaceService already logs out and redirects on failure.
       .subscribe({ error: () => undefined });

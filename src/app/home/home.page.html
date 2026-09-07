@@ -13,7 +13,7 @@
     headerElementModel?.mainImagePosition === 'center' ) {
     <div class="center-header-image">
       <img
-        [src]="headerElementModel?.mainImage"
+        [appCachedSrc]="headerElementModel?.mainImage"
         alt=""
         class="main-image"
         loading="lazy"
@@ -21,7 +21,7 @@
     </div>
     } @else { @if (headerElementModel?.mainImage?.trim()) {
     <img
-      [src]="headerElementModel?.mainImage"
+      [appCachedSrc]="headerElementModel?.mainImage"
       alt=""
       class="main-image"
       [slot]="
@@ -35,7 +35,7 @@
     />
     } @if (headerElementModel?.secondaryImage?.trim()) {
     <img
-      [src]="headerElementModel?.secondaryImage"
+      [appCachedSrc]="headerElementModel?.secondaryImage"
       alt=""
       class="secondary-image"
       slot="secondary"
@@ -65,7 +65,14 @@
   </ion-refresher>
   <div class="element-container">
     @if (pageElementModels && pageElementModels.length > 0) {
-      @for (el of pageElementModels; track el) {
+      <!--
+        Tracked by position, not identity: map() re-runs on every emission, and
+        under stale-while-revalidate there are two of them. Identity tracking
+        would destroy and recreate every card - re-flashing every image - the
+        moment the revalidation landed. The list is a deterministic sort of the
+        same payload, so the index is stable across those emissions.
+      -->
+      @for (el of pageElementModels; track $index) {
         <app-page-element [element]="el"></app-page-element>
       }
     } @else if (isLoading) {

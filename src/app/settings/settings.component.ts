@@ -15,12 +15,18 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { languageOutline, notificationsOutline } from 'ionicons/icons';
+import {
+  languageOutline,
+  notificationsOutline,
+  trashOutline,
+} from 'ionicons/icons';
 import { Location } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SettingsService } from './settings.service';
 import { AppConfigurationService } from '../app.configuration.service';
 import { ToastService } from '../shared/services/toast.service';
+import { CacheStorageService } from '../shared/cache/cache-storage.service';
+import { IonButton } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-settings',
@@ -41,6 +47,7 @@ import { ToastService } from '../shared/services/toast.service';
     IonItem,
     IonSelect,
     IonSelectOption,
+    IonButton,
     TranslatePipe,
   ],
 })
@@ -49,12 +56,34 @@ export class SettingsComponent {
   private settingsService = inject(SettingsService);
   private toastService = inject(ToastService);
   private translate = inject(TranslateService);
+  private cache = inject(CacheStorageService);
+  clearingCache = false;
   public appConfiguration = inject(AppConfigurationService).appConfiguration;
   currentLang = this.settingsService.selectedLanguage$;
   notificationsEnabled = this.settingsService.notificationsEnabled$;
 
   constructor() {
-    addIcons({ languageOutline, notificationsOutline });
+    addIcons({ languageOutline, notificationsOutline, trashOutline });
+  }
+
+  /**
+   * Escape hatch for "it is showing me old content". The cache revalidates on
+   * its own, so this exists for the rare case where a cached copy is wrong
+   * rather than merely stale.
+   */
+  async clearCache(): Promise<void> {
+    if (this.clearingCache) {
+      return;
+    }
+    this.clearingCache = true;
+    try {
+      await this.cache.clearAll();
+      this.toastService.showSuccess(
+        this.translate.instant('SETTINGS.CACHE_CLEARED'),
+      );
+    } finally {
+      this.clearingCache = false;
+    }
   }
 
   goBack() {

@@ -11,13 +11,14 @@ import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { hexToRgb } from '../../shared/color.utils';
 import { SelfieElementModel } from '../../shared/page.element/page.element.model';
+import { CachedSrcDirective } from '../../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'app-selfie',
   templateUrl: './selfie.component.html',
   styleUrls: ['./selfie.component.scss'],
   standalone: true,
-  imports: [IonIcon],
+  imports: [IonIcon, CachedSrcDirective],
 })
 export class SelfieComponent implements OnChanges {
   @Input() selfieElementModel!: SelfieElementModel;

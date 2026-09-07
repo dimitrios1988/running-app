@@ -28,7 +28,7 @@ import {
   chevronForwardOutline,
   notificationsOutline,
 } from 'ionicons/icons';
-import { finalize, Observable, Subscription, tap } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MyRaceService } from '../myrace/myrace.service';
@@ -103,17 +103,19 @@ export class NotificationsPage implements OnDestroy {
     this.notificationSub$?.unsubscribe();
   }
 
-  private loadNotifications(): Observable<INotification[]> {
+  private loadNotifications(forceRefresh = false): Observable<INotification[]> {
     return this.notificationsService
       .getNotifications(
         this.settingsService.selectedLanguage$()!,
         this.myRaceService.runner$()?.event?.id,
+        forceRefresh,
       )
       .pipe(
         tap((data: INotification[]) => {
           this.notifications = new Array(...data);
-        }),
-        finalize(() => {
+          // Measured per emission rather than in `finalize`: the cached copy
+          // paints first and the viewport must size itself against it, not wait
+          // for the revalidation behind it.
           this.checkViewportSize();
         }),
       );
@@ -125,9 +127,12 @@ export class NotificationsPage implements OnDestroy {
 
   doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
     this.notificationSub$?.unsubscribe();
-    this.notificationSub$ = this.loadNotifications()
-      .pipe(tap(() => (event.target as HTMLIonRefresherElement)?.complete()))
-      .subscribe();
+    const complete = () =>
+      (event.target as HTMLIonRefresherElement)?.complete();
+    this.notificationSub$ = this.loadNotifications(true).subscribe({
+      next: complete,
+      error: complete,
+    });
   }
 
   onScroll() {

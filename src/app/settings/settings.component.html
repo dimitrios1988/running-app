@@ -53,6 +53,17 @@
           }}</ion-select-option>
         </ion-select>
       </ion-item>
+      <ion-item>
+        <ion-icon name="trash-outline" slot="start" aria-hidden="true"></ion-icon>
+        <ion-label>{{ "SETTINGS.CLEAR_CACHE" | translate }}</ion-label>
+        <ion-button
+          slot="end"
+          fill="clear"
+          [disabled]="clearingCache"
+          (click)="clearCache()"
+          >{{ "SETTINGS.CLEAR" | translate }}</ion-button
+        >
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>

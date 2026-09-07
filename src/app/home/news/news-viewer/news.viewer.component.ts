@@ -25,6 +25,7 @@ import { Subscription } from 'rxjs';
 import { SettingsService } from '../../../settings/settings.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { CachedSrcDirective } from '../../../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'app-news.viewer',
@@ -41,6 +42,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
     IonSpinner,
     IonIcon,
     TranslatePipe,
+    CachedSrcDirective,
   ],
 })
 export class NewsViewerComponent implements OnInit, OnDestroy {
@@ -61,7 +63,7 @@ export class NewsViewerComponent implements OnInit, OnDestroy {
         this.news = {
           ...news,
           safeContent: this.sanitizer.bypassSecurityTrustHtml(
-            news.content ?? ''
+            news.content ?? '',
           ),
         };
       }
@@ -78,10 +80,15 @@ export class NewsViewerComponent implements OnInit, OnDestroy {
       this.newsSubscription = this.newsService
         .getNews(id, selectedLanguage)
         .subscribe({
+          // Cleared on the first emission, not on completion. The template
+          // gates all content behind `@if (loading())`, so waiting for
+          // completion would keep a cached article hidden until the
+          // revalidation behind it settled.
+          next: () => {
+            this.loading.set(false);
+          },
           error: () => {
             this.error.set('ERRORS.NEWS_LOADING_ERROR');
-          },
-          complete: () => {
             this.loading.set(false);
           },
         });

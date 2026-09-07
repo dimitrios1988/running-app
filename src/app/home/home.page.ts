@@ -26,10 +26,11 @@ import {
   HomeElementModel,
   PageElementModel,
 } from '../shared/page.element/page.element.model';
-import { finalize, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { SettingsService } from '../settings/settings.service';
 import { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { CachedSrcDirective } from '../shared/cache/cached-src.directive';
 
 @Component({
   selector: 'home-tab',
@@ -45,6 +46,7 @@ import { TranslatePipe } from '@ngx-translate/core';
     IonContent,
     PageElementComponent,
     TranslatePipe,
+    CachedSrcDirective,
   ],
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
@@ -80,8 +82,15 @@ export class HomePage implements OnDestroy {
     this.isLoading = this.pageElementModels.length === 0;
     this.homeElementsSub = this.homeService
       .getHomeElements(this.settingsService.selectedLanguage$()!)
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe();
+      // Cleared on the first emission rather than on completion: under
+      // stale-while-revalidate the cached copy arrives first and the network
+      // follows, so waiting for completion would hold the skeleton up until the
+      // revalidation settles - exactly the delay the cache exists to remove.
+      // `finalize` also fired on the ionViewWillLeave unsubscribe.
+      .subscribe({
+        next: () => (this.isLoading = false),
+        error: () => (this.isLoading = false),
+      });
     this.populateHomeElements();
   }
 
@@ -133,11 +142,13 @@ export class HomePage implements OnDestroy {
 
   doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {
     this.homeElementsSub.unsubscribe();
+    const complete = () =>
+      (event.target as HTMLIonRefresherElement)?.complete();
     this.homeElementsSub = this.homeService
-      .getHomeElements(this.settingsService.selectedLanguage$()!)
-      .subscribe(() => {
-        (event.target as HTMLIonRefresherElement)?.complete();
-      });
+      // A user-initiated refresh must reach the network and must surface its
+      // failure, so it bypasses the cache entirely.
+      .getHomeElements(this.settingsService.selectedLanguage$()!, true)
+      .subscribe({ next: complete, error: complete });
     this.populateHomeElements();
   }
 }
