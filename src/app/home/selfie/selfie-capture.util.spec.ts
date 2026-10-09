@@ -1,4 +1,8 @@
-import { composeSelfie, computeCoverCrop } from './selfie-capture.util';
+import {
+  OverlayDrawSpec,
+  composeSelfie,
+  computeCoverCrop,
+} from './selfie-capture.util';
 
 /** Solid-colour canvas, usable anywhere a CanvasImageSource is expected. */
 function paint(
@@ -179,5 +183,71 @@ describe('composeSelfie', () => {
     expect(canvas.width).toBe(360);
     expect(canvas.height).toBe(480);
     expect(canvas.width / canvas.height).toBeCloseTo(300 / 400, 5);
+  });
+
+  describe('with a user transform', () => {
+    const green: [number, number, number] = [0, 255, 0];
+
+    /** A solid green overlay on the 400x400 frame, 80x80 at the top-left. */
+    const composeWith = (overlay: Partial<OverlayDrawSpec>) =>
+      composeSelfie({
+        source: source(),
+        sourceWidth: 400,
+        sourceHeight: 400,
+        boxWidth: 400,
+        boxHeight: 400,
+        mirror: false,
+        overlay: {
+          image: paint(100, 100, [{ color: '#00ff00', x: 0, w: 100 }]),
+          intrinsicWidth: 100,
+          intrinsicHeight: 100,
+          x: 0,
+          y: 0,
+          width: 0.2,
+          height: 0.2,
+          opacity: null,
+          ...overlay,
+        },
+      });
+
+    it('moves the overlay by the offset', () => {
+      // Half the frame right and a quarter down: x 200..280, y 100..180.
+      const canvas = composeWith({
+        transform: { dx: 0.5, dy: 0.25, scale: 1, rotation: 0 },
+      });
+
+      expect(pixelAt(canvas, 240, 140)).toEqual(green);
+      expect(pixelAt(canvas, 40, 40)).toEqual(red);
+    });
+
+    it('scales about the centre', () => {
+      // 80x80 centred on (200, 200), doubled: 120..280 on both axes.
+      const canvas = composeWith({
+        x: 0.4,
+        y: 0.4,
+        transform: { dx: 0, dy: 0, scale: 2, rotation: 0 },
+      });
+
+      expect(pixelAt(canvas, 130, 130)).toEqual(green);
+      expect(pixelAt(canvas, 270, 270)).toEqual(green);
+      expect(pixelAt(canvas, 110, 110)).toEqual(red);
+    });
+
+    it('rotates about the centre', () => {
+      // A 200x40 strip centred on (200, 200) - x 100..300, y 180..220. A quarter
+      // turn stands it upright in place: x 180..220, y 100..300.
+      const canvas = composeWith({
+        x: 0.25,
+        y: 0.45,
+        width: 0.5,
+        height: 0.1,
+        transform: { dx: 0, dy: 0, scale: 1, rotation: Math.PI / 2 },
+      });
+
+      expect(pixelAt(canvas, 200, 120)).toEqual(green);
+      expect(pixelAt(canvas, 200, 280)).toEqual(green);
+      expect(pixelAt(canvas, 120, 200)).toEqual(red);
+      expect(pixelAt(canvas, 280, 200)).toEqual(blue);
+    });
   });
 });

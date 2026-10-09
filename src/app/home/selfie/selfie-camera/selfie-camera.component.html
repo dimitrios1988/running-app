@@ -29,8 +29,11 @@
           playsinline
         ></video>
 
+        <!-- `@if ... as` keeps this view while the overlay stays selected, so the
+             gesture directive survives the transform changing under it. -->
         @if (activeOverlay(); as overlay) {
           <img
+            #overlayImage
             class="overlay"
             [src]="overlay.displayUrl"
             alt=""
@@ -40,7 +43,33 @@
             [style.width.%]="overlay.width"
             [style.height.%]="overlay.height"
             [style.opacity]="overlay.opacity"
+            [style.transform]="overlay.transform"
           />
+
+          <!-- Before .shot, so the captured shot covers it and cannot be
+               dragged. -->
+          <div
+            class="gesture-layer"
+            appSelfieOverlayGesture
+            [transform]="activeTransform()"
+            [overlayElement]="overlayImage"
+            (transformChange)="onOverlayTransform($event)"
+          ></div>
+
+          @if (!previewUrl()) {
+            @if (overlayAdjusted()) {
+              <button
+                type="button"
+                class="overlay-reset"
+                [attr.aria-label]="'SELFIE.RESET_OVERLAY' | translate"
+                (click)="resetOverlay()"
+              >
+                <ion-icon name="arrow-undo-outline" aria-hidden="true"></ion-icon>
+              </button>
+            } @else if (!hintDismissed()) {
+              <p class="overlay-hint">{{ "SELFIE.ADJUST_HINT" | translate }}</p>
+            }
+          }
         }
 
         @if (previewUrl(); as url) {

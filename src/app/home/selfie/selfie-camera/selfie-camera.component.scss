@@ -86,6 +86,65 @@ ion-content {
      matching drawImage(). */
   height: auto;
   pointer-events: none;
+  /* The pivot for the user's scale and rotation. CSS's default anyway, but
+     composeSelfie() hard-codes the same centre pivot, so it is pinned here
+     rather than left implicit. */
+  transform-origin: 50% 50%;
+}
+
+/* Covers the whole stage rather than just the overlay: there is only ever one
+   overlay to steer, and a small one is hard to pinch with both fingers on it. */
+.gesture-layer {
+  position: absolute;
+  inset: 0;
+  /* Hands every touch to the gesture code. Without it the WebView takes a
+     two-finger pinch as page zoom - the viewport allows scaling - and cancels
+     the pointers part-way through. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.overlay-hint {
+  position: absolute;
+  bottom: var(--app-space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--app-space-3));
+  margin: 0;
+  padding: var(--app-space-1) var(--app-space-3);
+  border-radius: var(--app-radius-pill);
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: var(--app-text-xs);
+  line-height: 1.4;
+  text-align: center;
+  /* Gestures pass straight through to the layer underneath. */
+  pointer-events: none;
+}
+
+.overlay-reset {
+  position: absolute;
+  right: var(--app-space-2);
+  bottom: var(--app-space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 1.25rem;
+}
+
+.overlay-reset:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
 }
 
 .stage-status {

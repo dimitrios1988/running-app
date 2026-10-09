@@ -75,6 +75,8 @@
     "SHARE": "Share",
     "CLOSE": "Close camera",
     "PHOTO_PREVIEW": "Your photo",
+    "ADJUST_HINT": "Drag, pinch or twist to adjust",
+    "RESET_OVERLAY": "Reset frame",
     "ERRORS": {
       "PERMISSION_DENIED": "Camera access is off. Allow it in your settings to take a selfie.",
       "NO_CAMERA": "No camera was found on this device.",

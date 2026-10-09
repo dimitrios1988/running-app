@@ -127,6 +127,9 @@ export interface SelfieElementModel extends BasePageElement {
  * the only representation where the CSS preview (`%` of the stage) and the canvas
  * draw (`x * canvas.width`) are guaranteed to agree - pixel coordinates would need
  * a reference resolution and would drift on every device.
+ *
+ * This is where the overlay starts; the user can then move, scale and rotate it
+ * (see OverlayTransform), which never writes back here.
  */
 export interface SelfieOverlayModel {
   id: number | string;

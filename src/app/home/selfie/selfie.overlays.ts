@@ -7,7 +7,8 @@ import { SelfieOverlayModel } from '../../shared/page.element/page.element.model
  * Authoring contract: x/y/width/height are fractions of the captured frame, and
  * the frame is 3:4 (portrait). Artwork meant to cover the whole frame should be
  * authored at 3:4 too - a 16:9 asset stretched to `width: 1, height: 1` will look
- * squashed. Leave `height` null to keep the artwork's own aspect ratio.
+ * squashed. Leave `height` null to keep the artwork's own aspect ratio. This is
+ * only the starting placement - the user can move, scale and rotate it from there.
  *
  * Paths are relative (`assets/...`, not `/assets/...`) so they resolve under
  * `capacitor://localhost` on device as well as in the browser.

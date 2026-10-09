@@ -27,6 +27,7 @@ import {
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import {
+  arrowUndoOutline,
   closeOutline,
   refreshOutline,
   shareSocialOutline,
@@ -38,6 +39,7 @@ import {
 import { ShareImageService } from '../../../shared/services/share-image.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { canvasToJpeg, composeSelfie } from '../selfie-capture.util';
+import { SelfieOverlayGestureDirective } from '../selfie-overlay-gesture.directive';
 import {
   LoadedOverlayImage,
   SelfieOverlayLoader,
@@ -47,6 +49,10 @@ import {
   SelfieOverlayOption,
   SelfieOverlayStripComponent,
 } from '../selfie-overlay-strip/selfie-overlay-strip.component';
+import {
+  IDENTITY_TRANSFORM,
+  OverlayTransform,
+} from '../selfie-overlay-transform';
 
 interface OverlayEntry {
   model: SelfieOverlayModel;
@@ -63,6 +69,8 @@ interface ActiveOverlayView {
   /** null lets CSS `height: auto` keep the artwork's aspect ratio. */
   height: number | null;
   opacity: number | null;
+  /** The user's scale and rotation, pivoting on the centre as the capture does. */
+  transform: string;
 }
 
 @Component({
@@ -80,6 +88,7 @@ interface ActiveOverlayView {
     IonTitle,
     IonToolbar,
     TranslatePipe,
+    SelfieOverlayGestureDirective,
     SelfieOverlayStripComponent,
   ],
   // Component-scoped so every object URL it created is revoked when the modal
@@ -109,8 +118,17 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
   readonly mirror = signal(true);
   readonly selectedId = signal<SelfieOverlayId | null>(null);
   readonly previewUrl = signal<string | null>(null);
+  /** The gesture hint shows until the first adjustment, then stays gone. */
+  readonly hintDismissed = signal(false);
 
   private readonly entries = signal<OverlayEntry[]>([]);
+  /**
+   * The user's adjustment per overlay, absent until they make one. Kept for the
+   * life of the modal, so trying another frame and coming back does not lose it.
+   */
+  private readonly transforms = signal<
+    ReadonlyMap<SelfieOverlayId, OverlayTransform>
+  >(new Map());
 
   readonly options = computed<SelfieOverlayOption[]>(() =>
     this.entries().map((entry) => ({
@@ -128,19 +146,34 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
     return this.entries().find((entry) => entry.model.id === id) ?? null;
   });
 
+  readonly activeTransform = computed<OverlayTransform>(() => {
+    const id = this.selectedId();
+    if (id === null) {
+      return IDENTITY_TRANSFORM;
+    }
+    return this.transforms().get(id) ?? IDENTITY_TRANSFORM;
+  });
+
+  readonly overlayAdjusted = computed(() => {
+    const id = this.selectedId();
+    return id !== null && this.transforms().has(id);
+  });
+
   readonly activeOverlay = computed<ActiveOverlayView | null>(() => {
     const entry = this.selectedEntry();
     if (!entry) {
       return null;
     }
     const { model, artwork } = entry;
+    const { dx, dy, scale, rotation } = this.activeTransform();
     return {
       displayUrl: artwork.displayUrl,
-      left: model.x * 100,
-      top: model.y * 100,
+      left: (model.x + dx) * 100,
+      top: (model.y + dy) * 100,
       width: model.width * 100,
       height: model.height != null ? model.height * 100 : null,
       opacity: model.opacity,
+      transform: `rotate(${rotation}rad) scale(${scale})`,
     };
   });
 
@@ -158,7 +191,12 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
   };
 
   constructor() {
-    addIcons({ closeOutline, refreshOutline, shareSocialOutline });
+    addIcons({
+      arrowUndoOutline,
+      closeOutline,
+      refreshOutline,
+      shareSocialOutline,
+    });
   }
 
   ngAfterViewInit(): void {
@@ -186,6 +224,27 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
 
   onOverlaySelect(id: SelfieOverlayId | null): void {
     this.selectedId.set(id);
+  }
+
+  onOverlayTransform(transform: OverlayTransform): void {
+    const id = this.selectedId();
+    if (id === null) {
+      return;
+    }
+    this.transforms.update((all) => new Map(all).set(id, transform));
+    this.hintDismissed.set(true);
+  }
+
+  resetOverlay(): void {
+    const id = this.selectedId();
+    if (id === null) {
+      return;
+    }
+    this.transforms.update((all) => {
+      const next = new Map(all);
+      next.delete(id);
+      return next;
+    });
   }
 
   async capture(): Promise<void> {
@@ -220,6 +279,7 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
               width: entry.model.width,
               height: entry.model.height,
               opacity: entry.model.opacity,
+              transform: this.activeTransform(),
             }
           : null,
       });

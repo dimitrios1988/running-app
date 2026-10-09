@@ -1,8 +1,14 @@
 /**
  * Pure canvas helpers for the selfie camera. No Angular DI here on purpose - the
  * tricky parts (cover-crop math, mirroring) are the parts most worth unit testing,
- * and they stay trivially testable as long as this file imports nothing.
+ * and they stay trivially testable as long as this file imports nothing but
+ * other pure helpers.
  */
+
+import {
+  IDENTITY_TRANSFORM,
+  OverlayTransform,
+} from './selfie-overlay-transform';
 
 export interface CoverCrop {
   sx: number;
@@ -58,6 +64,8 @@ export interface OverlayDrawSpec {
   width: number;
   height: number | null;
   opacity: number | null;
+  /** The user's move, scale and rotation; omitted draws it as authored. */
+  transform?: OverlayTransform;
 }
 
 export interface ComposeSelfieOptions {
@@ -127,18 +135,22 @@ export function composeSelfie(options: ComposeSelfieOptions): HTMLCanvasElement 
         ? overlay.height * canvas.height
         : // Keep the artwork's own proportions rather than stretching it.
           dw * (overlay.intrinsicHeight / Math.max(1, overlay.intrinsicWidth));
+    const { dx, dy, scale, rotation } = overlay.transform ?? IDENTITY_TRANSFORM;
 
     ctx.save();
     if (overlay.opacity != null) {
       ctx.globalAlpha = Math.min(1, Math.max(0, overlay.opacity));
     }
-    ctx.drawImage(
-      overlay.image,
-      overlay.x * canvas.width,
-      overlay.y * canvas.height,
-      dw,
-      dh,
+    // Pivots on the overlay's centre, as the preview's CSS transform does
+    // (`transform-origin: 50% 50%`) - any other pivot and the photo stops
+    // matching what the user lined up.
+    ctx.translate(
+      (overlay.x + dx) * canvas.width + dw / 2,
+      (overlay.y + dy) * canvas.height + dh / 2,
     );
+    ctx.rotate(rotation);
+    ctx.scale(scale, scale);
+    ctx.drawImage(overlay.image, -dw / 2, -dh / 2, dw, dh);
     ctx.restore();
   }
 
