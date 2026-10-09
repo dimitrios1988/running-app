@@ -156,6 +156,15 @@ ion-content {
   background: rgba(0, 0, 0, 0.55);
 }
 
+/* The strip is only usable once there is a shot to put an overlay on, but it
+   keeps its row in the camera step too, so the stage stays the same size when
+   the shot replaces the feed. visibility rather than display: none keeps that
+   height while still taking the strip out of hit-testing, the tab order and
+   the accessibility tree. */
+app-selfie-overlay-strip.is-hidden {
+  visibility: hidden;
+}
+
 .controls {
   display: flex;
   flex: 0 0 auto;

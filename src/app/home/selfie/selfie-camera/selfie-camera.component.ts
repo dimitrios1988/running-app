@@ -38,7 +38,11 @@ import {
 } from '../../../shared/page.element/page.element.model';
 import { ShareImageService } from '../../../shared/services/share-image.service';
 import { ToastService } from '../../../shared/services/toast.service';
-import { canvasToJpeg, composeSelfie } from '../selfie-capture.util';
+import {
+  OverlayDrawSpec,
+  canvasToJpeg,
+  composeSelfie,
+} from '../selfie-capture.util';
 import { SelfieOverlayGestureDirective } from '../selfie-overlay-gesture.directive';
 import {
   LoadedOverlayImage,
@@ -60,7 +64,7 @@ interface OverlayEntry {
   thumbnail: LoadedOverlayImage;
 }
 
-/** What the live preview needs in order to mirror the capture exactly. */
+/** What the on-screen overlay needs in order to match the shared photo exactly. */
 interface ActiveOverlayView {
   displayUrl: string;
   left: number;
@@ -178,7 +182,12 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
   });
 
   private stream?: MediaStream;
-  private capturedBlob: Blob | null = null;
+  /**
+   * The shot without an overlay, cropped and mirrored as the user saw it. Kept
+   * as a canvas so sharing encodes the original pixels once, rather than
+   * re-compressing the preview JPEG.
+   */
+  private capturedPhoto: HTMLCanvasElement | null = null;
   private appStateHandle?: PluginListenerHandle;
   private destroyed = false;
   private startInFlight?: Promise<void>;
@@ -186,7 +195,7 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
     if (document.hidden) {
       this.stopStream();
     } else {
-      void this.startCamera();
+      this.resumeCamera();
     }
   };
 
@@ -257,36 +266,24 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
     void Haptics.impact({ style: ImpactStyle.Medium }).catch(() => undefined);
 
     try {
-      const entry = this.selectedEntry();
       // The box the user was actually looking at, measured rather than assumed,
       // so the capture stays correct if the layout ever changes.
       const box = this.stageEl().nativeElement.getBoundingClientRect();
 
-      const canvas = composeSelfie({
+      // The plain photo - the overlay is chosen and placed on it afterwards.
+      const photo = composeSelfie({
         source: video,
         sourceWidth: video.videoWidth,
         sourceHeight: video.videoHeight,
         boxWidth: box.width,
         boxHeight: box.height,
         mirror: this.mirror(),
-        overlay: entry
-          ? {
-              image: entry.artwork.image,
-              intrinsicWidth: entry.artwork.width,
-              intrinsicHeight: entry.artwork.height,
-              x: entry.model.x,
-              y: entry.model.y,
-              width: entry.model.width,
-              height: entry.model.height,
-              opacity: entry.model.opacity,
-              transform: this.activeTransform(),
-            }
-          : null,
+        overlay: null,
       });
 
-      const blob = await canvasToJpeg(canvas);
+      const blob = await canvasToJpeg(photo);
       this.clearPreview();
-      this.capturedBlob = blob;
+      this.capturedPhoto = photo;
       this.previewUrl.set(URL.createObjectURL(blob));
     } catch (error) {
       console.error('Selfie capture failed', error);
@@ -296,20 +293,47 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * The shot now covers the feed for as long as the user edits it, so the
+   * camera is released rather than left lit and draining the battery.
+   */
+  async onShotLoaded(shot: HTMLImageElement): Promise<void> {
+    // decode() first: `load` can fire before a large image is ready to paint,
+    // and stopping the stream blanks the video under it - a black flash.
+    await shot.decode().catch(() => undefined);
+    // A retake in the meantime wants the camera running again.
+    if (this.previewUrl()) {
+      this.stopStream();
+    }
+  }
+
   retake(): void {
     this.clearPreview();
-    // The stream is deliberately left running - restarting it is slow and can
-    // fail, and nothing about a retake requires a fresh one.
+    // The camera was released while the user edited the shot.
+    void this.startCamera();
   }
 
   async share(): Promise<void> {
-    const blob = this.capturedBlob;
-    if (!blob || this.busy()) {
+    const photo = this.capturedPhoto;
+    if (!photo || this.busy()) {
       return;
     }
 
     this.busy.set(true);
     try {
+      const entry = this.selectedEntry();
+      const canvas = composeSelfie({
+        // Already cropped and mirrored at capture, so it goes through 1:1.
+        source: photo,
+        sourceWidth: photo.width,
+        sourceHeight: photo.height,
+        boxWidth: photo.width,
+        boxHeight: photo.height,
+        mirror: false,
+        overlay: entry ? this.overlaySpec(entry) : null,
+      });
+      const blob = await canvasToJpeg(canvas);
+
       await this.shareImageService.share(blob, {
         title: this.selfieElementModel?.title ?? undefined,
         text: this.selfieElementModel?.shareText ?? undefined,
@@ -426,7 +450,7 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
         ({ isActive }) =>
           this.zone.run(() => {
             if (isActive) {
-              void this.startCamera();
+              this.resumeCamera();
             } else {
               // iOS suspends the track while backgrounded and returns black
               // frames on return, so release it outright.
@@ -437,6 +461,28 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
       return;
     }
     document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  private resumeCamera(): void {
+    // While a shot is being edited the camera stays released - restarting it
+    // would light the indicator under a still photo.
+    if (!this.previewUrl()) {
+      void this.startCamera();
+    }
+  }
+
+  private overlaySpec(entry: OverlayEntry): OverlayDrawSpec {
+    return {
+      image: entry.artwork.image,
+      intrinsicWidth: entry.artwork.width,
+      intrinsicHeight: entry.artwork.height,
+      x: entry.model.x,
+      y: entry.model.y,
+      width: entry.model.width,
+      height: entry.model.height,
+      opacity: entry.model.opacity,
+      transform: this.activeTransform(),
+    };
   }
 
   private async loadOverlays(): Promise<void> {
@@ -485,7 +531,7 @@ export class SelfieCameraComponent implements AfterViewInit, OnDestroy {
       URL.revokeObjectURL(url);
     }
     this.previewUrl.set(null);
-    this.capturedBlob = null;
+    this.capturedPhoto = null;
   }
 
   private async fail(key: string): Promise<void> {

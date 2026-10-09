@@ -29,34 +29,41 @@
           playsinline
         ></video>
 
-        <!-- `@if ... as` keeps this view while the overlay stays selected, so the
-             gesture directive survives the transform changing under it. -->
-        @if (activeOverlay(); as overlay) {
+        @if (previewUrl(); as url) {
           <img
-            #overlayImage
-            class="overlay"
-            [src]="overlay.displayUrl"
-            alt=""
-            aria-hidden="true"
-            [style.left.%]="overlay.left"
-            [style.top.%]="overlay.top"
-            [style.width.%]="overlay.width"
-            [style.height.%]="overlay.height"
-            [style.opacity]="overlay.opacity"
-            [style.transform]="overlay.transform"
+            #shot
+            class="shot"
+            [src]="url"
+            [alt]="'SELFIE.PHOTO_PREVIEW' | translate"
+            (load)="onShotLoaded(shot)"
           />
 
-          <!-- Before .shot, so the captured shot covers it and cannot be
-               dragged. -->
-          <div
-            class="gesture-layer"
-            appSelfieOverlayGesture
-            [transform]="activeTransform()"
-            [overlayElement]="overlayImage"
-            (transformChange)="onOverlayTransform($event)"
-          ></div>
+          <!-- The overlay only ever goes on the shot, never over the live feed.
+               `@if ... as` keeps this view while the overlay stays selected, so
+               the gesture directive survives the transform changing under it. -->
+          @if (activeOverlay(); as overlay) {
+            <img
+              #overlayImage
+              class="overlay"
+              [src]="overlay.displayUrl"
+              alt=""
+              aria-hidden="true"
+              [style.left.%]="overlay.left"
+              [style.top.%]="overlay.top"
+              [style.width.%]="overlay.width"
+              [style.height.%]="overlay.height"
+              [style.opacity]="overlay.opacity"
+              [style.transform]="overlay.transform"
+            />
 
-          @if (!previewUrl()) {
+            <div
+              class="gesture-layer"
+              appSelfieOverlayGesture
+              [transform]="activeTransform()"
+              [overlayElement]="overlayImage"
+              (transformChange)="onOverlayTransform($event)"
+            ></div>
+
             @if (overlayAdjusted()) {
               <button
                 type="button"
@@ -72,14 +79,6 @@
           }
         }
 
-        @if (previewUrl(); as url) {
-          <img
-            class="shot"
-            [src]="url"
-            [alt]="'SELFIE.PHOTO_PREVIEW' | translate"
-          />
-        }
-
         @if (starting()) {
           <div class="stage-status">
             <ion-spinner name="crescent" color="light"></ion-spinner>
@@ -87,6 +86,14 @@
         }
       </div>
     </div>
+
+    <!-- Rendered in the camera step too, just invisible - see .is-hidden. -->
+    <app-selfie-overlay-strip
+      [class.is-hidden]="!previewUrl()"
+      [options]="options()"
+      [selectedId]="selectedId()"
+      (overlaySelect)="onOverlaySelect($event)"
+    ></app-selfie-overlay-strip>
 
     @if (previewUrl()) {
       <div class="controls">
@@ -105,12 +112,6 @@
         </ion-button>
       </div>
     } @else {
-      <app-selfie-overlay-strip
-        [options]="options()"
-        [selectedId]="selectedId()"
-        (overlaySelect)="onOverlaySelect($event)"
-      ></app-selfie-overlay-strip>
-
       <div class="controls">
         <button
           type="button"
