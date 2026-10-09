@@ -66,7 +66,7 @@
             {{ "MY_RACE.SHOW_QR" | translate }}
           </button>
           } @else if (info.lp_runner?.receivesAsAGroup ||
-          info.lp_runner?.isPrintable) {
+          !info.lp_runner?.isPrintable) {
           <span class="runner-alert-text">
             <ion-icon
               name="alert-circle"
