@@ -5,6 +5,14 @@
   (click)="navigateToInfo()"
   [attr.aria-label]="infoChildElementModel?.title"
 >
+  @if (infoChildElementModel?.backgroundImage) {
+    <img
+      [appCachedSrc]="infoChildElementModel?.backgroundImage"
+      alt=""
+      class="background-image"
+    />
+    <span class="app-scrim" aria-hidden="true"></span>
+  }
   <div class="title-row">
     <!-- spans the full inner width: the chevron shares the title's line only -->
     <span class="subtitle">{{ infoChildElementModel?.subtitle }}</span>

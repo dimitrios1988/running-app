@@ -256,6 +256,19 @@ export class HomeService {
                         infoResponse['0(page_element)'].subtitle_size,
                       opens_in_external_url:
                         infoResponse['0(page_element)'].opens_external_url,
+                      backgroundImage: infoResponse['0(page_element)']
+                        .primary_image
+                        ? new URL(
+                            `/data/download/${
+                              infoResponse['0(page_element)'].primary_image[0]
+                                .name
+                            }?attribute_id=cc6d340b-2728-4bdb-95c3-90feb97dbcb2&file_id=${
+                              infoResponse['0(page_element)'].primary_image[0]
+                                .id
+                            }&version=0&token=${this.authService.getToken()}`,
+                            AUTH_CREDENTIALS.app_url,
+                          ).toString()
+                        : null,
                       backgroundColor: infoResponse['0(page_element)']
                         .background_color
                         ? `#${infoResponse['0(page_element)'].background_color}`

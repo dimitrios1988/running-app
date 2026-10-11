@@ -13,8 +13,9 @@ import { hexToRgb } from '../../../shared/color.utils';
 import { Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
 import { InfoChildElementModel } from '../../../shared/page.element/page.element.model';
+import { CachedSrcDirective } from '../../../shared/cache/cached-src.directive';
 @Component({
-  imports: [IonIcon],
+  imports: [IonIcon, CachedSrcDirective],
   selector: 'app-info-child',
   templateUrl: './info-child.component.html',
   styleUrls: ['./info-child.component.scss'],

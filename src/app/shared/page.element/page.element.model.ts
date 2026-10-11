@@ -75,6 +75,7 @@ export interface InfoChildElementModel {
   subtitle: string | null;
   subtitle_size: number | null;
   backgroundColor: string | null;
+  backgroundImage: string | null;
   textColor: string | null;
   opens_in_external_url: boolean;
 }
