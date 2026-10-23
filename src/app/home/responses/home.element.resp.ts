@@ -10,7 +10,7 @@ export interface HomeElementResponse {
 interface _4selfieoverlay {
   id: number;
   name: string | null;
-  ovelay_image: Image[] | null;
+  overlay_image: Image[] | null;
   thumbnail_url: null | string;
   position_x: number;
   position_y: number;

@@ -393,9 +393,9 @@ export class HomeService {
                         name: overlay.name,
                         imageUrl: new URL(
                           `/data/download/${
-                            overlay.ovelay_image?.[0].name
+                            overlay.overlay_image?.[0].name
                           }?attribute_id=d3dbc218-bae1-48aa-8bcd-3790f2e9ee3f&file_id=${
-                            overlay.ovelay_image?.[0].id
+                            overlay.overlay_image?.[0].id
                           }&version=0&token=${this.authService.getToken()}`,
                           AUTH_CREDENTIALS.app_url,
                         ).toString(),
