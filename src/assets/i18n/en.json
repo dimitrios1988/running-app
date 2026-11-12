@@ -2,7 +2,8 @@
   "COMMON": {
     "SETTINGS": "Settings",
     "LOGOUT": "Log out",
-    "RETRY": "Try again"
+    "RETRY": "Try again",
+    "CLOSE": "Close"
   },
   "TABS": {
     "HOME": "Home",
@@ -133,6 +134,7 @@
     "BIB_NUMBER": "Bib Number",
     "CLUB": "Club",
     "AGE_GROUP": "Age Group",
+    "REGISTRATION_LEVEL": "Registration Level",
     "PRINTED": "Printed",
     "SHOW_QR": "Show QR code",
     "SHOW_BIB": "Show bib number",
@@ -141,7 +143,19 @@
     "QR_LOADING": "Loading QR code...",
     "QR_ERROR": "Couldn't load the QR code.",
     "GROUP_RECEIVES": "Your bib will be collected by your team representative.",
-    "NOT_PRINTABLE": "This bib is not printable. Please contact the race organizers"
+    "NOT_PRINTABLE": "This bib is not printable. Please contact the race organizers",
+    "BIB_APPEARANCE": {
+      "MODIFY": "Modify Bib Appearance",
+      "TITLE": "Bib Appearance",
+      "HINT": "Choose how your bib will look when it's printed.",
+      "SELECTED": "Selected",
+      "DESIGN_N": "Design {{n}}",
+      "EMPTY": "No designs available",
+      "LOAD_ERROR": "Couldn't load the bib designs.",
+      "SAVING": "Saving...",
+      "SAVED": "Your bib design was saved.",
+      "SAVE_ERROR": "Couldn't save your bib design. Please try again."
+    }
   },
   "AUTH": {
     "ERRORS": {

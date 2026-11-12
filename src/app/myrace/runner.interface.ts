@@ -9,6 +9,7 @@ interface _1event {
   id: number;
   nameEn: string | null;
   nameGr: string | null;
+  lp_event_id: number | null;
 }
 
 interface _0runner {
@@ -24,6 +25,7 @@ interface _0runner {
   nationality: string | null;
   lastName: string | null;
   ageGroup: string | null;
+  registrationLevel: string | null;
 }
 
 interface _place {
@@ -32,8 +34,16 @@ interface _place {
 }
 
 interface _3runner {
+  /** null only in a body cached before the backend returned it. */
+  id: number | null;
   runnerQrData: string;
   isPrinted: boolean;
   isPrintable: boolean;
   receivesAsAGroup: boolean;
+  assignedBibTemplate: number | null;
+  registrationLevel: _4registration_level;
+}
+
+interface _4registration_level {
+  bibTemplateSelectionAllowed: boolean;
 }

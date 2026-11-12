@@ -25,6 +25,7 @@ import {
   IonLabel,
   IonNote,
   IonSpinner,
+  ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -34,6 +35,7 @@ import {
   qrCodeOutline,
   alertCircle,
   checkmarkCircle,
+  colorPaletteOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
@@ -78,7 +80,9 @@ export class MyracePage implements OnDestroy {
   private settingsService = inject(SettingsService);
   private myRaceService = inject(MyRaceService);
   private router = inject(Router);
+  private modalController = inject(ModalController);
   private runnerSub: Subscription = Subscription.EMPTY;
+  private pickerOpening = false;
 
   // Read the store signal straight through instead of copying it into a field.
   // The page instance survives tab switches (IonicRouteStrategy), so a copy
@@ -104,6 +108,17 @@ export class MyracePage implements OnDestroy {
   readonly canFlip = computed(() => {
     const lp = this.runnerInfo()?.lp_runner;
     return !!lp?.isPrintable && !lp.receivesAsAGroup && lp.runnerQrData;
+  });
+
+  // The design can only change while there is still a bib to print with it:
+  // not once it is printed, and not when it cannot be printed at all.
+  readonly canModifyBib = computed(() => {
+    const lp = this.runnerInfo()?.lp_runner;
+    return (
+      !!lp?.registrationLevel?.bibTemplateSelectionAllowed &&
+      lp.isPrintable &&
+      !lp.isPrinted
+    );
   });
 
   // Memoised by construction: a refresh that returns the same payload yields an
@@ -138,6 +153,7 @@ export class MyracePage implements OnDestroy {
       qrCodeOutline,
       alertCircle,
       checkmarkCircle,
+      colorPaletteOutline,
     });
     // Runs only when the URL actually changes, so a no-op refresh never flashes
     // the spinner. Angular destroys this effect with the component - it must
@@ -170,6 +186,25 @@ export class MyracePage implements OnDestroy {
     this.authService.logoutRunner().then(() => {
       this.router.navigate(['/tabs/login']);
     });
+  }
+
+  async openBibTemplatePicker(): Promise<void> {
+    // The import and create() are both async, so without this a double tap
+    // would stack two modals.
+    if (this.pickerOpening) return;
+    this.pickerOpening = true;
+    try {
+      // Loaded on demand, like the selfie camera: most runners never open it.
+      const { BibTemplatePickerComponent } = await import(
+        './bib-template-picker/bib-template-picker.component'
+      );
+      const modal = await this.modalController.create({
+        component: BibTemplatePickerComponent,
+      });
+      await modal.present();
+    } finally {
+      this.pickerOpening = false;
+    }
   }
 
   doRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>) {

@@ -1,0 +1,92 @@
+.picker {
+  max-width: 40rem;
+  margin-inline: auto;
+  /* --app-safe-bottom, not --ion-safe-area-bottom: Ionic overwrites the latter
+     on the modal host and it can read 0 on Android edge-to-edge */
+  padding: var(--app-space-4) var(--app-space-4)
+    calc(var(--app-space-6) + var(--app-safe-bottom));
+}
+
+.picker-hint {
+  margin: 0 0 var(--app-space-4);
+  font-size: var(--app-text-sm);
+  line-height: 1.5;
+  color: var(--ion-color-medium);
+}
+
+/* one column on phones, two side by side once there is room */
+.templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
+  gap: var(--app-space-5);
+}
+
+.template {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--app-radius-md);
+  background: none;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+/* while a choice is saving, the others step back */
+.template:disabled:not(.is-selected) .template-preview {
+  opacity: 0.6;
+}
+
+/* the A4-landscape ratio of the uploaded previews (1123x794), so the box holds
+   its size while the image loads; `contain` keeps the whole bib visible */
+.template-preview {
+  display: block;
+  aspect-ratio: 1.414;
+  border-radius: var(--app-radius-md);
+  box-shadow: var(--app-elev-1);
+  transition: box-shadow 0.16s ease;
+
+  img {
+    object-fit: contain;
+  }
+}
+
+/* the inner ring in the page colour opens a gap, so the orange ring never
+   touches the template's own artwork */
+.template.is-selected .template-preview {
+  box-shadow:
+    0 0 0 2px var(--ion-background-color),
+    0 0 0 4px var(--ion-color-primary);
+}
+
+/* a solid pill, so it stays legible over any artwork - and says "Selected"
+   in words, so the choice does not rest on colour alone */
+.template-selected {
+  position: absolute;
+  top: var(--app-space-2);
+  right: var(--app-space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-1);
+  padding: var(--app-space-1) var(--app-space-2);
+  border-radius: var(--app-radius-pill);
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-size: var(--app-text-xs);
+  font-weight: 600;
+  box-shadow: var(--app-elev-2);
+
+  ion-icon {
+    font-size: 1.15em;
+  }
+
+  ion-spinner {
+    --color: currentColor;
+    width: 1em;
+    height: 1em;
+  }
+}

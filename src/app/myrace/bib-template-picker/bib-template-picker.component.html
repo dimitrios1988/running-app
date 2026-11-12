@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ "MY_RACE.BIB_APPEARANCE.TITLE" | translate }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="close()"
+        [attr.aria-label]="'COMMON.CLOSE' | translate"
+      >
+        <ion-icon
+          slot="icon-only"
+          name="close-outline"
+          aria-hidden="true"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="picker">
+    <p class="picker-hint">{{ "MY_RACE.BIB_APPEARANCE.HINT" | translate }}</p>
+
+    @if (loading()) {
+      <div class="templates" aria-hidden="true">
+        @for (i of [1, 2]; track i) {
+          <div class="app-skeleton template-preview"></div>
+        }
+      </div>
+    } @else if (loadError()) {
+      <div class="app-empty">
+        <ion-icon name="alert-circle-outline" aria-hidden="true"></ion-icon>
+        <p class="app-empty-title">
+          {{ "MY_RACE.BIB_APPEARANCE.LOAD_ERROR" | translate }}
+        </p>
+        <ion-button fill="outline" (click)="retry()">
+          {{ "COMMON.RETRY" | translate }}
+        </ion-button>
+      </div>
+    } @else if (templates().length === 0) {
+      <div class="app-empty">
+        <ion-icon name="images-outline" aria-hidden="true"></ion-icon>
+        <p class="app-empty-title">
+          {{ "MY_RACE.BIB_APPEARANCE.EMPTY" | translate }}
+        </p>
+      </div>
+    } @else {
+      <div
+        class="templates"
+        role="radiogroup"
+        [attr.aria-label]="'MY_RACE.BIB_APPEARANCE.TITLE' | translate"
+      >
+        @for (template of templates(); track template.id; let i = $index) {
+          <!-- Templates have no names, so a screen reader hears "Design 1",
+               "Design 2"... and the selected state from aria-checked. -->
+          <button
+            type="button"
+            role="radio"
+            class="template app-pressable"
+            [class.is-selected]="template.id === selectedId()"
+            [attr.aria-checked]="template.id === selectedId()"
+            [attr.aria-busy]="savingId() === template.id ? 'true' : null"
+            [attr.aria-label]="
+              'MY_RACE.BIB_APPEARANCE.DESIGN_N' | translate: { n: i + 1 }
+            "
+            [disabled]="savingId() !== null"
+            (click)="select(template)"
+          >
+            <span class="template-preview app-media">
+              <img [appCachedSrc]="template.previewUrl" alt="" />
+            </span>
+            @if (template.id === selectedId()) {
+              <span class="template-selected" aria-hidden="true">
+                @if (savingId() === template.id) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                  {{ "MY_RACE.BIB_APPEARANCE.SAVING" | translate }}
+                } @else {
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  {{ "MY_RACE.BIB_APPEARANCE.SELECTED" | translate }}
+                }
+              </span>
+            }
+          </button>
+        }
+      </div>
+    }
+  </div>
+</ion-content>

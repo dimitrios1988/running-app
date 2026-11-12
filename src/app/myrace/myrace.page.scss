@@ -61,6 +61,18 @@
   opacity: 0.75;
 }
 
+/* the negative top margin collapses into the card's bottom margin, so the
+   button sits closer to the card it changes than to the details below */
+.bib-actions {
+  margin: calc(var(--app-space-3) - var(--app-space-5)) var(--app-space-4)
+    var(--app-space-5);
+
+  ion-button {
+    --border-radius: var(--app-radius-md);
+    font-weight: 600;
+  }
+}
+
 .details-list ion-note[slot="end"] {
   font-size: var(--app-text-sm);
   text-align: end;

@@ -144,12 +144,29 @@
       </div>
     </div>
 
+    @if (canModifyBib()) {
+    <div class="bib-actions">
+      <ion-button expand="block" (click)="openBibTemplatePicker()">
+        <ion-icon
+          slot="start"
+          name="color-palette-outline"
+          aria-hidden="true"
+        ></ion-icon>
+        {{ "MY_RACE.BIB_APPEARANCE.MODIFY" | translate }}
+      </ion-button>
+    </div>
+    }
+
     <ion-list class="details-list" lines="full" [inset]="true">
       <!-- <ion-list-header>
           <ion-label>{{ "MY_RACE.REGISTRATION_INFO" | translate }}</ion-label>
         </ion-list-header> -->
-
-      @if (info.runner.gender) {
+      @if (info.runner.block) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.BLOCK" | translate }}</ion-label>
+        <ion-note slot="end">{{ info.runner.block }}</ion-note>
+      </ion-item>
+      } @if (info.runner.gender) {
       <ion-item>
         <ion-label>{{ "MY_RACE.GENDER" | translate }}</ion-label>
         <ion-note slot="end">{{ info.runner.gender }}</ion-note>
@@ -158,11 +175,6 @@
       <ion-item>
         <ion-label>{{ "MY_RACE.FATHERS_NAME" | translate }}</ion-label>
         <ion-note slot="end">{{ info.runner.fathersName }}</ion-note>
-      </ion-item>
-      } @if (info.runner.email) {
-      <ion-item>
-        <ion-label>{{ "MY_RACE.EMAIL" | translate }}</ion-label>
-        <ion-note slot="end">{{ info.runner.email }}</ion-note>
       </ion-item>
       } @if (info.runner.birthdate) {
       <ion-item>
@@ -174,20 +186,25 @@
         <ion-label>{{ "MY_RACE.AGE_GROUP" | translate }}</ion-label>
         <ion-note slot="end">{{ info.runner.ageGroup }}</ion-note>
       </ion-item>
-      } @if (info.runner.nationality) {
+      } @if (info.runner.email) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.EMAIL" | translate }}</ion-label>
+        <ion-note slot="end">{{ info.runner.email }}</ion-note>
+      </ion-item>
+      }@if (info.runner.nationality) {
       <ion-item>
         <ion-label>{{ "MY_RACE.NATIONALITY" | translate }}</ion-label>
         <ion-note slot="end">{{ info.runner.nationality }}</ion-note>
-      </ion-item>
-      } @if (info.runner.block) {
-      <ion-item>
-        <ion-label>{{ "MY_RACE.BLOCK" | translate }}</ion-label>
-        <ion-note slot="end">{{ info.runner.block }}</ion-note>
       </ion-item>
       } @if (info.runner.club) {
       <ion-item>
         <ion-label>{{ "MY_RACE.CLUB" | translate }}</ion-label>
         <ion-note slot="end">{{ info.runner.club }}</ion-note>
+      </ion-item>
+      } @if (info.runner.registrationLevel) {
+      <ion-item>
+        <ion-label>{{ "MY_RACE.REGISTRATION_LEVEL" | translate }}</ion-label>
+        <ion-note slot="end">{{ info.runner.registrationLevel }}</ion-note>
       </ion-item>
       }
     </ion-list>
