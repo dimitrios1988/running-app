@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
 import { MyraceGuard } from '../myrace/myrace.guard';
+import { featureFlagGuard } from '../client/feature-flag.guard';
 
 export const routes: Routes = [
   {
@@ -65,12 +66,16 @@ export const routes: Routes = [
         path: 'myrace',
         loadComponent: () =>
           import('../myrace/myrace.page').then((m) => m.MyracePage),
-        canActivate: [MyraceGuard],
+        // The flag guard comes first: with the feature off, its redirect home
+        // takes priority over MyraceGuard's redirect to the login page.
+        canActivate: [featureFlagGuard('myRace'), MyraceGuard],
       },
       {
+        // Signing in with a bib number only exists to reach "My Registration".
         path: 'login',
         loadComponent: () =>
           import('../auth/login/login.page').then((m) => m.LoginPage),
+        canActivate: [featureFlagGuard('myRace')],
       },
       {
         path: '',

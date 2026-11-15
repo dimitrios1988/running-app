@@ -17,11 +17,11 @@ const UUID = '879d0b94-9ea8-4985-9309-9af5020e3fe0';
 const RECORD_ID = 1755621;
 
 const RUNNER_INFO_API = new URL(
-  '/api/mobile_app_manager/get_runner_info/v1',
+  `/api/${AUTH_CREDENTIALS.app_name}/get_runner_info/v1`,
   AUTH_CREDENTIALS.app_url,
 ).toString();
 const ASSIGN_API = new URL(
-  '/api/mobile_app_manager/assign_bib_template/v1',
+  `/api/${AUTH_CREDENTIALS.app_name}/assign_bib_template/v1`,
   AUTH_CREDENTIALS.app_url,
 ).toString();
 

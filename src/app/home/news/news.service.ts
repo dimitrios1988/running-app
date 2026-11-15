@@ -46,7 +46,7 @@ export class NewsService {
     forceRefresh = false,
   ): Observable<INewsListItem[]> {
     const newsItemsApi = new URL(
-      `/api/mobile_app_manager/news_items/v1`,
+      `/api/${AUTH_CREDENTIALS.app_name}/news_items/v1`,
       AUTH_CREDENTIALS.app_url,
     ).toString();
     return this.http
@@ -94,7 +94,7 @@ export class NewsService {
     forceRefresh = false,
   ): Observable<INews> {
     const newsItemApi = new URL(
-      `/api/mobile_app_manager/news_item/v1/${id}`,
+      `/api/${AUTH_CREDENTIALS.app_name}/news_item/v1/${id}`,
       AUTH_CREDENTIALS.app_url,
     ).toString();
     return this.http

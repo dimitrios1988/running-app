@@ -10,7 +10,13 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "prebuild": "node scripts/create-secrets-file.js"
+    "prestart": "node scripts/build-client.js --ensure",
+    "prebuild": "node scripts/build-client.js --ensure",
+    "pretest": "node scripts/build-client.js --ensure",
+    "client:build": "node scripts/build-client.js",
+    "client:apply": "node scripts/build-client.js --no-build",
+    "client:reset": "node scripts/build-client.js --reset",
+    "client:list": "node scripts/build-client.js --list"
   },
   "private": true,
   "dependencies": {
@@ -57,6 +63,7 @@
     "@angular/cli": "^21.2.5",
     "@angular/compiler-cli": "^21.2.6",
     "@angular/language-service": "^21.2.6",
+    "@capacitor/assets": "^4.0.0",
     "@capacitor/cli": "8.3.0",
     "@ionic/angular-toolkit": "^12.3.0",
     "@types/jasmine": "6.0.0",
@@ -73,6 +80,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "2.2.0",
+    "sharp": "^0.35.5",
     "typescript": "^5.9.3"
   },
   "description": "An Ionic project"

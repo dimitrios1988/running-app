@@ -18,7 +18,7 @@ export class BibTemplateService {
   private readonly authService = inject(AuthService);
 
   private readonly availableTemplatesApi = new URL(
-    `/api/mobile_app_manager/get_available_bib_templates/v1`,
+    `/api/${AUTH_CREDENTIALS.app_name}/get_available_bib_templates/v1`,
     AUTH_CREDENTIALS.app_url,
   ).toString();
 

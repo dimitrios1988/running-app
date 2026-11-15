@@ -1,0 +1,26 @@
+{
+  "appName": "Athens Authentic Marathon",
+  "appId": "gr.weallrun.athensauthenticmarathon",
+  "version": "1.0.0",
+  "buildNumber": 1,
+  "api": {
+    "baseUrl": "https://REPLACE_ME/"
+  },
+  "oneSignal": {
+    "appId": "REPLACE_ME"
+  },
+  "theme": {
+    "primary": "#c2410c",
+    "secondary": "#0b1b2b",
+    "tertiary": "#1d4ed8",
+    "accent": "#ff5a1f",
+    "darkMode": {
+      "primary": "#ff7a45",
+      "secondary": "#475569",
+      "tertiary": "#60a5fa"
+    }
+  },
+  "features": {
+    "myRace": true
+  }
+}

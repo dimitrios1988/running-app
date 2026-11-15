@@ -1,0 +1,30 @@
+{
+  "appName": "Running App",
+  "appId": "gr.weallrun.runningapp",
+  "version": "1.0",
+  "buildNumber": 1,
+  "api": {
+    "baseUrl": "https://liveprint.weallrun.gr/"
+  },
+  "oneSignal": {
+    "appId": "1eaf2e13-1c7d-43f6-9c62-4cdd2fc9f80f"
+  },
+  "theme": {
+    "primary": "#c2410c",
+    "secondary": "#0b1b2b",
+    "tertiary": "#1d4ed8",
+    "accent": "#ff5a1f",
+    "darkMode": {
+      "primary": "#ff7a45",
+      "secondary": "#475569",
+      "tertiary": "#60a5fa"
+    }
+  },
+  "assets": {
+    "splashBackgroundColor": "#ffffff",
+    "splashBackgroundColorDark": "#000000"
+  },
+  "features": {
+    "myRace": true
+  }
+}

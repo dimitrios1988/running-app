@@ -32,7 +32,7 @@ export class MyRaceService {
   private backgroundRefreshSub: Subscription = Subscription.EMPTY;
 
   private readonly assignBibTemplateApi = new URL(
-    `/api/mobile_app_manager/assign_bib_template/v1`,
+    `/api/${AUTH_CREDENTIALS.app_name}/assign_bib_template/v1`,
     AUTH_CREDENTIALS.app_url,
   ).toString();
 
@@ -107,7 +107,7 @@ export class MyRaceService {
     forceRefresh: boolean,
   ): Observable<IRunner> {
     const runnerInfoApi = new URL(
-      `/api/mobile_app_manager/get_runner_info/v1`,
+      `/api/${AUTH_CREDENTIALS.app_name}/get_runner_info/v1`,
       AUTH_CREDENTIALS.app_url,
     ).toString();
     return this.http

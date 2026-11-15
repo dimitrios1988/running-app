@@ -27,7 +27,7 @@ export class NotificationsService {
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
   private readonly notificationsApi = new URL(
-    `/api/mobile_app_manager/notifications/v1`,
+    `/api/${AUTH_CREDENTIALS.app_name}/notifications/v1`,
     AUTH_CREDENTIALS.app_url,
   ).toString();
   private readonly http = inject(HttpClient);

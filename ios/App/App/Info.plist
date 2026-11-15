@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>Running App</string>
+	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -25,11 +25,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Running App uses the camera so you can take a selfie to share your race moment.</string>
+	<string>$(APP_DISPLAY_NAME) uses the camera so you can take a selfie to share your race moment.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Running App saves the selfies you take to your photo library.</string>
+	<string>$(APP_DISPLAY_NAME) saves the selfies you take to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Running App needs access to your photo library to share the selfies you take.</string>
+	<string>$(APP_DISPLAY_NAME) needs access to your photo library to share the selfies you take.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

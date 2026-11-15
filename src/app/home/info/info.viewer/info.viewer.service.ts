@@ -15,7 +15,7 @@ export class InfoViewerService {
   private readonly authService = inject(AuthService);
 
   private readonly infoApi = new URL(
-    `/api/mobile_app_manager/info_view/v1`,
+    `/api/${AUTH_CREDENTIALS.app_name}/info_view/v1`,
     AUTH_CREDENTIALS.app_url,
   ).toString();
 

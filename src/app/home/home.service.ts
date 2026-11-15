@@ -34,7 +34,7 @@ export class HomeService {
   public readonly homeElements = signal<HomeElementModel | null>(null);
 
   private readonly pageElementsApi = new URL(
-    `/api/mobile_app_manager/page_elements/v1`,
+    `/api/${AUTH_CREDENTIALS.app_name}/page_elements/v1`,
     AUTH_CREDENTIALS.app_url,
   ).toString();
 

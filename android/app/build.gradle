@@ -1,6 +1,23 @@
 apply plugin: 'com.android.application'
 
+// White-label: scripts/build-client.js writes the identity of the client this
+// project was prepared for to <repo>/.client/android.json (gitignored), next to
+// the generated res/values/strings.xml and launcher/splash/notification images.
+// See README.md.
+def clientIdentityFile = rootProject.file('../.client/android.json')
+def clientIdentity = clientIdentityFile.exists() ? new groovy.json.JsonSlurper().parse(clientIdentityFile, 'UTF-8') : null
+def clientStringsFile = file('src/main/res/values/strings.xml')
+// Generated resources that the launch theme in res/values/styles.xml refers to.
+def clientSplashColorFile = file('src/main/res/values/splash_background.xml')
+def clientSplashIconFiles = [file('src/main/res/values/splash_icon.xml'), file('src/main/res/drawable-nodpi/splash_icon.png')]
+
+// Release signing comes from the environment (Codemagic variable group), never
+// from the repository. Without it, release builds stay unsigned as before.
+def releaseKeystorePath = System.getenv('CM_KEYSTORE_PATH')
+
 android {
+    // The code package. It is the same for every client, so MainActivity never
+    // has to move; only applicationId (the store identity) differs.
     namespace = "gr.weallrun.runningapp"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -9,6 +26,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        if (clientIdentity != null) {
+            applicationId clientIdentity.appId
+            versionCode(clientIdentity.buildNumber as Integer)
+            versionName clientIdentity.version
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +38,41 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (releaseKeystorePath) {
+                storeFile file(releaseKeystorePath)
+                storePassword System.getenv('CM_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('CM_KEY_ALIAS')
+                keyPassword System.getenv('CM_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (releaseKeystorePath) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
+
+// The app name, icons and splash screens are generated per client and are not
+// in git. Say so plainly instead of failing later with "resource not found".
+tasks.named('preBuild').configure {
+    doFirst {
+        if (clientIdentity == null || !clientStringsFile.exists()) {
+            throw new GradleException(
+                "No client has been applied to the Android project.\n" +
+                "Run:  npm run client:build -- <client>     (clients are listed by: npm run client:list)")
+        }
+        if (!clientSplashColorFile.exists() || !clientSplashIconFiles.any { it.exists() }) {
+            throw new GradleException(
+                "The generated Android resources of client \"${clientIdentity.client}\" are incomplete " +
+                "(made by an older scripts/build-client.js?).\n" +
+                "Run:  npm run client:build -- ${clientIdentity.client}")
         }
     }
 }

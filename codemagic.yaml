@@ -1,0 +1,298 @@
+# Codemagic CI/CD: one Android and one iOS workflow per client.
+#
+# Everything shared lives under `definitions` and is pulled in with YAML
+# anchors, so a client's workflows only say who the client is and where its
+# builds are published. To add a client, copy an "<client>-android" /
+# "<client>-ios" pair at the bottom of this file and change the workflow id +
+# name, the variable group and CLIENT_NAME (the folder under clients/).
+#
+# What a build does
+#   Android  signed AAB -> Google Play, internal testing track, as a draft
+#   iOS      signed IPA -> App Store Connect (TestFlight, internal testers)
+# The version code / build number is one above the latest one in the store.
+# Nothing is ever published to production from here: promoting a release is a
+# manual step in Play Console / App Store Connect, and the first script of
+# every workflow fails the build if this file says otherwise.
+#
+# No secrets live in this repository. Each client has ONE environment variable
+# group in Codemagic (all values marked "Secret"):
+#
+#   Android signing   CM_KEYSTORE                       upload keystore, base64-encoded
+#                     CM_KEYSTORE_PASSWORD
+#                     CM_KEY_ALIAS
+#                     CM_KEY_PASSWORD
+#   Google Play       GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS   service account JSON key
+#   iOS signing and   APP_STORE_CONNECT_ISSUER_ID       App Store Connect API key
+#   App Store Connect APP_STORE_CONNECT_KEY_IDENTIFIER  (role: App Manager)
+#                     APP_STORE_CONNECT_PRIVATE_KEY     contents of the .p8 file
+#                     CERTIFICATE_PRIVATE_KEY           RSA key of the distribution certificate
+#   App               AUTH_USERNAME, AUTH_PASSWORD      API credentials compiled into the app
+#
+# Optional in the same group:
+#   AUTH_APP_URL, AUTH_APP_NAME, ONESIGNAL_APP_ID   override the client's config.json
+#   APP_STORE_APPLE_ID                              the app's numeric Apple ID, if the
+#                                                   lookup by bundle id should be skipped
+#
+# Builds are started by hand (Codemagic UI or API); there is no `triggering`.
+# See README.md for the full walkthrough.
+
+definitions:
+  # Tool versions shared by every workflow.
+  tools: &tools
+    node: 24
+    java: 21
+    xcode: latest
+
+  # Publishing defaults. A client's workflow merges one of these and may
+  # override single keys (see the workflows at the bottom).
+  google_play: &google_play
+    credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+    track: internal
+    # Google Play only accepts draft releases while an app has never been
+    # released. Set to false in the client's workflow once its first release
+    # is live, so internal testers get new builds without a manual step.
+    submit_as_draft: true
+
+  app_store_connect: &app_store_connect
+    api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+    key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+    issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+    # The upload alone makes the build available to internal testers. `true`
+    # also submits it to Apple's beta review, which external groups require.
+    submit_to_testflight: false
+    submit_to_app_store: false
+
+  scripts:
+    # Releases reach production only by hand. This fails the build if the
+    # GOOGLE_PLAY_TRACK variable (Codemagic lets it override the track set in
+    # this file) or this file itself would publish there.
+    - &no_production_publishing
+      name: Refuse to publish to production
+      script: |
+        TRACK=$(printf '%s' "${GOOGLE_PLAY_TRACK:-}" | tr '[:upper:]' '[:lower:]')
+        if [ "$TRACK" = "production" ]; then
+          echo "GOOGLE_PLAY_TRACK is set to production. Production releases are promoted by hand in Play Console."
+          exit 1
+        fi
+        if grep -niE "^[[:space:]]*(track:[[:space:]]*[\"']?production|release_promotion:|submit_to_app_store:[[:space:]]*[\"']?(true|yes|on))" codemagic.yaml; then
+          echo "codemagic.yaml must not publish to production (see the lines above)."
+          echo "Production releases are promoted by hand in Play Console / App Store Connect."
+          exit 1
+        fi
+        echo "OK: nothing in this build publishes to production."
+
+    - &install_dependencies
+      name: Install npm dependencies
+      script: npm ci
+
+    # The next versionCode is one above the highest one in any Google Play
+    # track. `google-play` signs in with GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS.
+    # A new app has nothing to look up; the build then keeps "buildNumber" from
+    # the client's config.json, which is the AAB you upload by hand once.
+    - &android_build_number
+      name: Get the next version code from Google Play
+      script: |
+        PACKAGE_NAME=$(node -p "require('./clients/$CLIENT_NAME/config.json').appId")
+        LATEST=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME") || LATEST=""
+        case "$LATEST" in
+          '' | *[!0-9]*)
+            echo "No version code found in Google Play for $PACKAGE_NAME (new app, or the lookup failed)."
+            echo "Using buildNumber from clients/$CLIENT_NAME/config.json."
+            ;;
+          *)
+            echo "Highest version code in Google Play for $PACKAGE_NAME: $LATEST"
+            echo "CLIENT_BUILD_NUMBER=$((LATEST + 1))" >> $CM_ENV
+            ;;
+        esac
+
+    # The next build number is one above the highest one in TestFlight or the
+    # App Store, across all versions. The lookup needs the app's numeric Apple
+    # ID, which is found from the bundle id unless the client's group provides
+    # APP_STORE_APPLE_ID. With no build in App Store Connect yet, the build
+    # keeps "buildNumber" from the client's config.json.
+    - &ios_build_number
+      name: Get the next build number from App Store Connect
+      script: |
+        BUNDLE_ID=$(node -p "require('./clients/$CLIENT_NAME/config.json').appId")
+        APP_ID="${APP_STORE_APPLE_ID:-}"
+        if [ -z "$APP_ID" ]; then
+          APP_ID=$(app-store-connect apps list --bundle-id-identifier "$BUNDLE_ID" --strict-match-identifier --json \
+            | node -p "(JSON.parse(require('fs').readFileSync(0, 'utf8'))[0] || {}).id || ''") || APP_ID=""
+        fi
+        LATEST=""
+        case "$APP_ID" in
+          '' | *[!0-9]*)
+            echo "Could not find an app with bundle id $BUNDLE_ID in App Store Connect."
+            ;;
+          *)
+            LATEST=$(app-store-connect get-latest-build-number "$APP_ID" --all-versions) || LATEST=""
+            ;;
+        esac
+        case "$LATEST" in
+          '' | *[!0-9]*)
+            echo "No build number found in App Store Connect for $BUNDLE_ID (no builds yet, or the lookup failed)."
+            echo "Using buildNumber from clients/$CLIENT_NAME/config.json."
+            ;;
+          *)
+            echo "Highest build number in App Store Connect for $BUNDLE_ID: $LATEST"
+            echo "CLIENT_BUILD_NUMBER=$((LATEST + 1))" >> $CM_ENV
+            ;;
+        esac
+
+    # The one step that turns the base app into the client's app: validates
+    # clients/$CLIENT_NAME, generates config, theme, icons and splash screens,
+    # runs the Angular build and `cap sync`. CLIENT_BUILD_NUMBER comes from the
+    # step above; when it is not set the script uses config.json's buildNumber.
+    - &brand_and_build_android
+      name: Apply client branding, build web app, sync Capacitor (Android)
+      script: |
+        node scripts/build-client.js --platform android ${CLIENT_BUILD_NUMBER:+--build-number "$CLIENT_BUILD_NUMBER"}
+
+    - &brand_and_build_ios
+      name: Apply client branding, build web app, sync Capacitor (iOS)
+      script: |
+        node scripts/build-client.js --platform ios ${CLIENT_BUILD_NUMBER:+--build-number "$CLIENT_BUILD_NUMBER"}
+
+    # android/app/build.gradle signs the release build with these four
+    # CM_KEYSTORE_* / CM_KEY_* variables whenever CM_KEYSTORE_PATH is set.
+    - &android_keystore
+      name: Set up the Android upload keystore
+      script: |
+        : "${CM_KEYSTORE:?is not set - add it to this client's variable group}"
+        : "${CM_KEYSTORE_PASSWORD:?is not set - add it to this client's variable group}"
+        : "${CM_KEY_ALIAS:?is not set - add it to this client's variable group}"
+        : "${CM_KEY_PASSWORD:?is not set - add it to this client's variable group}"
+        echo "$CM_KEYSTORE" | base64 --decode > /tmp/upload-keystore.jks
+        echo "CM_KEYSTORE_PATH=/tmp/upload-keystore.jks" >> $CM_ENV
+
+    - &android_bundle
+      name: Build the signed Android App Bundle
+      script: |
+        cd android
+        chmod +x gradlew
+        ./gradlew bundleRelease
+
+    # Automatic signing with the App Store Connect API key from the client's
+    # group. The bundle id is the client's appId; by default the fetch also
+    # covers bundle ids that extend it, i.e. the OneSignal notification service
+    # extension ("<appId>.OneSignalNotificationServiceExtension").
+    - &ios_signing
+      name: Fetch iOS signing files and apply them to the Xcode project
+      script: |
+        BUNDLE_ID=$(node -p "require('./clients/$CLIENT_NAME/config.json').appId")
+        echo "Signing for $BUNDLE_ID"
+        keychain initialize
+        app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+        keychain add-certificates
+        xcode-project use-profiles --project ios/App/App.xcodeproj
+
+    - &ios_ipa
+      name: Build the signed IPA
+      script: xcode-project build-ipa --project ios/App/App.xcodeproj --scheme App
+
+  # Workflow bodies. A client's workflow merges one of these and adds its own
+  # `name`, `environment` and `publishing`.
+  android_workflow: &android_workflow
+    # mac_mini_m2 is available on every Codemagic plan. With billing enabled,
+    # linux_x2 is the cheaper choice for Android (remove `xcode` from the
+    # environment in that case).
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    scripts:
+      - *no_production_publishing
+      - *install_dependencies
+      - *android_keystore
+      - *android_build_number
+      - *brand_and_build_android
+      - *android_bundle
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/mapping.txt
+
+  ios_workflow: &ios_workflow
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    scripts:
+      - *no_production_publishing
+      - *install_dependencies
+      - *ios_build_number
+      - *brand_and_build_ios
+      - *ios_signing
+      - *ios_ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+
+workflows:
+  # ---------------------------------------------------------------------------
+  # SEGAS - Athina Half Marathon
+  # ---------------------------------------------------------------------------
+  segas-athina-half-marathon-android:
+    <<: *android_workflow
+    name: SEGAS - Athina Half Marathon (Android)
+    environment:
+      <<: *tools
+      groups:
+        - segas_athina_half_marathon
+      vars:
+        CLIENT_NAME: segas-athina-half-marathon
+    publishing:
+      google_play:
+        <<: *google_play
+        # track: alpha              # another testing track for this client
+        # submit_as_draft: false    # once the app's first release is live
+
+  segas-athina-half-marathon-ios:
+    <<: *ios_workflow
+    name: SEGAS - Athina Half Marathon (iOS)
+    environment:
+      <<: *tools
+      groups:
+        - segas_athina_half_marathon
+      vars:
+        CLIENT_NAME: segas-athina-half-marathon
+    publishing:
+      app_store_connect:
+        <<: *app_store_connect
+        # External testers: name this app's TestFlight groups and submit each
+        # build for beta review.
+        # submit_to_testflight: true
+        # beta_groups:
+        #   - SEGAS Testers
+
+  # ---------------------------------------------------------------------------
+  # SEGAS - Athens Authentic Marathon
+  # ---------------------------------------------------------------------------
+  segas-athens-authentic-marathon-android:
+    <<: *android_workflow
+    name: SEGAS - Athens Authentic Marathon (Android)
+    environment:
+      <<: *tools
+      groups:
+        - segas_athens_authentic_marathon
+      vars:
+        CLIENT_NAME: segas-athens-authentic-marathon
+    publishing:
+      google_play:
+        <<: *google_play
+        # track: alpha              # another testing track for this client
+        # submit_as_draft: false    # once the app's first release is live
+
+  segas-athens-authentic-marathon-ios:
+    <<: *ios_workflow
+    name: SEGAS - Athens Authentic Marathon (iOS)
+    environment:
+      <<: *tools
+      groups:
+        - segas_athens_authentic_marathon
+      vars:
+        CLIENT_NAME: segas-athens-authentic-marathon
+    publishing:
+      app_store_connect:
+        <<: *app_store_connect
+        # External testers: name this app's TestFlight groups and submit each
+        # build for beta review.
+        # submit_to_testflight: true
+        # beta_groups:
+        #   - SEGAS Testers

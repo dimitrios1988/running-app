@@ -27,6 +27,16 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Notification branding. Everything these entries point at is generated
+             per client by scripts/build-client.js (res/values/strings.xml and the
+             ic_stat_onesignal_default drawables), so this file is the same for
+             every client. OneSignal takes its accent colour from the string
+             resource first and from this meta-data second; the two Firebase
+             defaults cover a notification that FCM displays by itself. -->
+        <meta-data android:name="com.onesignal.NotificationAccentColor.DEFAULT" android:value="@string/onesignal_notification_accent_color" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_onesignal_default" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notification_accent" />
     </application>
 
     <!-- Permissions -->

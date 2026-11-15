@@ -1,0 +1,8 @@
+{
+  "api": {
+    "appName": "mobile_app_manager"
+  },
+  "features": {
+    "myRace": true
+  }
+}

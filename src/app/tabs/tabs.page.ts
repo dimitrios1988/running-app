@@ -16,6 +16,7 @@ import {
   personOutline,
 } from 'ionicons/icons';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FeatureFlagsService } from '../client/feature-flags.service';
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -24,6 +25,9 @@ import { TranslatePipe } from '@ngx-translate/core';
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
+
+  /** The "My Registration" tab is optional per client (feature flag `myRace`). */
+  public readonly myRaceEnabled = inject(FeatureFlagsService).isEnabled('myRace');
 
   constructor() {
     addIcons({

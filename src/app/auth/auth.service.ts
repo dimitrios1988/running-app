@@ -62,7 +62,7 @@ export class AuthService {
 
   loginRunner(bib: number, email: string): Observable<LoginRunnerResponse[]> {
     const url = new URL(
-      `/api/mobile_app_manager/login_runner/v1`,
+      `/api/${AUTH_CREDENTIALS.app_name}/login_runner/v1`,
       AUTH_CREDENTIALS.app_url,
     ).toString();
     return this.http
