@@ -43,14 +43,16 @@ export class OneSignalService {
         // payload would silently fetch NaN. Fall back to the list instead.
         const notificationId = Number(deeplink);
         if (Number.isFinite(notificationId)) {
-          this.router.navigate([`/tabs/notifications/viewer/${notificationId}`]);
+          this.router.navigate([
+            `/tabs/notifications/viewer/${notificationId}`,
+          ]);
         } else {
           console.warn(
-            `OneSignal deeplink "${deeplink}" is not a notification id; opening the list.`,
+            `OneSignal deeplink "${deeplink}" is not a notification id; opening the list.`
           );
           this.router.navigate(['/tabs/notifications']);
         }
-      },
+      }
     );
 
     effect(() => {

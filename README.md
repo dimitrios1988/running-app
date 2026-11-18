@@ -109,7 +109,7 @@ places; the next `client:build` simply replaces them.
    | `theme` | `primary` is required. Optional: `secondary`, `tertiary`, `success`, `warning`, `danger`, `medium`, `light`, `dark`, `accent`. Shade, tint and contrast colours are derived. `darkMode: { ... }` overrides colours for dark mode (otherwise the light value is reused). `notificationAccent` defaults to `primary`. `variables` / `darkMode.variables` set any other CSS custom property. |
    | `assets.iconBackgroundColor` | Background of the app icon: behind `icon.png` in the Android adaptive icon, or behind the logo when the icon is generated (default white). |
    | `assets.splashBackgroundColor`, `assets.splashBackgroundColorDark` | Background of a splash generated from the logo, and of the launch screen Android 12+ always show (default white; dark mode keeps the light colour unless set). With a supplied `splash.png`, set them to its background. |
-   | `assets.iconLogoScale`, `assets.splashLogoScale` | Size of the logo on the generated icon / splash relative to the automatic size: `1.2` is 20% larger (0.25 to 2, default 1). |
+   | `assets.iconLogoScale`, `assets.splashLogoScale` | Size of the logo on the generated icon / splash relative to the automatic size: `1.2` is 20% larger (0.25 to 2, default 1). Making it larger stops where the logo would be cut off; see [Artwork](#artwork). |
    | `features` | Feature flags, see below. |
 
 3. Replace the images in `assets/` (see [Artwork](#artwork)): put the client's
@@ -155,6 +155,20 @@ The images actually used land in `.client/assets/` (`icon.png`, `splash.png`,
 `splash-dark.png`) for a look before building. The build stops when the logo is
 too small for them, and warns when it is very wide, when it has no transparent
 background, or when most of it is close to the colour behind it.
+
+**How far the scales go.** `assets.iconLogoScale` and `assets.splashLogoScale`
+can always shrink the logo, but they only enlarge it while it still fits:
+
+| Where | Limit | Typical largest scale |
+| --- | --- | --- |
+| App icon | The logo's outline stays inside the circle every Android launcher shows (one image serves iOS too). | 1.15 for a logo that fills its corners, up to 1.6 for a round one |
+| Splash (iOS, Android 8–11) | The logo stays inside the part of the image every device shows. | 1.3 to 1.5 for a wide wordmark, about 2.6 for a square logo |
+| Launch screen on Android 12+ | Android shows the logo inside a 192dp circle, whatever the scale. | about 1.1 to 1.6, depending on the logo's shape |
+
+The build log shows, for each image, how large the logo is drawn and the
+largest scale that fits that logo ("fits up to ..."); a larger value is reduced
+to it with a warning. When comparing sizes on a device, uninstall the app
+first: Android launchers and iOS keep showing cached icons and launch screens.
 
 **Android launch screens.** Android 12 and later ignore the splash image and
 always show their own launch screen: an icon centred on

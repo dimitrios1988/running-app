@@ -33,7 +33,7 @@ export class MyRaceService {
 
   private readonly assignBibTemplateApi = new URL(
     `/api/${AUTH_CREDENTIALS.app_name}/assign_bib_template/v1`,
-    AUTH_CREDENTIALS.app_url,
+    AUTH_CREDENTIALS.app_url
   ).toString();
 
   constructor() {
@@ -55,7 +55,7 @@ export class MyRaceService {
         this.authService.logoutRunner();
         this.router.navigate(['/tabs/login']);
         throw error;
-      }),
+      })
     );
   }
 
@@ -68,7 +68,7 @@ export class MyRaceService {
     const lpRunnerId = current?.lp_runner?.id;
     if (!current || lpRunnerId == null) {
       return throwError(
-        () => new Error('No registration to assign a bib template to'),
+        () => new Error('No registration to assign a bib template to')
       );
     }
 
@@ -83,20 +83,20 @@ export class MyRaceService {
         // AuthInterceptor completes without a value when it cannot recover a
         // 401. That is a failed save, not one still pending.
         throwIfEmpty(
-          () => new Error('assign_bib_template/v1 gave no response'),
+          () => new Error('assign_bib_template/v1 gave no response')
         ),
         map((response) => {
           // A 200 is only trusted when it names the record that was sent.
           if (Number(response?.['0']) !== lpRunnerId) {
             throw new Error(
-              'assign_bib_template/v1 did not confirm the assignment',
+              'assign_bib_template/v1 did not confirm the assignment'
             );
           }
         }),
         tap(() => {
           this.patchAssignedBibTemplate(templateId);
           this.refreshInBackground(uuid);
-        }),
+        })
       );
   }
 
@@ -104,11 +104,11 @@ export class MyRaceService {
    * on failure. */
   private fetchRunnerInfo(
     uuid: string,
-    forceRefresh: boolean,
+    forceRefresh: boolean
   ): Observable<IRunner> {
     const runnerInfoApi = new URL(
       `/api/${AUTH_CREDENTIALS.app_name}/get_runner_info/v1`,
-      AUTH_CREDENTIALS.app_url,
+      AUTH_CREDENTIALS.app_url
     ).toString();
     return this.http
       .get<RunnerInfoResponse[]>(runnerInfoApi, {
@@ -172,7 +172,7 @@ export class MyRaceService {
         }),
         tap((runner: IRunner) => {
           this._runner.set(runner);
-        }),
+        })
       );
   }
 
@@ -183,7 +183,7 @@ export class MyRaceService {
             ...runner,
             lp_runner: { ...runner.lp_runner, assignedBibTemplate: templateId },
           }
-        : runner,
+        : runner
     );
   }
 

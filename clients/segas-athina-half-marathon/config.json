@@ -1,13 +1,13 @@
 {
-  "appName": "Athina Half Marathon",
-  "appId": "gr.weallrun.athinahalfmarathon",
+  "appName": "Athens Half Marathon",
+  "appId": "gr.weallrun.athenshalfmarathon",
   "version": "1.0.0",
   "buildNumber": 1,
   "api": {
-    "baseUrl": "https://liveprint.weallrun.gr/"
+    "baseUrl": "https://athinahalfmarathon.weallrun.gr/"
   },
   "oneSignal": {
-    "appId": "1eaf2e13-1c7d-43f6-9c62-4cdd2fc9f80f"
+    "appId": "9e0f1310-b86f-4cf8-a7cb-a3496c13755c"
   },
   "theme": {
     "primary": "#c2410c",
@@ -23,7 +23,9 @@
   "assets": {
     "splashBackgroundColor": "#ed7f00",
     "splashBackgroundColorDark": "#ed7f00",
-    "iconBackgroundColor": "#ed7f00"
+    "iconBackgroundColor": "#ed7f00",
+    "iconLogoScale": 2,
+    "splashLogoScale": 2
   },
   "features": {
     "myRace": true

@@ -45,7 +45,7 @@ export class AuthService {
         });
         this.token = response.token;
         return response;
-      }),
+      })
     );
   }
 
@@ -63,13 +63,13 @@ export class AuthService {
   loginRunner(bib: number, email: string): Observable<LoginRunnerResponse[]> {
     const url = new URL(
       `/api/${AUTH_CREDENTIALS.app_name}/login_runner/v1`,
-      AUTH_CREDENTIALS.app_url,
+      AUTH_CREDENTIALS.app_url
     ).toString();
     return this.http
       .get<LoginRunnerResponse[]>(url, {
         params: {
           bib: bib,
-          email,
+          email: email.toLowerCase().trim(),
         },
       })
       .pipe(
@@ -87,7 +87,7 @@ export class AuthService {
           });
           this.userPayload_.set(userPayload);
           return response;
-        }),
+        })
       );
   }
 

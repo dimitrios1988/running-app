@@ -16,7 +16,7 @@ const ASSETS_STATE_FILE = path.join(STATE_DIR, 'assets-state.json');
  * Part of the fingerprint that --skip-assets checks. Bump it whenever the way
  * images are derived changes, so output of an older script is not reused.
  */
-const PIPELINE_VERSION = 2;
+const PIPELINE_VERSION = 3;
 
 const MIN_ICON = 1024;
 const MIN_SPLASH = 2732;
@@ -156,6 +156,29 @@ async function readLogo(sharp, file) {
   }
   const corner = [data[0], data[1], data[2]].slice(0, Math.max(1, channels - 1));
 
+  // How far the visible pixels reach from the centre of the bounding box, as a
+  // share of its half-diagonal: 1 when the logo fills the corners of its box
+  // (always, without transparency), down to about 0.7 for a round logo. The
+  // round masks of the icon and of Android's launch screen only need this real
+  // outline to fit, not the whole box.
+  let reach = 1;
+  if (transparent) {
+    const centreX = (left + right + 1) / 2;
+    const centreY = (top + bottom + 1) / 2;
+    let farthest = 0;
+    for (let y = top; y <= bottom; y += 1) {
+      for (let x = left; x <= right; x += 1) {
+        if (data[(y * width + x) * channels + alphaAt] > EMPTY_ALPHA) {
+          // Measured to the pixel's outer corner, so the whole pixel fits.
+          const dx = Math.abs(x + 0.5 - centreX) + 0.5;
+          const dy = Math.abs(y + 0.5 - centreY) + 0.5;
+          farthest = Math.max(farthest, dx * dx + dy * dy);
+        }
+      }
+    }
+    reach = Math.min(1, Math.sqrt(farthest) / Math.hypot((right - left + 1) / 2, (bottom - top + 1) / 2));
+  }
+
   let buffer;
   if (transparent) {
     buffer = await sharp(file)
@@ -177,6 +200,7 @@ async function readLogo(sharp, file) {
     width: meta.width,
     height: meta.height,
     aspect: meta.width / meta.height,
+    reach,
     transparent,
     // Grey images have one colour channel; spread it to three.
     corner: corner.length === 1 ? [corner[0], corner[0], corner[0]] : corner,
@@ -217,38 +241,72 @@ async function blendShare(sharp, logo, hex) {
 }
 
 /**
- * Where the logo goes on a generated app icon: centred, sized so that its
- * bounding box fits in the circle no launcher mask cuts into.
+ * The logo centred on a square that a round mask cuts: at the automatic size
+ * (scale 1) its bounding box has a diagonal of `diagonal` (a share of the
+ * square's edge); larger scales are allowed while its visible outline stays
+ * inside the circle of `safeDiagonal`. `maxScale` is that limit for this logo.
  */
-function iconLayout(logo, scale) {
-  const wanted = ICON_LOGO_DIAGONAL * scale;
-  const diagonal = Math.min(wanted, ICON_SAFE_DIAGONAL);
-  const height = (diagonal / Math.hypot(logo.aspect, 1)) * ICON_SIZE;
+function circleLayout(logo, scale, { size, diagonal, safeDiagonal }) {
+  // 1% to spare: resizing smears the outermost pixels by a pixel or so.
+  const maxScale = (safeDiagonal * 0.99) / logo.reach / diagonal;
+  const used = Math.min(scale, maxScale);
+  const height = ((diagonal * used) / Math.hypot(logo.aspect, 1)) * size;
   return {
-    size: ICON_SIZE,
+    size,
     width: Math.max(1, Math.round(height * logo.aspect)),
     height: Math.max(1, Math.round(height)),
-    limitedTo: wanted > ICON_SAFE_DIAGONAL ? ICON_SAFE_DIAGONAL / ICON_LOGO_DIAGONAL : null,
+    maxScale,
+    limited: scale > maxScale,
   };
 }
 
 /**
+ * Where the logo goes on a generated app icon: centred, never reaching outside
+ * the circle no launcher mask cuts into.
+ */
+function iconLayout(logo, scale) {
+  return circleLayout(logo, scale, {
+    size: ICON_SIZE,
+    diagonal: ICON_LOGO_DIAGONAL,
+    safeDiagonal: ICON_SAFE_DIAGONAL,
+  });
+}
+
+/**
+ * Where the logo goes on the icon of the Android 12+ launch screen. Android
+ * draws that icon at 288dp and shows only the centred circle of 192dp.
+ */
+function android12Layout(logo, scale) {
+  const layout = circleLayout(logo, scale, {
+    size: ANDROID12_ICON_SIZE,
+    diagonal: ANDROID12_LOGO_DIAGONAL,
+    safeDiagonal: ANDROID12_SAFE_DIAGONAL,
+  });
+  return { ...layout, dp: Math.round((Math.max(layout.width, layout.height) / ANDROID12_ICON_SIZE) * 288) };
+}
+
+/**
  * Where the logo goes on a generated splash screen: centred, inside the part
- * of the image that every phone and tablet shows.
+ * of the image that every phone and tablet shows. The square splash is cropped
+ * to the screen, so here the bounding box itself has to fit.
  */
 function splashLayout(logo, scale) {
   const side = SPLASH_SAFE_SIDE * SPLASH_SIZE;
   let width = Math.sqrt(SPLASH_LOGO_AREA * logo.aspect) * side;
   let height = width / logo.aspect;
   const fit = Math.min(1, (SPLASH_LOGO_MAX_WIDTH * side) / width, (SPLASH_LOGO_MAX_HEIGHT * side) / height);
-  width *= fit * scale;
-  height *= fit * scale;
-  const limit = Math.min(1, (SPLASH_LOGO_LIMIT * side) / width, (SPLASH_LOGO_LIMIT * side) / height);
+  width *= fit;
+  height *= fit;
+  const maxScale = Math.min((SPLASH_LOGO_LIMIT * side) / width, (SPLASH_LOGO_LIMIT * side) / height);
+  const used = Math.min(scale, maxScale);
   return {
     size: SPLASH_SIZE,
-    width: Math.max(1, Math.round(width * limit)),
-    height: Math.max(1, Math.round(height * limit)),
-    limitedTo: limit < 1 ? scale * limit : null,
+    width: Math.max(1, Math.round(width * used)),
+    height: Math.max(1, Math.round(height * used)),
+    maxScale,
+    limited: scale > maxScale,
+    // The safe square is about as wide as a phone held upright.
+    phoneShare: (width * used) / side,
   };
 }
 
@@ -319,18 +377,11 @@ async function writeAndroidSplash(sharp, config, plan) {
     }
     const iconDir = path.join(android.RES_DIR, night ? 'drawable-night-nodpi' : 'drawable-nodpi');
     fs.mkdirSync(iconDir, { recursive: true });
-    const wanted = ANDROID12_LOGO_DIAGONAL * config.assets.splashLogoScale;
-    const diagonal = Math.min(wanted, ANDROID12_SAFE_DIAGONAL);
-    const height = (diagonal / Math.hypot(image.logo.aspect, 1)) * ANDROID12_ICON_SIZE;
     fs.writeFileSync(
       path.join(iconDir, android.SPLASH_ICON),
       await compose(sharp, {
         logo: image.logo,
-        layout: {
-          size: ANDROID12_ICON_SIZE,
-          width: Math.max(1, Math.round(height * image.logo.aspect)),
-          height: Math.max(1, Math.round(height)),
-        },
+        layout: image.android12,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
         transparent: true,
       }),
@@ -376,12 +427,25 @@ async function writeAndroidSplash(sharp, config, plan) {
   }
 }
 
-function describe(image) {
+/**
+ * Log lines for one image: where it comes from and, when generated, how large
+ * the logo is drawn and how far its scale setting can go for this logo.
+ */
+function describe(image, kind, config) {
   if (image.file) {
-    return rel(image.file);
+    return [rel(image.file)];
   }
   const { logo, layout, background } = image;
-  return `generated from ${rel(logo.file)}: logo ${layout.width}x${layout.height} px centred on ${background}`;
+  const percent = (share) => `${Math.round(share * 100)}%`;
+  const range = (setting, max) => `assets.${setting} ${config.assets[setting]}, fits up to ${max.toFixed(2)}`;
+  if (kind === 'icon') {
+    const share = Math.max(layout.width, layout.height) / layout.size;
+    return [`${rel(logo.file)} on ${background}: logo spans ${percent(share)} of the icon (${range('iconLogoScale', layout.maxScale)})`];
+  }
+  return [
+    `${rel(logo.file)} on ${background}: logo ${percent(layout.phoneShare)} of a phone's width (${range('splashLogoScale', layout.maxScale)})`,
+    `on Android 12+: logo ${image.android12.dp}dp wide in Android's 192dp circle (fits up to ${image.android12.maxScale.toFixed(2)})`,
+  ];
 }
 
 /**
@@ -425,9 +489,9 @@ async function inspect(config) {
       what: 'the app icon',
       fix: 'choose another assets.iconBackgroundColor, or supply icon.png',
     });
-    if (layout.limitedTo) {
+    if (layout.limited) {
       warnings.push(
-        `assets.iconLogoScale ${options.iconLogoScale} would let the logo reach outside the circle that every launcher shows; it is drawn at the largest safe size instead (${layout.limitedTo.toFixed(2)}).`,
+        `assets.iconLogoScale ${options.iconLogoScale} would let ${rel(logo.file)} reach outside the circle that every launcher shows; it is drawn at the largest size that fits instead (${layout.maxScale.toFixed(2)} for this logo).`,
       );
     }
     if (logo.aspect > ICON_WIDE_LOGO || logo.aspect < 1 / ICON_WIDE_LOGO) {
@@ -448,7 +512,13 @@ async function inspect(config) {
     }
   }
   const generatedSplash = (source, background, use) => {
-    const image = { logo: source, layout: splashLayout(source, options.splashLogoScale), background };
+    const image = {
+      logo: source,
+      layout: splashLayout(source, options.splashLogoScale),
+      // The same logo on the launch screen Android 12+ draw themselves.
+      android12: android12Layout(source, options.splashLogoScale),
+      background,
+    };
     drawn.push({ image, what: 'the splash screen', ...use });
     return image;
   };
@@ -474,24 +544,33 @@ async function inspect(config) {
       });
     }
   }
-  for (const image of [splash, splashDark]) {
-    if (image.layout && image.layout.limitedTo) {
-      warnings.push(
-        `assets.splashLogoScale ${options.splashLogoScale} would push ${rel(image.logo.file)} beyond the part of the splash screen that every device shows; it is drawn at the largest size that fits instead (${image.layout.limitedTo.toFixed(2)}).`,
-      );
-      break;
-    }
+  const generatedSplashes = [splash, splashDark].filter((image) => !image.file);
+  const splashLimit = generatedSplashes.find((image) => image.layout.limited);
+  if (splashLimit) {
+    warnings.push(
+      `assets.splashLogoScale ${options.splashLogoScale} would push ${rel(splashLimit.logo.file)} beyond the part of the splash screen that every device shows; it is drawn at the largest size that fits instead (${splashLimit.layout.maxScale.toFixed(2)} for this logo).`,
+    );
+  }
+  const android12Limit = generatedSplashes.find((image) => image.android12.limited);
+  if (android12Limit) {
+    warnings.push(
+      `On Android 12 and later, whose launch screen shows the logo inside a 192dp circle, assets.splashLogoScale ${options.splashLogoScale} does not fit; there ${rel(android12Limit.logo.file)} is drawn at the largest size that does (${android12Limit.android12.maxScale.toFixed(2)} for this logo).`,
+    );
   }
 
   // --- logo resolution and background --------------------------------------------
   for (const source of [...new Set(drawn.map(({ image }) => image.logo))]) {
     const uses = drawn.filter(({ image }) => image.logo === source);
-    const needed = Math.max(...uses.map(({ image }) => image.layout.width));
-    const factor = Math.max(...uses.map(({ image }) => image.layout.width / source.width));
-    if (factor > 1) {
-      const list = uses.map(({ image, what }) => `${what} draws it ${image.layout.width} px wide`);
+    // Every size the logo is drawn at, the Android 12+ launch screen included.
+    const sizes = uses.flatMap(({ image, what }) => [
+      { what, width: image.layout.width },
+      ...(image.android12 ? [{ what: 'the Android 12+ launch screen', width: image.android12.width }] : []),
+    ]);
+    const needed = Math.max(...sizes.map(({ width }) => width));
+    if (needed > source.width) {
+      const list = [...new Set(sizes.map(({ what, width }) => `${what} draws it ${width} px wide`))];
       errors.push(
-        `${rel(source.file)} is too small: it is ${source.width}x${source.height} px without its transparent border, and ${[...new Set(list)].join(' and ')}. Export it at least ${needed} px wide (or lower assets.iconLogoScale / assets.splashLogoScale).`,
+        `${rel(source.file)} is too small: it is ${source.width}x${source.height} px without its transparent border, and ${list.join(', ').replace(/, ([^,]*)$/, ' and $1')}. Export it at least ${needed} px wide (or lower assets.iconLogoScale / assets.splashLogoScale).`,
       );
     }
     for (const background of new Set(uses.map(({ image }) => image.background))) {
@@ -686,9 +765,13 @@ async function generate(config, platforms, plan) {
     ios.cleanAssets();
   }
   const iconFile = await stage(sharp, plan);
-  log.info(`app icon       ${describe(plan.icon)}`);
-  log.info(`splash         ${describe(plan.splash)}`);
-  log.info(`splash (dark)  ${describe(plan.splashDark)}`);
+  for (const [label, image, kind] of [
+    ['app icon', plan.icon, 'icon'],
+    ['splash', plan.splash, 'splash'],
+    ['splash (dark)', plan.splashDark, 'splash'],
+  ]) {
+    describe(image, kind, config).forEach((line, index) => log.info(`${(index ? '' : label).padEnd(15)}${line}`));
+  }
   if (![plan.icon, plan.splash, plan.splashDark].every((image) => image.file)) {
     log.info(`the generated images are in ${rel(STAGING_DIR)}/ for a closer look`);
   }
@@ -758,4 +841,5 @@ module.exports = {
   // Exposed for checking the layout rules in isolation.
   iconLayout,
   splashLayout,
+  android12Layout,
 };
