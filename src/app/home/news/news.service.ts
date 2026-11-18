@@ -43,11 +43,11 @@ export class NewsService {
 
   getNewsItems(
     language: string,
-    forceRefresh = false,
+    forceRefresh = false
   ): Observable<INewsListItem[]> {
     const newsItemsApi = new URL(
       `/api/${AUTH_CREDENTIALS.app_name}/news_items/v1`,
-      AUTH_CREDENTIALS.app_url,
+      AUTH_CREDENTIALS.app_url
     ).toString();
     return this.http
       .get<NewsListResponse[]>(newsItemsApi, {
@@ -69,7 +69,7 @@ export class NewsService {
                     }?attribute_id=9ec4d1de-8886-4eb4-b501-6128916a3124&file_id=${
                       item['0(post)'].header_image[0].id
                     }&version=0&token=${this.authService.getToken()}`,
-                    AUTH_CREDENTIALS.app_url,
+                    AUTH_CREDENTIALS.app_url
                   ).toString()
                 : null,
             publishedDate: new Date(item['0(post)'].published_at * 1000),
@@ -80,22 +80,22 @@ export class NewsService {
         }),
         catchError((error) => {
           const errorMessage = this.translateService.instant(
-            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS',
+            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS'
           );
           this.toastService.showError(errorMessage);
           return throwError(() => error);
-        }),
+        })
       );
   }
 
   getNews(
     id: number,
     language: string,
-    forceRefresh = false,
+    forceRefresh = false
   ): Observable<INews> {
     const newsItemApi = new URL(
       `/api/${AUTH_CREDENTIALS.app_name}/news_item/v1/${id}`,
-      AUTH_CREDENTIALS.app_url,
+      AUTH_CREDENTIALS.app_url
     ).toString();
     return this.http
       .get<NewsItemResponse[]>(newsItemApi, {
@@ -105,6 +105,23 @@ export class NewsService {
       .pipe(
         map((response: NewsItemResponse[]) => {
           const item = response[0]['0(post)'];
+          const doc = new DOMParser().parseFromString(
+            item.content ?? '',
+            'text/html'
+          );
+
+          doc.querySelectorAll('img[src]').forEach((img) => {
+            let src = img.getAttribute('src')!;
+
+            src = src.replaceAll('__token__', `${this.authService.getToken()}`);
+
+            // "/path/img.png" -> add host; skip protocol-relative "//cdn..."
+            if (src.startsWith('/') && !src.startsWith('//')) {
+              src = AUTH_CREDENTIALS.app_url + src;
+            }
+            img.setAttribute('src', src);
+          });
+          item.content = doc.body.innerHTML;
           return {
             id: item.id,
             title: item.title,
@@ -118,7 +135,7 @@ export class NewsService {
                     }?attribute_id=9ec4d1de-8886-4eb4-b501-6128916a3124&file_id=${
                       item.header_image[0].id
                     }&version=0&token=${this.authService.getToken()}`,
-                    AUTH_CREDENTIALS.app_url,
+                    AUTH_CREDENTIALS.app_url
                   ).toString()
                 : null,
           };
@@ -128,11 +145,11 @@ export class NewsService {
         }),
         catchError((error) => {
           const errorMessage = this.translateService.instant(
-            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS',
+            'NEWS_LIST.ERRORS.FAILED_TO_LOAD_NEWS'
           );
           this.toastService.showError(errorMessage);
           return throwError(() => error);
-        }),
+        })
       );
   }
 }
