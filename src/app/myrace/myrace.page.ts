@@ -107,7 +107,12 @@ export class MyracePage implements OnDestroy {
   // Only runners who collect their own printed bib have a QR to show.
   readonly canFlip = computed(() => {
     const lp = this.runnerInfo()?.lp_runner;
-    return !!lp?.isPrintable && !lp.receivesAsAGroup && lp.runnerQrData;
+    return (
+      !lp?.isPrinted &&
+      !!lp?.isPrintable &&
+      !lp.receivesAsAGroup &&
+      lp.runnerQrData
+    );
   });
 
   // The design can only change while there is still a bib to print with it:
