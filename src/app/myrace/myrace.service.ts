@@ -30,6 +30,7 @@ export class MyRaceService {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private backgroundRefreshSub: Subscription = Subscription.EMPTY;
+  private runnerInfoSub: Subscription = Subscription.EMPTY;
 
   private readonly assignBibTemplateApi = new URL(
     `/api/${AUTH_CREDENTIALS.app_name}/assign_bib_template/v1`,
@@ -37,14 +38,18 @@ export class MyRaceService {
   ).toString();
 
   constructor() {
+    // Read no signal here but userPayload. Each signed-in run fetches the
+    // runner, so depending on _runner would re-fetch every time one lands.
     effect(() => {
       const payload = this.authService.userPayload();
       if (!payload) {
-        // A re-read still in flight must not put a signed-out runner back.
+        // Reads still in flight must not put a signed-out runner back.
+        this.runnerInfoSub.unsubscribe();
         this.backgroundRefreshSub.unsubscribe();
         this._runner.set(null);
       } else {
-        this.getRunnerInfo(payload.uuid).subscribe();
+        // Signed in: a login, or a saved session restored at app start.
+        this.runnerInfoSub = this.getRunnerInfo(payload.uuid).subscribe();
       }
     });
   }

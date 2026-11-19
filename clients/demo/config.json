@@ -4,7 +4,7 @@
   "version": "1.0",
   "buildNumber": 1,
   "api": {
-    "baseUrl": "https://liveprint.weallrun.gr/"
+    "baseUrl": "https://liveprint.zefksisconsulting.gr/"
   },
   "oneSignal": {
     "appId": "1eaf2e13-1c7d-43f6-9c62-4cdd2fc9f80f"

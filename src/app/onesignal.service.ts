@@ -1,4 +1,4 @@
-import { effect, inject, Injectable } from '@angular/core';
+import { computed, effect, inject, Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import OneSignal, { NotificationClickEvent } from '@onesignal/capacitor-plugin';
 import { AlertController } from '@ionic/angular/standalone';
@@ -7,6 +7,7 @@ import { ONESIGNAL } from './secrets';
 import { SettingsService } from './settings/settings.service';
 import { Router } from '@angular/router';
 import { AuthService } from './auth/auth.service';
+import { MyRaceService } from './myrace/myrace.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,7 @@ export class OneSignalService {
   private router = inject(Router);
   private alertController = inject(AlertController);
   private translateService = inject(TranslateService);
+  private readonly myRaceService = inject(MyRaceService);
 
   private readonly isNative = Capacitor.isNativePlatform();
 
@@ -88,7 +90,25 @@ export class OneSignalService {
         this.setSubscriberLanguage(selectedLanguage);
       }
     });
+
+    effect(() => {
+      const tags = this.runnerTags();
+      console.log('OneSignal tags:', tags);
+      if (tags) {
+        OneSignal.User.addTags(tags).catch((error) =>
+          console.error('OneSignal addTags failed:', error)
+        );
+      }
+    });
   }
+
+  private readonly runnerTags = computed(
+    () => {
+      const runner = this.myRaceService.runner$();
+      return runner ? { event: String(runner.event.id) } : null;
+    },
+    { equal: (a, b) => JSON.stringify(a) === JSON.stringify(b) }
+  );
 
   /**
    * Shows a one-time in-app opt-in prompt on the very first launch.

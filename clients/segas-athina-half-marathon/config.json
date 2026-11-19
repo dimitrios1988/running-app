@@ -2,7 +2,7 @@
   "appName": "Athens Half Marathon",
   "appId": "gr.weallrun.athenshalfmarathon",
   "version": "1.0.0",
-  "buildNumber": 1,
+  "buildNumber": 2,
   "api": {
     "baseUrl": "https://athinahalfmarathon.weallrun.gr/"
   },
