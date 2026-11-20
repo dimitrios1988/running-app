@@ -144,6 +144,11 @@
     "QR_ERROR": "Couldn't load the QR code.",
     "GROUP_RECEIVES": "Your bib will be collected by your team representative.",
     "NOT_PRINTABLE": "This bib is not printable. Please contact the race organizers",
+    "ERRORS": {
+      "LOAD_FAILED": "Couldn't load your registration",
+      "LOAD_FAILED_HINT": "Check your internet connection and try again. You're still signed in.",
+      "REFRESH_FAILED": "Couldn't refresh. Showing your last saved registration."
+    },
     "BIB_APPEARANCE": {
       "MODIFY": "Modify Bib Appearance",
       "TITLE": "Bib Appearance",

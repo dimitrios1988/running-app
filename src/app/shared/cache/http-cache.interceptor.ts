@@ -107,8 +107,8 @@ export class HttpCacheInterceptor implements HttpInterceptor {
             // re-run each service's map() and rebuild every model object.
             filter((response) => !sameBody(response.body, entry.body)),
             // A failed revalidation is not an error the app should see: it
-            // already has content on screen. This is what keeps the error toast
-            // (and MyRaceService's force-logout) quiet when offline.
+            // already has content on screen. This is what keeps the error
+            // toasts quiet when offline.
             catchError(() => EMPTY),
           ),
         );

@@ -96,7 +96,7 @@
 
 
 /* loading, loaded and error all occupy this identical square: no layout shift.
-   The qzone=4 quiet zone is baked into the returned SVG, so no inner padding,
+   The 4-module quiet zone is part of the generated SVG, so no inner padding,
    and the panel stays exactly #fff so there is no seam with the image. */
 .bib-qr-slot {
   display: grid;

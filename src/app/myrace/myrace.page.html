@@ -209,6 +209,19 @@
       }
     </ion-list>
   </div>
+  } @else if (loadFailed()) {
+  <!-- no card to fall back on: neither the HTTP cache nor the saved card had
+       one. The runner is still signed in; this is never a reason to log out -->
+  <div class="app-empty">
+    <ion-icon name="cloud-offline-outline" aria-hidden="true"></ion-icon>
+    <p class="app-empty-title">{{ "MY_RACE.ERRORS.LOAD_FAILED" | translate }}</p>
+    <p class="app-empty-text">
+      {{ "MY_RACE.ERRORS.LOAD_FAILED_HINT" | translate }}
+    </p>
+    <ion-button fill="outline" (click)="retry()">
+      {{ "COMMON.RETRY" | translate }}
+    </ion-button>
+  </div>
   } @else {
   <div class="app-skeleton app-skeleton-card" aria-hidden="true"></div>
   }

@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
@@ -6,11 +6,12 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { EMPTY } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
+import { AuthService, RUNNER_CARD_PREF_KEY } from '../auth/auth.service';
 import { UserPayload } from '../auth/responses/user-payload';
 import { AUTH_CREDENTIALS } from '../secrets';
-import { MyRaceService } from './myrace.service';
+import { MyRaceService, RunnerNotFoundError } from './myrace.service';
 import { RunnerInfoResponse } from './runner.info.resp';
 
 const UUID = '879d0b94-9ea8-4985-9309-9af5020e3fe0';
@@ -40,8 +41,9 @@ function runnerInfo(assignedTemplate = 3): RunnerInfoResponse {
       nationality: null,
       last_name: 'Papa',
       age_group: null,
+      registration_level: null,
     },
-    '1(event)': { name_en: 'Road Race', name_gr: null, id: 7 },
+    '1(event)': { name_en: 'Road Race', name_gr: null, id: 7, lp_event_id: null },
     '2(category)': { name_gr: null, name_en: '5K' },
     '3(runner)': {
       id: RECORD_ID,
@@ -59,15 +61,25 @@ describe('MyRaceService', () => {
   let service: MyRaceService;
   let httpMock: HttpTestingController;
   let logoutRunner: jasmine.Spy;
+  let navigate: jasmine.Spy;
   let signedInUuid: string | null;
+  /** Drives the service's sign-in effect. */
+  let payload: WritableSignal<UserPayload | null>;
   /** Makes a POST complete without a value, as AuthInterceptor does when it
    * cannot recover from a 401. */
   let swallowPost: boolean;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Clears a card saved by an earlier test. Awaiting it also loads the
+    // plugin's web implementation (localStorage) up front, so later calls run
+    // in the order they are made.
+    await Preferences.remove({ key: RUNNER_CARD_PREF_KEY });
+
     signedInUuid = UUID;
     swallowPost = false;
+    payload = signal<UserPayload | null>(null);
     logoutRunner = jasmine.createSpy('logoutRunner').and.resolveTo();
+    navigate = jasmine.createSpy('navigate').and.resolveTo(true);
 
     TestBed.configureTestingModule({
       providers: [
@@ -81,15 +93,12 @@ describe('MyRaceService', () => {
         {
           provide: AuthService,
           useValue: {
-            userPayload: signal<UserPayload | null>(null).asReadonly(),
+            userPayload: payload.asReadonly(),
             getRunnerUUID: () => signedInUuid,
             logoutRunner,
           },
         },
-        {
-          provide: Router,
-          useValue: { navigate: jasmine.createSpy('navigate').and.resolveTo(true) },
-        },
+        { provide: Router, useValue: { navigate } },
       ],
     });
     service = TestBed.inject(MyRaceService);
@@ -99,12 +108,33 @@ describe('MyRaceService', () => {
     TestBed.tick();
   });
 
-  afterEach(() => httpMock.verify());
+  afterEach(async () => {
+    httpMock.verify();
+    await Preferences.remove({ key: RUNNER_CARD_PREF_KEY });
+  });
 
   function seed(body: RunnerInfoResponse = runnerInfo()): void {
     service.getRunnerInfo(UUID).subscribe({ error: () => undefined });
     httpMock.expectOne((r) => r.url === RUNNER_INFO_API).flush([body]);
   }
+
+  /** Lets Preferences' promises resolve. */
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const offline = { status: 0, statusText: '' };
+  const expectRunnerInfo = () =>
+    httpMock.expectOne((r) => r.url === RUNNER_INFO_API);
+  const savedCard = async () =>
+    (await Preferences.get({ key: RUNNER_CARD_PREF_KEY })).value;
+  const saveCard = (body: RunnerInfoResponse) =>
+    Preferences.set({
+      key: RUNNER_CARD_PREF_KEY,
+      value: JSON.stringify([body]),
+    });
+  /** What the effect does when a session starts or is restored at launch. */
+  const signIn = () => {
+    payload.set({ uuid: UUID });
+    TestBed.tick();
+  };
 
   const assigned = () => service.runner$()?.lp_runner?.assignedBibTemplate;
   const expectAssign = () =>
@@ -138,6 +168,104 @@ describe('MyRaceService', () => {
           registrationLevel: { bibTemplateSelectionAllowed: false },
         }),
       );
+    });
+  });
+
+  describe('when a load fails', () => {
+    it('keeps the runner signed in when offline, and passes the error on', () => {
+      let failed = false;
+      service.getRunnerInfo(UUID).subscribe({ error: () => (failed = true) });
+      expectRunnerInfo().error(new ProgressEvent('error'), offline);
+
+      expect(failed).toBeTrue();
+      expect(logoutRunner).not.toHaveBeenCalled();
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
+    it('keeps the runner signed in on a server error', () => {
+      service.getRunnerInfo(UUID).subscribe({ error: () => undefined });
+      expectRunnerInfo().flush('down', {
+        status: 500,
+        statusText: 'Server Error',
+      });
+
+      expect(logoutRunner).not.toHaveBeenCalled();
+    });
+
+    it('keeps the runner signed in when the body is not a list, as from a captive portal', () => {
+      service.getRunnerInfo(UUID).subscribe({ error: () => undefined });
+      expectRunnerInfo().flush('<html>Sign in to the Wi-Fi</html>');
+
+      expect(logoutRunner).not.toHaveBeenCalled();
+    });
+
+    it('keeps the card on screen when a refresh fails', () => {
+      seed();
+      service.getRunnerInfo(UUID, true).subscribe({ error: () => undefined });
+      expectRunnerInfo().error(new ProgressEvent('error'), offline);
+
+      expect(service.runner$()?.runner.bib).toBe('1234');
+      expect(logoutRunner).not.toHaveBeenCalled();
+    });
+
+    it('signs the runner out when the server has no registration for them', () => {
+      let error: unknown;
+      service.getRunnerInfo(UUID).subscribe({ error: (e) => (error = e) });
+      expectRunnerInfo().flush([]);
+
+      expect(error).toBeInstanceOf(RunnerNotFoundError);
+      expect(logoutRunner).toHaveBeenCalled();
+      expect(navigate).toHaveBeenCalledWith(['/tabs/login']);
+    });
+
+    it('does not store a card that lands after the runner signed out', async () => {
+      service.getRunnerInfo(UUID).subscribe({ error: () => undefined });
+      signedInUuid = null;
+      expectRunnerInfo().flush([runnerInfo()]);
+      await settle();
+
+      expect(service.runner$()).toBeNull();
+      expect(await savedCard()).toBeNull();
+    });
+  });
+
+  describe('saved card', () => {
+    it('saves the raw body of a successful read', async () => {
+      seed();
+
+      expect(JSON.parse((await savedCard()) ?? 'null')).toEqual([runnerInfo()]);
+    });
+
+    it('restores the saved card at sign-in when the network fails', async () => {
+      await saveCard(runnerInfo());
+      signIn();
+      expectRunnerInfo().error(new ProgressEvent('error'), offline);
+      await settle();
+
+      expect(service.runner$()?.runner.bib).toBe('1234');
+      expect(logoutRunner).not.toHaveBeenCalled();
+    });
+
+    it('ignores a saved card that belongs to another runner', async () => {
+      const body = runnerInfo();
+      await saveCard({
+        ...body,
+        '0(runner)': { ...body['0(runner)'], uuid: 'someone-else' },
+      });
+      signIn();
+      expectRunnerInfo().error(new ProgressEvent('error'), offline);
+      await settle();
+
+      expect(service.runner$()).toBeNull();
+    });
+
+    it('never replaces a card that has already landed', async () => {
+      await saveCard(runnerInfo(1));
+      signIn();
+      expectRunnerInfo().flush([runnerInfo(2)]);
+      await settle();
+
+      expect(assigned()).toBe(2);
     });
   });
 

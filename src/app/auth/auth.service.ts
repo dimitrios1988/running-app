@@ -9,6 +9,13 @@ import { LoginRunnerResponse } from './responses/login-runner.resp';
 import { UserPayload } from './responses/user-payload';
 import { CacheStorageService } from '../shared/cache/cache-storage.service';
 
+/**
+ * Preferences key for the runner's last `get_runner_info` body, which keeps
+ * their card on screen offline. It belongs to the session, not to the cache:
+ * Settings → Clear cache leaves it alone, signing out removes it.
+ */
+export const RUNNER_CARD_PREF_KEY = 'runner_info';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -74,8 +81,9 @@ export class AuthService {
       })
       .pipe(
         map((response) => {
-          // Whoever was signed in before, their runner-scoped responses must
-          // not be replayed to this one. Shared CMS content and images survive.
+          // Whoever was signed in before, their runner-scoped responses and
+          // saved card must not be shown to this one. Shared CMS content and
+          // images survive.
           void this.dropRunnerScopedCache();
           // Store tokens
           const userPayload = {
@@ -107,9 +115,13 @@ export class AuthService {
     await this.dropRunnerScopedCache();
   }
 
-  /** Drops the runner's cached responses - their race card and notifications -
-   * while leaving shared CMS content and images in place. */
-  private dropRunnerScopedCache(): Promise<void> {
-    return this.cache.removeWhere((entry) => entry.scope === 'user');
+  /** Drops what the device holds for the runner - their cached race card and
+   * notifications, and the saved card that keeps My Registration usable
+   * offline - while leaving shared CMS content and images in place. */
+  private async dropRunnerScopedCache(): Promise<void> {
+    await Promise.all([
+      Preferences.remove({ key: RUNNER_CARD_PREF_KEY }),
+      this.cache.removeWhere((entry) => entry.scope === 'user'),
+    ]);
   }
 }

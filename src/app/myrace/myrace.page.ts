@@ -5,6 +5,7 @@ import {
   inject,
   OnDestroy,
   ElementRef,
+  signal,
   viewChild,
 } from '@angular/core';
 import { finalize, Subscription } from 'rxjs';
@@ -30,6 +31,7 @@ import {
 import { addIcons } from 'ionicons';
 import {
   chevronDownCircleOutline,
+  cloudOfflineOutline,
   exitOutline,
   personCircleOutline,
   qrCodeOutline,
@@ -39,16 +41,14 @@ import {
 } from 'ionicons/icons';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
-import { MyRaceService } from './myrace.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MyRaceService, RunnerNotFoundError } from './myrace.service';
 import { SettingsService } from '../settings/settings.service';
+import { ToastService } from '../shared/services/toast.service';
 import { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
 import { ScreenBrightness } from '@capacitor-community/screen-brightness';
 import { Capacitor } from '@capacitor/core';
-
-// Vector output: deliberately no `size` param - the SVG scales to its CSS box.
-const QR_ENDPOINT = 'https://api.qrserver.com/v1/create-qr-code/';
-const QR_PARAMS = '&ecc=H&bgcolor=fff&qzone=4&format=svg';
+import { qrSvgDataUrl } from './qr-svg';
 
 @Component({
   selector: 'app-myrace',
@@ -81,8 +81,14 @@ export class MyracePage implements OnDestroy {
   private myRaceService = inject(MyRaceService);
   private router = inject(Router);
   private modalController = inject(ModalController);
+  private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
   private runnerSub: Subscription = Subscription.EMPTY;
   private pickerOpening = false;
+
+  /** The last load failed. Only shown when there is no card at all - with one
+   * on screen, the runner keeps seeing it. */
+  readonly loadFailed = signal(false);
 
   // Read the store signal straight through instead of copying it into a field.
   // The page instance survives tab switches (IonicRouteStrategy), so a copy
@@ -126,17 +132,15 @@ export class MyracePage implements OnDestroy {
     );
   });
 
-  // Memoised by construction: a refresh that returns the same payload yields an
-  // identical string, so [src] receives a stable value and the <img> is never
-  // asked to reload on an unrelated change. Never put a nonce or Date.now() in
-  // here - an unstable URL would re-request forever.
+  // Drawn on the device (qr-svg.ts), so the code shows at bib pickup with no
+  // signal. Memoised by construction: a refresh that returns the same payload
+  // yields an identical string, so [src] receives a stable value and the <img>
+  // is never asked to reload on an unrelated change. Never put a nonce or
+  // Date.now() in here - an unstable URL would reload forever.
   readonly qrUrl = computed<string | null>(() => {
     const data = this.runnerInfo()?.lp_runner?.runnerQrData ?? '';
-    // encodeURIComponent is required, not cosmetic: an unencoded '#' would
-    // truncate the query and the QR would silently encode a partial payload.
-    return data
-      ? `${QR_ENDPOINT}?data=${encodeURIComponent(data)}${QR_PARAMS}`
-      : null;
+    // null for a payload that cannot be encoded: the error face shows instead.
+    return data ? qrSvgDataUrl(data) : null;
   });
 
   // ---- QR flip state -------------------------------------------------------
@@ -155,6 +159,7 @@ export class MyracePage implements OnDestroy {
       exitOutline,
       personCircleOutline,
       chevronDownCircleOutline,
+      cloudOfflineOutline,
       qrCodeOutline,
       alertCircle,
       checkmarkCircle,
@@ -166,7 +171,7 @@ export class MyracePage implements OnDestroy {
     effect(() => {
       const url = this.qrUrl();
       this.qrLoading = url !== null;
-      this.qrError = url === null; // no payload -> render the error face
+      this.qrError = url === null; // nothing to draw -> render the error face
     });
   }
 
@@ -216,6 +221,10 @@ export class MyracePage implements OnDestroy {
     this.loadRunnerInfo(() => event.target.complete(), true);
   }
 
+  retry(): void {
+    this.loadRunnerInfo();
+  }
+
   async onCardTap(): Promise<void> {
     if (!this.canFlip()) return;
     this.qrFlipped = !this.qrFlipped;
@@ -240,8 +249,8 @@ export class MyracePage implements OnDestroy {
     event.stopPropagation();
     if (!this.qrUrl()) return;
     // Clearing qrError makes @if destroy and re-create the <img>, so the
-    // browser issues a fresh request. Re-assigning the same src string would
-    // not: Angular skips the DOM write when the bound value is unchanged.
+    // browser loads it afresh. Re-assigning the same src string would not:
+    // Angular skips the DOM write when the bound value is unchanged.
     this.qrError = false;
     this.qrLoading = true;
   }
@@ -266,11 +275,25 @@ export class MyracePage implements OnDestroy {
       return;
     }
 
+    this.loadFailed.set(false);
     this.runnerSub.unsubscribe();
     this.runnerSub = this.myRaceService
       .getRunnerInfo(uuid, forceRefresh)
       .pipe(finalize(() => onSettled?.()))
-      // MyRaceService already logs out and redirects on failure.
-      .subscribe({ error: () => undefined });
+      .subscribe({
+        error: (error: unknown) => {
+          // The server no longer knows this registration: MyRaceService has
+          // signed the runner out and is on its way to the login page.
+          if (error instanceof RunnerNotFoundError) return;
+          // Offline, a timeout or a server error: the runner stays signed in,
+          // and a card already on screen stays there.
+          this.loadFailed.set(true);
+          if (forceRefresh && this.runnerInfo()) {
+            void this.toastService.showWarning(
+              this.translateService.instant('MY_RACE.ERRORS.REFRESH_FAILED')
+            );
+          }
+        },
+      });
   }
 }
