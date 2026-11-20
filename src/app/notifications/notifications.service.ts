@@ -24,6 +24,7 @@ import { withHttpCache } from '../shared/cache/http-cache.context';
 export class NotificationsService {
   private readonly _notifications = signal<INotification[]>([]);
   private notificationSub$: Subscription = Subscription.EMPTY;
+  private backgroundRefreshSub: Subscription = Subscription.EMPTY;
   private readonly toastService = inject(ToastService);
   private readonly translateService = inject(TranslateService);
   private readonly notificationsApi = new URL(
@@ -51,6 +52,43 @@ export class NotificationsService {
     language: string,
     eventId?: number,
     forceRefresh = false,
+  ): Observable<INotification[]> {
+    return this.fetchNotifications(language, eventId, forceRefresh).pipe(
+      catchError((error) => {
+        const errorMessage = this.translateService.instant(
+          'NOTIFICATIONS.ERRORS.FAILED_TO_LOAD_NOTIFICATIONS',
+        );
+        this.toastService.showError(errorMessage);
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  /**
+   * Re-reads the list after a push is opened. HttpCacheInterceptor serves its
+   * copy for 30s without touching the network, so otherwise the list could
+   * come back without the notification just tapped. Silent on failure: the
+   * viewer the push opens reports its own error.
+   */
+  refreshInBackground(): void {
+    const language = this.settingsService.selectedLanguage$();
+    if (!language) {
+      return;
+    }
+    this.backgroundRefreshSub.unsubscribe();
+    this.backgroundRefreshSub = this.fetchNotifications(
+      language,
+      this.myRaceService.runner$()?.event.id,
+      true,
+    ).subscribe({ error: () => undefined });
+  }
+
+  /** The request, mapping and store update, without getNotifications' error
+   * toast. */
+  private fetchNotifications(
+    language: string,
+    eventId: number | undefined,
+    forceRefresh: boolean,
   ): Observable<INotification[]> {
     // `event` comes from the logged-in runner, so this list is runner-scoped
     // even though the endpoint looks like shared content.
@@ -85,13 +123,6 @@ export class NotificationsService {
           });
           this._notifications.set(notifications);
         });
-      }),
-      catchError((error) => {
-        const errorMessage = this.translateService.instant(
-          'NOTIFICATIONS.ERRORS.FAILED_TO_LOAD_NOTIFICATIONS',
-        );
-        this.toastService.showError(errorMessage);
-        return throwError(() => error);
       }),
     );
   }

@@ -1,4 +1,4 @@
-import { computed, effect, inject, Injectable } from '@angular/core';
+import { computed, effect, inject, Injectable, Injector } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import OneSignal, { NotificationClickEvent } from '@onesignal/capacitor-plugin';
 import { AlertController } from '@ionic/angular/standalone';
@@ -8,6 +8,7 @@ import { SettingsService } from './settings/settings.service';
 import { Router } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 import { MyRaceService } from './myrace/myrace.service';
+import { NotificationsService } from './notifications/notifications.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ import { MyRaceService } from './myrace/myrace.service';
 export class OneSignalService {
   private settingsService = inject(SettingsService);
   private authService = inject(AuthService);
+  private readonly injector = inject(Injector);
   private router = inject(Router);
   private alertController = inject(AlertController);
   private translateService = inject(TranslateService);
@@ -34,6 +36,11 @@ export class OneSignalService {
     OneSignal.Notifications.addEventListener(
       'click',
       (event: NotificationClickEvent) => {
+        // Looked up per tap rather than injected: AppComponent builds this
+        // service at startup, and building NotificationsService with it would
+        // start that service's fetch effect on every launch.
+        this.injector.get(NotificationsService).refreshInBackground();
+
         const additionalData = event.notification.additionalData as
           | { deeplink?: string }
           | undefined;
