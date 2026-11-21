@@ -12,10 +12,9 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep line numbers, so crash reports deobfuscated with the mapping file
+# (Play Console reads it from the app bundle) point at real lines.
+-keepattributes SourceFile,LineNumberTable
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ...and replace the original source file names in those stack traces.
+-renamesourcefileattribute SourceFile
